@@ -1,23 +1,25 @@
 <?php
-// Informations de connexion à la base de données
-$host = 'localhost'; // ou l'adresse de votre serveur de base de données
-$db   = 'first_blog';
-$user = 'first_blog';
-$pass = 'first_blog';
-$charset = 'utf8mb4';
 
-// DSN (Data Source Name) pour la connexion PDO
-$dsn = "mysql:host=$host;dbname=$db;charset=$charset";
-$options = [
-    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    PDO::ATTR_EMULATE_PREPARES   => false,
-];
+// Autoload dependencies installed via Composer
+require_once __DIR__ . '/../vendor/autoload.php';
 
-try {
-    $pdo = new PDO($dsn, $user, $pass, $options);
-    echo "Connexion à la base de données réussie.";
-} catch (PDOException $e) {
-    echo "Échec de la connexion à la base de données : " . $e->getMessage();
-}
-?>
+// Use statements to import necessary classes
+use App\core\Router;
+use App\core\HttpRequest;
+use App\Controllers\HomeController;
+
+// Initialize a new HTTP request instance
+$request = new HttpRequest();
+
+/**
+ * Create a new Router instance
+ */
+$router = new Router();
+
+// Include the routes definition file from the config directory
+require_once __DIR__ . '/../app/config/Routes.php';
+
+// Define the application routes
+defineRoutes($router);
+
+$router->handleRequest($request);
