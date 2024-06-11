@@ -21,7 +21,7 @@ class HttpRequest
     private $method;
 
     /**
-     * @var array|null The parameters of the current request
+     * @var string[]|null The parameters of the current request
      */
     private $param;
 
@@ -34,6 +34,28 @@ class HttpRequest
     {
         $this->url = $_SERVER['REQUEST_URI'];
         $this->method = $_SERVER['REQUEST_METHOD'];
+        $this->param = $this->initializeParams();
+    }
+
+     /**
+     * Initializes the parameters of the current request.
+     *
+     * @return array<string> The parameters of the current request
+     */
+    private function initializeParams()
+    {
+        switch ($this->method) {
+            case 'GET':
+                return $_GET;
+            case 'POST':
+                return $_POST;
+            case 'PUT':
+            case 'DELETE':
+                parse_str(file_get_contents('php://input'), $params);
+                return $params;
+            default:
+                return [];
+        }
     }
 
     /**
@@ -59,7 +81,7 @@ class HttpRequest
     /**
      * Gets the parameters of the current request.
      *
-     * @return array|null The parameters of the current request, or null if none are set
+     * @return string[]|null The parameters of the current request, or null if none are set
      */
     public function getParams()
     {

@@ -11,7 +11,7 @@ use App\Controllers\HomeController;
  *
  * @param Router $router The router instance to add routes to
  */
-function defineRoutes(Router $router)
+function defineRoutes(Router $router): void
 {
     // Define the route for the home page
     $router->addRoute('GET', '/', [HomeController::class, 'index']);

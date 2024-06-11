@@ -12,7 +12,7 @@ namespace App\core;
 class Router
 {
     /**
-     * @var array $routes Array of registered routes
+     * @var array<array{method: string, path: string, callback: callable|array{string, string}}> $routes Array of registered routes
      */
     private $routes = [];
 
@@ -21,10 +21,11 @@ class Router
      *
      * @param string $method HTTP method (e.g., 'GET', 'POST')
      * @param string $path The route path, with optional dynamic segments (e.g., '/user/{id}')
-     * @param callable|array $callback The callback to be executed when the route is matched. This can be
+     * @param callable|array{string, string} $callback The callback to be executed when the route is matched. This can be
      *                                 a function or an array with a class and method (e.g., [HomeController::class, 'index'])
+     * @return void
      */
-    public function addRoute($method, $path, $callback)
+    public function addRoute($method, $path, $callback): void
     {
         $path = preg_replace('/{[a-zA-Z0-9_]+}/', '([^/]+)', $path);
         $this->routes[] = [
@@ -38,8 +39,10 @@ class Router
      * Handles an incoming request and dispatches it to the appropriate route callback.
      *
      * @param HttpRequest $request The current HTTP request instance
+     * 
+     * @return void
      */
-    public function handleRequest($request)
+    public function handleRequest($request): void
     {
         // Iterate over each registered route
         foreach ($this->routes as $route) {
@@ -55,10 +58,14 @@ class Router
                     // Get the method name
                     $method = $route['callback'][1];
                     // Call the method on the controller with the captured URL parameters
-                    call_user_func_array([$controller, $method], $matches);
+                    $response = call_user_func_array([$controller, $method], $matches);
                 } else {
                     // Call the callback function with the captured URL parameters
-                    call_user_func_array($route['callback'], $matches);
+                    $response = call_user_func_array($route['callback'], $matches);
+                }
+                // Check if the response is a string and output it
+                if (is_string($response)) {
+                    echo $response;
                 }
                 // Stop processing further routes once a match is found
                 return;

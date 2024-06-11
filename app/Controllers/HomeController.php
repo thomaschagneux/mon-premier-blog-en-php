@@ -2,20 +2,25 @@
 
 namespace App\Controllers;
 
-class HomeController
+use App\Services\Mailer;
+
+class HomeController extends AbstractController
 {
-    public function index()
+    public function index(): string
     {
-        include __DIR__ . '/../Views/index.php';
+        return $this->twig->render('index.html.twig', [
+            'title' => 'Home Page',
+            'content' => 'This is the content of the home page.',
+        ]);
     }
 
-    public function about($id)
+    public function about(int $id): string
     {
-        echo 'This is the about page of ' . $id;
+        return 'This is the about page of ' . $id;
     }
 
-    public function contact()
+    public function contact(): string
     {
-        echo 'This is the contact page.';
+        return 'contact';
     }
 }

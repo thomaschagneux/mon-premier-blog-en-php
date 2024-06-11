@@ -12,10 +12,11 @@ help:
 	@echo "Usage: make [target]"
 	@echo
 	@echo "Targets:"
-	@echo "  install    Install project dependencies"
-	@echo "  start      Start the PHP development server"
-	@echo "  clean      Clean up generated files"
-	@echo "  help       Display this help message"
+	@echo "	install		Install project dependencies"
+	@echo "	start		Start the PHP development server"
+	@echo "	clean		Clean up generated files"
+	@echo "	help		Display this help message"
+	@echo "	test		Use phpStan code analyse"
 
 # Install project dependencies
 install:
@@ -29,3 +30,5 @@ start:
 clean:
 	rm -rf vendor
 	rm -rf composer.lock
+test:
+	vendor/bin/phpstan analyse
