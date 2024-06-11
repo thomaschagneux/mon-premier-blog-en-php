@@ -2,6 +2,8 @@
 
 namespace App\Controllers;
 
+use App\Services\Mailer;
+
 class HomeController extends AbstractController
 {
     public function index(): string
@@ -19,7 +21,6 @@ class HomeController extends AbstractController
 
     public function contact(): string
     {
-       
         return 'contact';
     }
 }
