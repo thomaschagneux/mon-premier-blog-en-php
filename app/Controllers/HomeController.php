@@ -2,8 +2,6 @@
 
 namespace App\Controllers;
 
-
-
 class HomeController extends AbstractController
 {
     public function index(): string
@@ -21,9 +19,7 @@ class HomeController extends AbstractController
 
     public function contact(): string
     {
-        echo "<pre>";
-	print_r($_SERVER);
-	echo "</pre>";
-	exit;
+       
+        return 'contact';
     }
 }
