@@ -6,7 +6,6 @@ require_once __DIR__ . '/../vendor/autoload.php';
 // Use statements to import necessary classes
 use App\core\Router;
 use App\core\HttpRequest;
-use App\Controllers\HomeController;
 
 // Initialize a new HTTP request instance
 $request = new HttpRequest();
