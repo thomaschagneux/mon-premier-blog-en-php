@@ -42,7 +42,7 @@ class Router
      * 
      * @return void
      */
-    public function handleRequest($request): void
+    public function handleRequest(HttpRequest $request): void
     {
         // Iterate over each registered route
         foreach ($this->routes as $route) {

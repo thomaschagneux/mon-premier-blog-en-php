@@ -21,7 +21,7 @@ class HttpRequest
     private $method;
 
     /**
-     * @var string[]|null The parameters of the current request
+     * @var array<int|string, array<mixed>|string> The parameters of the current request
      */
     private $param;
 
@@ -40,7 +40,7 @@ class HttpRequest
      /**
      * Initializes the parameters of the current request.
      *
-     * @return array<string> The parameters of the current request
+     * @return array<int|string, array<mixed>|string> The parameters of the current request
      */
     private function initializeParams()
     {
@@ -51,7 +51,11 @@ class HttpRequest
                 return $_POST;
             case 'PUT':
             case 'DELETE':
-                parse_str(file_get_contents('php://input'), $params);
+                $input = file_get_contents('php://input');
+                if ($input === false) {
+                    return [];
+                }
+                parse_str($input, $params);
                 return $params;
             default:
                 return [];
@@ -81,7 +85,7 @@ class HttpRequest
     /**
      * Gets the parameters of the current request.
      *
-     * @return string[]|null The parameters of the current request, or null if none are set
+     * @return array<int|string, array<mixed>|string> The parameters of the current request, or null if none are set
      */
     public function getParams()
     {
