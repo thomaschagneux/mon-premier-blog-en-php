@@ -1,6 +1,6 @@
 # phpstan.neon
 parameters:
-    level: 6
+    level: max
     paths:
         - app
     bootstrapFiles:
