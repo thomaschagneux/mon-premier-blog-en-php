@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Twig\UrlExtension;
 use Respect\Validation\Validator as v;
 use Respect\Validation\Validatable;
 use Twig\Environment;
@@ -20,9 +21,13 @@ abstract class AbstractController
      *
      * Initializes the Twig environment.
      */
-    public function __construct()
+    public function __construct($router)
     {
-        $loader = new FilesystemLoader(__DIR__ . '/../Views');
+        $loader = new FilesystemLoader(
+            [__DIR__ . '/../Views',
+            __DIR__ . '/../Views/components',
+            __DIR__ . '/../Views/components/base',]
+        );
         $this->twig = new Environment($loader, [
             'debug' => true, // Enable debug mode
         ]);

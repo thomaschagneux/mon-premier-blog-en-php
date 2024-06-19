@@ -63,7 +63,7 @@ class Router
                     }
 
                     // Instantiate the controller
-                    $controller = new $controllerName();
+                    $controller = new $controllerName($this);
 
 
                     /** @var callable $callable */
