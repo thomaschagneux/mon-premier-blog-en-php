@@ -21,7 +21,7 @@ abstract class AbstractController
      *
      * Initializes the Twig environment.
      */
-    public function __construct($router)
+    public function __construct()
     {
         $loader = new FilesystemLoader(
             [__DIR__ . '/../Views',
