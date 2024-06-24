@@ -2,6 +2,8 @@
 
 namespace App\Controllers;
 
+use App\core\RedirectResponse;
+use App\core\Router;
 use App\Twig\UrlExtension;
 use Respect\Validation\Validator as v;
 use Respect\Validation\Validatable;
@@ -11,27 +13,32 @@ use Twig\Extension\DebugExtension;
 
 abstract class AbstractController
 {
-    /**
-     * @var Environment
-     */
-    protected $twig;
+    protected Environment $twig;
+
+    protected Router $router;
 
     /**
      * AbstractController constructor.
      *
      * Initializes the Twig environment.
      */
-    public function __construct()
+    public function __construct(Router $router)
     {
         $loader = new FilesystemLoader(
             [__DIR__ . '/../Views',
             __DIR__ . '/../Views/components',
             __DIR__ . '/../Views/components/base',]
         );
+
         $this->twig = new Environment($loader, [
             'debug' => true, // Enable debug mode
         ]);
+
+        $this->router = $router;
+
         $this->twig->addExtension(new DebugExtension()); // Add DebugExtension
+
+        $this->twig->addExtension(new UrlExtension($router)); // Add UrlExtension
     }
 
     /**
@@ -80,5 +87,16 @@ abstract class AbstractController
         } else {
             return "Validation failed!";
         }
+    }
+
+    /**
+     * Get a redirection to the named route with optional parameters
+     * 
+     * @param array<int|string, array<mixed>|string> $params 
+     */
+    protected function redirectToRoute(string $routeName, array $params = []): RedirectResponse
+    {
+        $url = $this->router->getRouteUrl($routeName, $params);
+        return new RedirectResponse($url);
     }
 }
