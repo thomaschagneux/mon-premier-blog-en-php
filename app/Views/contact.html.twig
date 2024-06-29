@@ -1,0 +1,11 @@
+{% extends "components/base/base.html.twig" %}
+
+{% block body %}
+	{% for user in users %}
+		<pre>
+        {{ dump(user) }}
+    </pre>
+	{% endfor %}
+	
+
+{% endblock %}
