@@ -17,13 +17,28 @@ class RedirectResponse
     private string $url;
 
     /**
+     * @var HttpHeaders The HTTP headers handler.
+     */
+    private HttpHeaders $headers;
+
+    /**
+     * @var HttpResponse The HTTP response handler.
+     */
+    private HttpResponse $response;
+
+    /**
      * RedirectResponse constructor.
      *
      * @param string $url The URL to which the client will be redirected.
+     * @param HttpHeaders $headers The HTTP headers handler.
+     * @param HttpResponse $response The HTTP response handler.
+     * 
      */
-    public function __construct(string $url)
+    public function __construct(string $url, HttpHeaders $headers, HttpResponse $response)
     {
         $this->url = $url;
+        $this->headers = $headers;
+        $this->response = $response;
     }
 
     /**
@@ -37,8 +52,8 @@ class RedirectResponse
      */
     public function send(): void
     {
-        header('Location: ' . $this->url);
-        exit;
+        $this->headers->sendHeader('Location: ' . $this->url);
+        $this->response->terminate();
     }
     
     /**

@@ -2,6 +2,8 @@
 
 namespace App\Controllers;
 
+use App\core\HttpHeaders;
+use App\core\HttpResponse;
 use App\core\RedirectResponse;
 use App\core\Router;
 use App\Twig\UrlExtension;
@@ -17,6 +19,10 @@ abstract class AbstractController
 
     protected Router $router;
 
+    protected HttpHeaders $headers;
+
+    protected HttpResponse $response;
+
     /**
      * AbstractController constructor.
      *
@@ -24,6 +30,12 @@ abstract class AbstractController
      */
     public function __construct(Router $router)
     {
+        $this->router = $router;
+
+        $this->headers = new HttpHeaders();
+
+        $this->response = new HttpResponse();
+
         $loader = new FilesystemLoader(
             [__DIR__ . '/../Views',
             __DIR__ . '/../Views/components',
@@ -33,8 +45,6 @@ abstract class AbstractController
         $this->twig = new Environment($loader, [
             'debug' => true, // Enable debug mode
         ]);
-
-        $this->router = $router;
 
         $this->twig->addExtension(new DebugExtension()); // Add DebugExtension
 
@@ -97,6 +107,6 @@ abstract class AbstractController
     protected function redirectToRoute(string $routeName, array $params = []): RedirectResponse
     {
         $url = $this->router->getRouteUrl($routeName, $params);
-        return new RedirectResponse($url);
+        return new RedirectResponse($url, $this->headers, $this->response);
     }
 }
