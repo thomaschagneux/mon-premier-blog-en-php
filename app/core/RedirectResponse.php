@@ -2,6 +2,8 @@
 
 namespace App\core;
 
+use Exception;
+
 /**
  * Class RedirectResponse
  *
@@ -32,11 +34,12 @@ class RedirectResponse
      * @param string $url The URL to which the client will be redirected.
      * @param HttpHeaders $headers The HTTP headers handler.
      * @param HttpResponse $response The HTTP response handler.
+     * @throws Exception if the URL is not valid
      * 
      */
     public function __construct(string $url, HttpHeaders $headers, HttpResponse $response)
     {
-        $this->url = $url;
+        $this->url = $this->sanitizeUrl($url);
         $this->headers = $headers;
         $this->response = $response;
     }
@@ -64,5 +67,23 @@ class RedirectResponse
     public function getUrl(): string
     {
         return $this->url;
+    }
+
+    /**
+     * Sanitizes the URL.
+     *
+     * @param string $url The URL to sanitize.
+     * @return string The sanitized URL.
+     * @throws Exception if the URL is not valid
+     */
+    private function sanitizeUrl(string $url): string
+    {
+        $sanitizeUrl = filter_var($url, FILTER_SANITIZE_URL);
+
+        if($sanitizeUrl === false || empty($sanitizeUrl)) {
+            throw new Exception("Invalid URL");
+        }
+
+        return $sanitizeUrl;
     }
 }
