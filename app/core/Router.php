@@ -127,7 +127,7 @@ class Router
         $route = $this->namedRoutes[$name]['path'];
 
         // Replace dynamic segments in the path with the provided parameters
-        foreach ($params as $key => $value) {
+        foreach ($params as $value) {
             $route = preg_replace('/\(\[\^\/\]\+\)/', $value, $route, 1);
              // Check if preg_replace returned null, indicating an error
             if ($route === null) {
