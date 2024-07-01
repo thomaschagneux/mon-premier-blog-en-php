@@ -16,6 +16,6 @@ class HttpResponse
      */
     public function terminate(): void
     {
-        exit;
+        throw new SystemExit("Script termination requested.");
     }
 }

@@ -120,7 +120,7 @@ class Router
     {
         // Check if the named route exists
         if (!isset($this->namedRoutes[$name])) {
-            throw new \RuntimeException("Route '$name' does not exist");
+            throw new \RuntimeException("Route does not exist");
         }
 
         // Retrieve the path for the named route
@@ -131,7 +131,7 @@ class Router
             $route = preg_replace('/\(\[\^\/\]\+\)/', $value, $route, 1);
              // Check if preg_replace returned null, indicating an error
             if ($route === null) {
-                throw new \RuntimeException("Error processing route regex for parameter $key");
+                throw new \RuntimeException("Error processing route");
             }
         }
         // Remove start (^) and end ($) anchors from the route pattern
