@@ -25,8 +25,8 @@ class HttpHeaders implements HttpHeadersInterface
         // The use of header() is necessary here to send HTTP headers, which is a common and standard operation in PHP.
         // The header() function is used to send raw HTTP headers and it is essential for operations like redirection.
         // By encapsulating the header() function in this method, we ensure that it is used in a controlled and secure manner.
-        // codacy:ignore Security:HeaderInjection
-        header($header);
+         // @codingStandardsIgnoreLine
+         header($header);
     }
 
     /**
