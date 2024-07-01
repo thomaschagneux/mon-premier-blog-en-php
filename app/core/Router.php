@@ -12,9 +12,18 @@ namespace App\core;
 class Router
 {
     /**
-     * @var array<array{method: string, path: string, callback: callable|array{class-string, string}}> $routes Array of registered routes
+     * @var array<array{method: string, path: string, callback: callable|array{class-string, string}}> $routes 
+     * 
+     * Array of registered routes
      */
-    private $routes = [];
+    private array $routes = [];
+    
+    /** 
+     * @var array<string, array{method: string, path: string, callback: callable|array{class-string, string}}> $namedRoutes
+     * 
+     * Array of named routes for easier URL generation.
+     */
+    private array $namedRoutes = [];
 
     /**
      * Adds a route to the routing table.
@@ -25,16 +34,22 @@ class Router
      *                                 a function or an array with a class and method (e.g., [HomeController::class, 'index'])
      * @return void
      */
-    public function addRoute(string $method, string $path, $callback): void
+    public function addRoute(string $method, string $path, $callback, string $name): void
     {
         // Convert dynamic segments in the path to regular expression patterns
         $path = preg_replace('/{[a-zA-Z0-9_]+}/', '([^/]+)', $path);
         // Add the route to the routing table
-        $this->routes[] = [
+        $route = [
             'method' => $method,
             'path' => '#^' . $path . '$#',
             'callback' => $callback
         ];
+
+        if ($name) {
+            $this->namedRoutes[$name] = $route;
+        }
+
+        $this->routes[] = $route;
     }
 
     /**
@@ -75,7 +90,12 @@ class Router
                     $response = call_user_func_array($route['callback'], $matches);
                 }
 
-                if (is_string($response)) {
+                 // Check if the response is an instance of RedirectResponse
+                if ($response instanceof RedirectResponse) {
+                    // Send the redirection response to the client
+                    $response->send();
+
+                } elseif (is_string($response)) {
                     // If the response is a string, output it
                     echo $response;
                 }
@@ -86,5 +106,41 @@ class Router
         // If no route was matched, return a 404 response
         http_response_code(404);
         include __DIR__ . '/../Views/404.php';
+    }
+
+    /**
+     * Generates a URL for a named route with the given parameters.
+     * 
+     * @param string $name The name of the route
+     * @param array<int|string, array<mixed>|string> $params
+     * @return string The generated URL
+     * @throws \RuntimeException If the named route does not exist or if there is an error in processing the route regex
+     */
+    public function getRouteUrl(string $name, array $params = []): string
+    {
+        // Check if the named route exists
+        if (!isset($this->namedRoutes[$name])) {
+            throw new \RuntimeException("Route does not exist");
+        }
+
+        // Retrieve the path for the named route
+        $route = $this->namedRoutes[$name]['path'];
+
+        // Replace dynamic segments in the path with the provided parameters
+        foreach ($params as $value) {
+            $route = preg_replace('/\(\[\^\/\]\+\)/', $value, $route, 1);
+             // Check if preg_replace returned null, indicating an error
+            if ($route === null) {
+                throw new \RuntimeException("Error processing route");
+            }
+        }
+        // Remove start (^) and end ($) anchors from the route pattern
+        $finalRoute = preg_replace('/#\^|\$#/', '', $route);
+        // Check if preg_replace returned null, indicating an error
+        if ($finalRoute === null) {
+            throw new \RuntimeException("Error processing final route regex");
+        }
+        // Return the generated URL
+        return $finalRoute;
     }
 }

@@ -1,8 +1,7 @@
 <?php
 
 namespace App\Controllers;
-
-use App\Services\Mailer;
+use App\core\RedirectResponse;
 
 class HomeController extends AbstractController
 {
@@ -19,8 +18,8 @@ class HomeController extends AbstractController
         return 'This is the about page of ' . $id;
     }
 
-    public function contact(): string
+    public function contact(): RedirectResponse
     {
-        return 'contact';
+        return $this->redirectToRoute('about', ['id' => '1']);
     }
 }
