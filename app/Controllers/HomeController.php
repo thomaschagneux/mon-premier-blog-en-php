@@ -2,7 +2,7 @@
 
 namespace App\Controllers;
 
-use App\Services\Mailer;
+use App\Models\User;
 
 class HomeController extends AbstractController
 {
@@ -21,6 +21,12 @@ class HomeController extends AbstractController
 
     public function contact(): string
     {
-        return 'contact';
+        $userModel = new User;
+       $users = $userModel->getAllUsers();
+       
+       return $this->twig->render('contact.html.twig', [
+        'users' => $users
+       ]);
+            
     }
 }

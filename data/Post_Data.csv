@@ -1,0 +1,4 @@
+id,title,lede,content,user_id,created_at,updated_at
+1,Premier Post,Ceci est le premier post.,Contenu détaillé du premier post en français.,1,2023-06-28 10:00:00,
+2,Deuxième Post,Ceci est le deuxième post.,Contenu détaillé du deuxième post en français.,2,2023-06-28 10:00:00,
+3,Troisième Post,Ceci est le troisième post.,Contenu détaillé du troisième post en français.,3,2023-06-28 10:00:00,

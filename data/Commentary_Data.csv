@@ -1,0 +1,4 @@
+id,content,post_id,user_id,created_at,updated_at
+1,Ceci est un commentaire sur le premier post.,1,1,2023-06-28 10:00:00,
+2,Ceci est un autre commentaire.,2,2,2023-06-28 10:00:00,
+3,Un commentaire supplémentaire pour le troisième post.,3,3,2023-06-28 10:00:00,

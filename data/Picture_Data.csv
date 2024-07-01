@@ -1,0 +1,4 @@
+id,file_name,path_name,mimeType,created_at,updated_at
+1,photo1.jpg,/images/photo1.jpg,image/jpeg,2023-06-28 10:00:00,
+2,photo2.jpg,/images/photo2.jpg,image/jpeg,2023-06-28 10:00:00,
+3,photo3.png,/images/photo3.png,image/png,2023-06-28 10:00:00,
