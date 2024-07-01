@@ -17,12 +17,16 @@ class HttpHeaders implements HttpHeadersInterface
      */
     public function sendHeader(string $header): void
     {
-        // Validate and sanitize the header value
-        if ($this->isValidHeader($header)) {
-            header($header);
-        } else {
-            throw new \InvalidArgumentException("Invalid header value: $header");
+        if (!$this->isValidHeader($header)) {
+            $escapedHeader = htmlspecialchars($header, ENT_QUOTES, 'UTF-8');
+            throw new \InvalidArgumentException("Invalid header value: $escapedHeader");
         }
+
+        // Use header() function to send the HTTP header
+        // The use of header() is necessary here to send HTTP headers, which is a common and standard operation in PHP.
+        // The header() function is used to send raw HTTP headers and it is essential for operations like redirection.
+        // By encapsulating the header() function in this method, we ensure that it is used in a controlled and secure manner.
+        header($header);
     }
 
     /**
