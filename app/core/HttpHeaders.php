@@ -18,8 +18,7 @@ class HttpHeaders implements HttpHeadersInterface
     public function sendHeader(string $header): void
     {
         if (!$this->isValidHeader($header)) {
-            $escapedHeader = htmlspecialchars($header, ENT_QUOTES, 'UTF-8');
-            throw new \InvalidArgumentException("Invalid header value: $escapedHeader");
+            throw new \InvalidArgumentException("Invalid header value: " . htmlspecialchars($header, ENT_QUOTES, 'UTF-8'));
         }
 
         // Use header() function to send the HTTP header
