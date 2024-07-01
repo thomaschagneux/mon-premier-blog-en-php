@@ -32,3 +32,15 @@ clean:
 	rm -rf composer.lock
 test:
 	vendor/bin/phpstan analyse
+
+insert_data:
+	$(PHP) scripts/insert_data.php
+create_db:
+	$(PHP) scripts/create_db.php
+create_tables:
+	$(PHP) scripts/create_tables.php
+drop_db:
+	$(PHP) scripts/drop_db.php
+
+reset: drop_db create_db create_tables insert_data
+	@echo "Database has been reset."

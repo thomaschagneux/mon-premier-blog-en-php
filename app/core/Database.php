@@ -89,4 +89,9 @@ class Database
 
         return $this->conn;
     }
+
+    public function getDbName(): string
+    {
+        return $this->db_name;
+    }
 }
