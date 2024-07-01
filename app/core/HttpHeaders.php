@@ -7,7 +7,7 @@ namespace App\core;
  *
  * This class encapsulates HTTP header operations.
  */
-class HttpHeaders
+class HttpHeaders implements HttpHeadersInterface
 {
     /**
      * Sends an HTTP header.

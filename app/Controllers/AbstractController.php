@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\core\HttpHeaders;
+use App\core\HttpHeadersInterface;
 use App\core\HttpResponse;
 use App\core\RedirectResponse;
 use App\core\Router;
@@ -19,7 +20,7 @@ abstract class AbstractController
 
     protected Router $router;
 
-    protected HttpHeaders $headers;
+    protected HttpHeadersInterface $headers;
 
     protected HttpResponse $response;
 

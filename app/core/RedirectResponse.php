@@ -19,9 +19,9 @@ class RedirectResponse
     private string $url;
 
     /**
-     * @var HttpHeaders The HTTP headers handler.
+     * @var HttpHeadersInterface The HTTP headers handler.
      */
-    private HttpHeaders $headers;
+    private HttpHeadersInterface $headers;
 
     /**
      * @var HttpResponse The HTTP response handler.
@@ -32,12 +32,12 @@ class RedirectResponse
      * RedirectResponse constructor.
      *
      * @param string $url The URL to which the client will be redirected.
-     * @param HttpHeaders $headers The HTTP headers handler.
+     * @param HttpHeadersInterface $headers The HTTP headers handler.
      * @param HttpResponse $response The HTTP response handler.
      * @throws Exception if the URL is not valid
      * 
      */
-    public function __construct(string $url, HttpHeaders $headers, HttpResponse $response)
+    public function __construct(string $url, HttpHeadersInterface $headers, HttpResponse $response)
     {
         $this->url = $this->sanitizeUrl($url);
         $this->headers = $headers;
