@@ -1,0 +1,5 @@
+# Ignore environment file
+.env
+
+# Ignore all files in the scripts directory
+scripts/*
