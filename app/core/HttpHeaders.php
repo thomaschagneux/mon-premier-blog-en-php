@@ -18,7 +18,7 @@ class HttpHeaders implements HttpHeadersInterface
     public function sendHeader(string $header): void
     {
         if (!$this->isValidHeader($header)) {
-            throw new \InvalidArgumentException("Invalid header value: " . htmlspecialchars($header, ENT_QUOTES, 'UTF-8'));
+            throw new \InvalidArgumentException("Invalid header value: ");
         }
 
         // Use header() function to send the HTTP header
@@ -38,6 +38,8 @@ class HttpHeaders implements HttpHeadersInterface
     {
         // Basic validation for the header value
         // patern: matches with a->z & A->Z & '/' & '-'
-        return preg_match('/^[a-zA-Z0-9\-\/\s:]+$/', $header) === 1;
+        return preg_match('/^[a-zA-Z0-9\-\/\s:]+$/', $header) === 1 
+        && strpos($header, "\n") === false 
+        && strpos($header, "\r") === false;
     }
 }
