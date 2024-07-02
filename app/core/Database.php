@@ -82,7 +82,7 @@ class Database
             $this->conn = new PDO("mysql:host=" . $this->host . ";dbname=" . $this->db_name, $this->username, $this->password);
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $exception) {
-            echo "Connection error \r\n";
+            throw new \Exception("Connexion error");
         }
 
         return $this->conn;
@@ -101,10 +101,9 @@ class Database
      */
     private function getEnvVar(string $key): string
     {
-        $value = $_ENV[$key] ?? false;
-        if ($value === false) {
+        if (!isset($_ENV[$key])) {
             throw new \Exception("Environment variable '$key' not found.");
         }
-        return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+        return htmlspecialchars($_ENV[$key], ENT_QUOTES, 'UTF-8');
     }
 }
