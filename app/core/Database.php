@@ -2,8 +2,6 @@
 
 namespace App\core;
 
-require_once __DIR__ . '/../../vendor/autoload.php';
-
 use Dotenv\Dotenv;
 use PDO;
 use PDOException;
@@ -51,10 +49,10 @@ class Database
         $dotenv = Dotenv::createImmutable(__DIR__ . '/../../');
         $dotenv->load();
 
-        $this->host = $_ENV['DB_HOST'];
-        $this->db_name = $_ENV['DB_NAME'];
-        $this->username = $_ENV['DB_USER'];
-        $this->password = $_ENV['DB_PASS'];
+        $this->host = isset($_ENV['DB_HOST']) ? $_ENV['DB_HOST'] : '';
+        $this->db_name = isset($_ENV['DB_NAME']) ? $_ENV['DB_NAME'] : '';
+        $this->username = isset($_ENV['DB_USER']) ? $_ENV['DB_USER'] : '';
+        $this->password = isset($_ENV['DB_PASS']) ? $_ENV['DB_PASS'] : '';
     }
 
     /**
@@ -84,7 +82,7 @@ class Database
             $this->conn = new PDO("mysql:host=" . $this->host . ";dbname=" . $this->db_name, $this->username, $this->password);
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $exception) {
-            echo "Connection error: " . $exception->getMessage() . '\r\n';
+            echo "Connection error \r\n";
         }
 
         return $this->conn;
