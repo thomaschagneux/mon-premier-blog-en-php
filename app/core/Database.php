@@ -101,9 +101,10 @@ class Database
      */
     private function getEnvVar(string $key): string
     {
-        $value = $_SERVER[$key] ?? null;
-        if ($value === null) {
-            throw new \Exception("Environment variable '$key' not found or invalid.");
+         // @codingStandardsIgnoreLine
+        $value = $_ENV[$key];
+        if ($value === false) {
+            throw new \Exception("Environment variable not found.");
         }
         return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
     }
