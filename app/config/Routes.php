@@ -14,11 +14,11 @@ use App\Controllers\HomeController;
 function defineRoutes(Router $router): void
 {
     // Define the route for the home page
-    $router->addRoute('GET', '/', [HomeController::class, 'index']);
+    $router->addRoute('GET', '/', [HomeController::class, 'index'], 'index');
 
     // Define the route for the about page with a dynamic {id} parameter
-    $router->addRoute('GET', '/about/{id}', [HomeController::class, 'about']);
+    $router->addRoute('GET', '/about/{id}', [HomeController::class, 'about'], 'about');
 
     // Define the route for the contact page
-    $router->addRoute('GET', '/contact', [HomeController::class, 'contact']);
+    $router->addRoute('GET', '/contact', [HomeController::class, 'contact'], 'contact');
 }
