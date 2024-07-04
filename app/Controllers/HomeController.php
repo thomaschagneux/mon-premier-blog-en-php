@@ -1,7 +1,9 @@
 <?php
 
 namespace App\Controllers;
-use App\core\RedirectResponse;
+
+use App\Models\User;
+
 
 class HomeController extends AbstractController
 {
@@ -18,8 +20,15 @@ class HomeController extends AbstractController
         return 'This is the about page of ' . $id;
     }
 
-    public function contact(): RedirectResponse
+    public function contact(): string
     {
-        return $this->redirectToRoute('about', ['id' => '1']);
+        $userModel = new User;
+       $users = $userModel->getAllUsers();
+       
+       return $this->twig->render('contact.html.twig', [
+        'users' => $users
+       ]);
+            
+
     }
 }
