@@ -50,6 +50,10 @@ abstract class AbstractController
         $this->twig->addExtension(new DebugExtension()); // Add DebugExtension
 
         $this->twig->addExtension(new UrlExtension($router)); // Add UrlExtension
+
+        if (session_status() == PHP_SESSION_NONE) {
+            session_start();
+        }
     }
 
     /**
@@ -109,5 +113,10 @@ abstract class AbstractController
     {
         $url = $this->router->getRouteUrl($routeName, $params);
         return new RedirectResponse($url, $this->headers, $this->response);
+    }
+
+    public function isAdmin(): bool
+    {
+        return isset($_SESSION['user']) && $_SESSION['user']['role'] === 'ROLE_ADMIN';
     }
 }

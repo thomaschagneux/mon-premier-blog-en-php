@@ -101,7 +101,7 @@ class Database
      */
     private function getEnvVar(string $key): string
     {
-         // @codingStandardsIgnoreLine
+        // @codingStandardsIgnoreLine
         $value = $_ENV[$key];
         if ($value === false) {
             throw new \Exception("Environment variable not found.");

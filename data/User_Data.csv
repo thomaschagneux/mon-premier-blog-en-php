@@ -1,4 +1,4 @@
 id,first_name,last_name,email,password,role,picture_id,created_at,updated_at
-1,Jean,Dupont,jean.dupont@example.com,$2y$10$yTfGfcBsmq8IOytxfgL3pueGtpY3B4hlvm5LGhXgA.cZT8P6lvhTe,ROLE_USER,1.0,2023-06-28 10:00:00,
-2,Marie,Curie,marie.curie@example.com,$2y$10$yTfGfcBsmq8IOytxfgL3pueGtpY3B4hlvm5LGhXgA.cZT8P6lvhTe,ROLE_ADMIN,2.0,2023-06-28 10:00:00,
-3,Pierre,Dupuis,pierre.dupuis@example.com,$2y$10$yTfGfcBsmq8IOytxfgL3pueGtpY3B4hlvm5LGhXgA.cZT8P6lvhTe,ROLE_USER,3.0,2023-06-28 10:00:00,
+1,Jean,Dupont,jean.dupont@example.com,$2y$10$.1g9nwRq4tfBs4z9c1/fReggRlHixX44wADuxAklqJJq7vt6/KD2a,ROLE_USER,1.0,2023-06-28 10:00:00,
+2,Marie,Curie,marie.curie@example.com,$2y$10$.1g9nwRq4tfBs4z9c1/fReggRlHixX44wADuxAklqJJq7vt6/KD2a,ROLE_ADMIN,2.0,2023-06-28 10:00:00,
+3,Pierre,Dupuis,pierre.dupuis@example.com,$2y$10$.1g9nwRq4tfBs4z9c1/fReggRlHixX44wADuxAklqJJq7vt6/KD2a,ROLE_USER,3.0,2023-06-28 10:00:00,

@@ -1,0 +1,25 @@
+{% extends "components/base/base.html.twig" %}
+
+{% block body %}
+{% if error is defined %}
+  <div class="text-danger">{{ error}}</div>
+{% endif %}
+<form method="POST" action={{path('login')}}>
+  <div class="mb-3">
+    <label for="loginEmail" class="form-label">Identifiant</label>
+    <input type="email" class="form-control" name="loginEmail" id="loginEmail" placeholder="jean.dupont@mail.fr">
+  </div>
+  <div class="mb-3">
+    <label for="loginPassword" class="form-label">Mot de passe:</label>
+    <input type="password" class="form-control" name="loginPassword" id="loginPassword"aria-describedby="passwordHelp">
+    <div id="passwordHelp" class="form-text">Entrez votre mot de passe à l'abri des regards indiscrets</div>
+
+  </div>
+  <div class="mb-3 form-check">
+    <input type="checkbox" class="form-check-input" id="Check1">
+    <label class="form-check-label" for="Check1">Check me out</label>
+  </div>
+  <button type="submit" class="btn btn-primary" >Submit</button>
+</form>
+
+{% endblock %}
