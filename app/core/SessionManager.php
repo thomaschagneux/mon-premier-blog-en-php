@@ -6,14 +6,14 @@ class SessionManager
 {
     public function startSession(): void
     {
-        if (session_status() == PHP_SESSION_NONE) {
+        if ($this->getSessionStatus() == PHP_SESSION_NONE) {
             session_start();
         }
     }
 
     public function isSessionStarted(): bool
     {
-        return session_status() === PHP_SESSION_ACTIVE;
+        return $this->getSessionStatus() === PHP_SESSION_ACTIVE;
     }
 
     public function destroySession(): void
@@ -31,7 +31,7 @@ class SessionManager
      */
     public function get(string $key)
     {
-        return $_SESSION[$key] ?? null;
+        return isset($_SESSION[$key]) ? $this->sanitize($_SESSION[$key]) : null;
     }
 
     /**
@@ -43,7 +43,7 @@ class SessionManager
      */
     public function set(string $key, $value): void
     {
-        $_SESSION[$key] = $value;
+        $_SESSION[$key] = $this->sanitize($value);
     }
 
     /**
@@ -66,5 +66,33 @@ class SessionManager
     public function has(string $key): bool
     {
         return isset($_SESSION[$key]);
+    }
+
+    /**
+     * Get the session status
+     *
+     * @return int
+     */
+    public function getSessionStatus(): int
+    {
+        return session_status();
+    }
+
+    /**
+     * Sanitize the data before storing or retrieving
+     *
+     * @param mixed $data
+     * @return mixed
+     */
+    private function sanitize($data)
+    {
+        if (is_array($data)) {
+            foreach ($data as $key => $value) {
+                $data[$key] = $this->sanitize($value);
+            }
+        } else {
+            $data = htmlspecialchars($data, ENT_QUOTES, 'UTF-8');
+        }
+        return $data;
     }
 }
