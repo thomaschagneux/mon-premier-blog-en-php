@@ -142,4 +142,5 @@ abstract class AbstractController
     {
         return htmlspecialchars($input, ENT_QUOTES, 'UTF-8');
     }
+
 }
