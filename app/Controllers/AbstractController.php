@@ -7,6 +7,7 @@ use App\core\HttpHeadersInterface;
 use App\core\HttpResponse;
 use App\core\RedirectResponse;
 use App\core\Router;
+use App\core\SessionManager;
 use App\Twig\UrlExtension;
 use Respect\Validation\Validator as v;
 use Respect\Validation\Validatable;
@@ -23,6 +24,8 @@ abstract class AbstractController
     protected HttpHeadersInterface $headers;
 
     protected HttpResponse $response;
+
+    protected SessionManager $session;
 
     /**
      * AbstractController constructor.
@@ -51,9 +54,8 @@ abstract class AbstractController
 
         $this->twig->addExtension(new UrlExtension($router)); // Add UrlExtension
 
-        if (session_status() == PHP_SESSION_NONE) {
-            session_start();
-        }
+        $this->session = new SessionManager();
+        $this->session->startSession();
     }
 
     /**
