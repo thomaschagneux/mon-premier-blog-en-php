@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\core\RedirectResponse;
+use App\core\SessionManager;
 use App\Models\User;
 
 class AuthController extends AbstractController
@@ -32,7 +33,7 @@ class AuthController extends AbstractController
             
             if ($user && password_verify($password, $user->getPassword())) {                
 
-                $_SESSION['user'] = [
+                SessionManager::put('user', [
                     'first_name' => $user->getFirstName(),
                     'last_name' => $user->getLastName(),
                     'email' => $user->getEmail(),
@@ -41,7 +42,7 @@ class AuthController extends AbstractController
                     'picture_id' => $user->getpictureId(),   
                     'created_at' => $user->getCreatedAt()->format('d/m/y'),
                     'updated_at' => $user->getUpdatedAt()->format('d/m/y'),                 
-                ];
+                ]);
 
            return $this->redirectToRoute('contact');
             } else {
