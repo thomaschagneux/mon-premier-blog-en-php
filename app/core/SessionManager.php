@@ -4,23 +4,16 @@ namespace App\core;
 
 class SessionManager
 {
-    public function startSession(): void
-    {
-        if ($this->getSessionStatus() == PHP_SESSION_NONE) {
-            session_start();
-        }
-    }
 
-    public function isSessionStarted(): bool
+    /**
+     * Put a value in the session
+     *
+     * @param string $key
+     * @param mixed $value
+     */
+    public static function put($key, $value): void
     {
-        return $this->getSessionStatus() === PHP_SESSION_ACTIVE;
-    }
-
-    public function destroySession(): void
-    {
-        if ($this->isSessionStarted()) {
-            session_destroy();
-        }
+        $_SESSION[$key] = self::sanitize($value);
     }
 
     /**
@@ -29,53 +22,50 @@ class SessionManager
      * @param string $key
      * @return mixed
      */
-    public function get(string $key)
+    public static function get($key)
     {
-        return $this->sanitize($_SESSION[$key] ?? null);
+        return isset($_SESSION[$key]) ? self::sanitize($_SESSION[$key]) : null;
     }
 
     /**
-     * Set a value in the session
+     * Get all values from the session
      *
-     * @param string $key
-     * @param mixed $value
-     * @return void
+     * @return array<string, mixed>
      */
-    public function set(string $key, $value): void
+    public static function getAll(): array
     {
-        $_SESSION[$key] = $this->sanitize($value);
+        return self::sanitizeArray($_SESSION);
     }
 
     /**
-     * Remove a value from the session
+     * Destroy the session
+     */
+    public static function destroy(): void
+    {
+        if (session_status() == PHP_SESSION_ACTIVE) {
+            session_unset();
+            session_destroy();
+        }
+    }
+
+     /**
+     * Start the session if not already started
+     */
+    public static function start(): void
+    {
+        if (session_status() == PHP_SESSION_NONE) {
+            session_start();
+        }
+    }
+
+    /**
+     * Forget a value from the session
      *
      * @param string $key
-     * @return void
      */
-    public function remove(string $key): void
+    public static function forget($key): void
     {
         unset($_SESSION[$key]);
-    }
-
-    /**
-     * Check if a session key is set
-     *
-     * @param string $key
-     * @return bool
-     */
-    public function has(string $key): bool
-    {
-        return isset($_SESSION[$key]);
-    }
-
-    /**
-     * Get the session status
-     *
-     * @return int
-     */
-    public function getSessionStatus(): int
-    {
-        return session_status();
     }
 
     /**
@@ -84,25 +74,30 @@ class SessionManager
      * @param mixed $data
      * @return mixed
      */
-    private function sanitize($data)
+    private static function sanitize($data)
     {
         if (is_array($data)) {
-            foreach ($data as $key => $value) {
-                $data[$key] = $this->sanitize($value);
-            }
+            return self::sanitizeArray($data);
+        } elseif (is_string($data)) {
+            return htmlspecialchars($data, ENT_QUOTES, 'UTF-8');
         } else {
-            $data = htmlspecialchars((string)$data, ENT_QUOTES, 'UTF-8');
+           
+            return $data;
+        }
+    }
+
+    /**
+     * Sanitize an array
+     *
+     * @param array<string, mixed> $data
+     * @return array<string, mixed>
+     */
+    private static function sanitizeArray(array $data): array
+    {
+        foreach ($data as $key => $value) {
+            $data[$key] = self::sanitize($value);
         }
         return $data;
     }
 
-    /**
-     * Get all session values
-     *
-     * @return array
-     */
-    public function getAll(): array
-    {
-        return $this->sanitize($_SESSION);
-    }
 }

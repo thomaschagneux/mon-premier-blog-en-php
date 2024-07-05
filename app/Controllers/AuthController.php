@@ -61,7 +61,7 @@ class AuthController extends AbstractController
     
 
     public function logout(): RedirectResponse {
-        $this->session->destroySession();
+        $this->session->destroy();
         return $this->redirectToRoute('index');
     }
 }

@@ -55,7 +55,7 @@ abstract class AbstractController
         $this->twig->addExtension(new UrlExtension($router)); // Add UrlExtension
 
         $this->session = new SessionManager();
-        $this->session->startSession();
+        $this->session->start();
     }
 
     /**
@@ -119,7 +119,8 @@ abstract class AbstractController
 
     public function isAdmin(): bool
     {
-        return $this->session->has('user') && $this->session->get('user')['role'] === 'ROLE_ADMIN';
+        $user = $this->session->get('user');
+        return is_array($user) && isset($user['role']) && $user['role'] === 'ROLE_ADMIN';
     }
 
     protected function isPostRequest(): bool
