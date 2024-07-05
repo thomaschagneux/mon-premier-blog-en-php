@@ -1,9 +1,6 @@
 {% extends "components/base/base.html.twig" %}
 
 {% block body %}
-<pre>
-		{{ dump(session) }}
-	</pre>
 	{% for user in users %}
 	<ul class="list-group mb-3">
 	{% for key, value in user %}

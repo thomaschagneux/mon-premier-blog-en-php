@@ -33,7 +33,6 @@ class HomeController extends AbstractController
    
     return $this->twig->render('contact.html.twig', [
         'users' => $users,
-        'session' => $_SESSION,
         'test' => $testuser
     ]);
     }else {

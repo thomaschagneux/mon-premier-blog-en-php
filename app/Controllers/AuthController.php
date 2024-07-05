@@ -30,11 +30,7 @@ class AuthController extends AbstractController
             $user = $userModel->findByUsermail($email);
     
             
-            if ($user && password_verify($password, $user->getPassword())) {
-                // Démarrer la session et stocker les informations utilisateur
-                session_start();
-
-                
+            if ($user && password_verify($password, $user->getPassword())) {                
 
                 $_SESSION['user'] = [
                     'first_name' => $user->getFirstName(),
