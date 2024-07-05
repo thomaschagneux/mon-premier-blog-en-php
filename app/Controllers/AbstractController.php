@@ -119,6 +119,6 @@ abstract class AbstractController
 
     public function isAdmin(): bool
     {
-        return isset($_SESSION['user']) && $_SESSION['user']['role'] === 'ROLE_ADMIN';
+        return $this->session->has('user') && $this->session->get('user')['role'] === 'ROLE_ADMIN';
     }
 }

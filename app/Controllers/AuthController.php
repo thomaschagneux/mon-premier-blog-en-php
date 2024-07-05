@@ -16,9 +16,9 @@ class AuthController extends AbstractController
      * @return string|RedirectResponse
      */
     public function login() {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $email = $_POST['loginEmail'] ?? null;
-            $password = $_POST['loginPassword'] ?? null;
+        if ($this->isPostRequest()) {
+            $email = $this->getPostParam('loginEmail');
+            $password = $this->getPostParam('loginPassword');
     
             if ($email === null || $password === null) {
                 // Gérer le cas où les données POST ne sont pas présentes
@@ -63,6 +63,16 @@ class AuthController extends AbstractController
     public function logout(): RedirectResponse {
         $this->session->destroySession();
         return $this->redirectToRoute('index');
+    }
+
+    private function isPostRequest(): bool
+    {
+        return isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST';
+    }
+
+    private function getPostParam(string $key): ?string
+    {
+        return isset($_POST[$key]) ? trim($_POST[$key]) : null;
     }
 }
 

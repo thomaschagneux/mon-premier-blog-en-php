@@ -56,4 +56,15 @@ class SessionManager
     {
         unset($_SESSION[$key]);
     }
+
+    /**
+     * Check if a session key is set
+     *
+     * @param string $key
+     * @return bool
+     */
+    public function has(string $key): bool
+    {
+        return isset($_SESSION[$key]);
+    }
 }
