@@ -64,15 +64,5 @@ class AuthController extends AbstractController
         $this->session->destroySession();
         return $this->redirectToRoute('index');
     }
-
-    private function isPostRequest(): bool
-    {
-        return isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST';
-    }
-
-    private function getPostParam(string $key): ?string
-    {
-        return isset($_POST[$key]) ? trim($_POST[$key]) : null;
-    }
 }
 

@@ -31,7 +31,7 @@ class SessionManager
      */
     public function get(string $key)
     {
-        return isset($_SESSION[$key]) ? $this->sanitize($_SESSION[$key]) : null;
+        return $this->sanitize($_SESSION[$key] ?? null);
     }
 
     /**
@@ -91,8 +91,18 @@ class SessionManager
                 $data[$key] = $this->sanitize($value);
             }
         } else {
-            $data = htmlspecialchars($data, ENT_QUOTES, 'UTF-8');
+            $data = htmlspecialchars((string)$data, ENT_QUOTES, 'UTF-8');
         }
         return $data;
+    }
+
+    /**
+     * Get all session values
+     *
+     * @return array
+     */
+    public function getAll(): array
+    {
+        return $this->sanitize($_SESSION);
     }
 }

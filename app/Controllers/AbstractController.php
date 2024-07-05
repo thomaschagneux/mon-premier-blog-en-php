@@ -121,4 +121,24 @@ abstract class AbstractController
     {
         return $this->session->has('user') && $this->session->get('user')['role'] === 'ROLE_ADMIN';
     }
+
+    protected function isPostRequest(): bool
+    {
+        return $this->getServerParam('REQUEST_METHOD') === 'POST';
+    }
+
+    protected function getPostParam(string $key): ?string
+    {
+        return isset($_POST[$key]) ? trim($this->sanitizeInput($_POST[$key])) : null;
+    }
+
+    protected function getServerParam(string $key): ?string
+    {
+        return isset($_SERVER[$key]) ? $this->sanitizeInput($_SERVER[$key]) : null;
+    }
+
+    private function sanitizeInput(string $input): string
+    {
+        return htmlspecialchars($input, ENT_QUOTES, 'UTF-8');
+    }
 }
