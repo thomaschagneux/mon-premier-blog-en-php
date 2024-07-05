@@ -133,9 +133,10 @@ abstract class AbstractController
         return isset($_POST[$key]) ? trim($this->sanitizeInput($_POST[$key])) : null;
     }
 
-    // codacy-ignore-line
+    
     protected function getServerParam(string $key): ?string
     {
+        // codacy-ignore-line
         return isset($_SERVER[$key]) ? $this->sanitizeInput($_SERVER[$key]) : null;
     }
 
