@@ -136,7 +136,7 @@ abstract class AbstractController
     
     protected function getServerParam(string $key): ?string
     {
-        // codacy-ignore-line
+        // @codingStandardsIgnoreLine
         return isset($_SERVER[$key]) ? $this->sanitizeInput($_SERVER[$key]) : null;
     }
 
