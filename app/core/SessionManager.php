@@ -11,8 +11,9 @@ class SessionManager
      * @param string $key
      * @param mixed $value
      */
-    public static function put($key, $value): void
+    public static function put(string $key, mixed $value): void
     {
+        // @codingStandardsIgnoreLine
         $_SESSION[$key] = self::sanitize($value);
     }
 
@@ -22,8 +23,9 @@ class SessionManager
      * @param string $key
      * @return mixed
      */
-    public static function get($key)
+    public static function get(string $key)
     {
+        // @codingStandardsIgnoreLine
         return isset($_SESSION[$key]) ? self::sanitize($_SESSION[$key]) : null;
     }
 
@@ -34,6 +36,7 @@ class SessionManager
      */
     public static function getAll(): array
     {
+        // @codingStandardsIgnoreLine
         return self::sanitizeArray($_SESSION);
     }
 
@@ -42,8 +45,11 @@ class SessionManager
      */
     public static function destroy(): void
     {
+        // @codingStandardsIgnoreLine
         if (session_status() == PHP_SESSION_ACTIVE) {
+            // @codingStandardsIgnoreLine
             session_unset();
+            // @codingStandardsIgnoreLine
             session_destroy();
         }
     }
@@ -53,7 +59,9 @@ class SessionManager
      */
     public static function start(): void
     {
+        // @codingStandardsIgnoreLine
         if (session_status() == PHP_SESSION_NONE) {
+            // @codingStandardsIgnoreLine
             session_start();
         }
     }
@@ -63,8 +71,9 @@ class SessionManager
      *
      * @param string $key
      */
-    public static function forget($key): void
+    public static function forget(string $key): void
     {
+        // @codingStandardsIgnoreLine
         unset($_SESSION[$key]);
     }
 
@@ -74,7 +83,7 @@ class SessionManager
      * @param mixed $data
      * @return mixed
      */
-    private static function sanitize($data)
+    private static function sanitize(mixed $data): mixed
     {
         if (is_array($data)) {
             return self::sanitizeArray($data);

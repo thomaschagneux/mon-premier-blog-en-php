@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\core\HttpHeaders;
 use App\core\HttpHeadersInterface;
 use App\core\HttpResponse;
+use App\core\PostManager;
 use App\core\RedirectResponse;
 use App\core\Router;
 use App\core\SessionManager;
@@ -26,6 +27,8 @@ abstract class AbstractController
     protected HttpResponse $response;
 
     protected SessionManager $session;
+
+    protected PostManager $postManager;
 
     /**
      * AbstractController constructor.
@@ -78,7 +81,7 @@ abstract class AbstractController
      * 
      * @return bool Returns true if the value passes all the rules, false otherwise.
      */
-    protected function validate($value, $rules): bool {
+    protected function validate(mixed $value, array $rules): bool {
         $validator = v::create();
         foreach ($rules as $rule) {
             $validator->addRule($rule);
@@ -94,7 +97,8 @@ abstract class AbstractController
      * 
      * @return string Returns a validation message indicating if the validation passed or failed.
      */
-    protected function getValidationMessages($value, $rules) {
+    protected function getValidationMessages(mixed $value, array $rules): string
+    {
         $validator = v::create();
         foreach ($rules as $rule) {
             $validator->addRule($rule);
@@ -108,8 +112,9 @@ abstract class AbstractController
 
     /**
      * Get a redirection to the named route with optional parameters
-     * 
-     * @param array<int|string, array<mixed>|string> $params 
+     *
+     * @param array<int|string, array<mixed>|string> $params
+     * @throws \Exception
      */
     protected function redirectToRoute(string $routeName, array $params = []): RedirectResponse
     {
@@ -128,9 +133,16 @@ abstract class AbstractController
         return $this->getServerParam('REQUEST_METHOD') === 'POST';
     }
 
+
+    /**
+     * @throws \Exception
+     */
     protected function getPostParam(string $key): ?string
     {
-        return isset($_POST[$key]) ? trim($this->sanitizeInput($_POST[$key])) : null;
+        if ($this->isPostRequest() && $this->postManager->isValidNonce()) {
+            return $this->postManager->getPostParam($key);
+        }
+        throw new \Exception("Invalid CSRF token or not a POST request");
     }
 
     
