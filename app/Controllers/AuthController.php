@@ -18,8 +18,8 @@ class AuthController extends AbstractController
      */
     public function login() {
         if ($this->isPostRequest()) {
-            $email = $this->getPostParam('loginEmail');
-            $password = $this->getPostParam('loginPassword');
+            $email = $this->postManager->getPostParam('loginEmail');
+            $password = $this->postManager->getPostParam('loginPassword');
     
             if ($email === null || $password === null) {
                 // Gérer le cas où les données POST ne sont pas présentes
@@ -33,7 +33,7 @@ class AuthController extends AbstractController
             
             if ($user && password_verify($password, $user->getPassword())) {                
 
-                SessionManager::put('user', [
+                $this->session->put('user', [
                     'first_name' => $user->getFirstName(),
                     'last_name' => $user->getLastName(),
                     'email' => $user->getEmail(),
