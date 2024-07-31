@@ -59,6 +59,8 @@ abstract class AbstractController
 
         $this->session = new SessionManager();
         $this->session->start();
+
+        $this->postManager = new PostManager();
     }
 
     /**
