@@ -24,24 +24,6 @@ class PostManager
     }
 
     /**
-     * Validate nonce to prevent CSRF attacks.
-     *
-     * @return bool Returns true if the nonce is valid, false otherwise.
-     */
-    public function isValidNonce(): bool
-    {
-        // Use filter_input to access the nonce
-        $nonce = filter_input(INPUT_POST, 'nonce', FILTER_SANITIZE_STRING);
-
-        if ($nonce === null) {
-            return false;
-        }
-
-        // Replace the return statement with actual nonce validation logic
-        return $_SESSION['nonce'] === $nonce; // Replace with real verification
-    }
-
-    /**
      * Sanitize a given input.
      *
      * @param string $input The input to sanitize.

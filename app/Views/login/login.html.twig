@@ -5,6 +5,7 @@
   <div class="text-danger">{{ error}}</div>
 {% endif %}
 <form method="POST" action={{path('login')}}>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
   <div class="mb-3">
     <label for="loginEmail" class="form-label">Identifiant</label>
     <input type="email" class="form-control" name="loginEmail" id="loginEmail" placeholder="jean.dupont@mail.fr">

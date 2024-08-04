@@ -134,19 +134,6 @@ abstract class AbstractController
     {
         return $this->getServerParam('REQUEST_METHOD') === 'POST';
     }
-
-
-    /**
-     * @throws \Exception
-     */
-    protected function getPostParam(string $key): ?string
-    {
-        if ($this->isPostRequest() && $this->postManager->isValidNonce()) {
-            return $this->postManager->getPostParam($key);
-        }
-        throw new \Exception("Invalid CSRF token or not a POST request");
-    }
-
     
     protected function getServerParam(string $key): ?string
     {

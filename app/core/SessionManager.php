@@ -18,6 +18,18 @@ class SessionManager
     }
 
     /**
+     * Vérifie si une clé existe dans la session.
+     *
+     * @param string $key La clé à vérifier.
+     * @return bool Retourne true si la clé existe, false sinon.
+     */
+    public function has(string $key): bool
+    {
+        // @codingStandardsIgnoreLine
+        return isset($_SESSION[$key]);
+    }
+
+    /**
      * Get a value from the session
      *
      * @param string $key
@@ -27,17 +39,6 @@ class SessionManager
     {
         // @codingStandardsIgnoreLine
         return isset($_SESSION[$key]) ? self::sanitize($_SESSION[$key]) : null;
-    }
-
-    /**
-     * Get all values from the session
-     *
-     * @return array<string, mixed>
-     */
-    public static function getAll(): array
-    {
-        // @codingStandardsIgnoreLine
-        return self::sanitizeArray($_SESSION);
     }
 
     /**
