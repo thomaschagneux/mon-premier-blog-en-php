@@ -17,9 +17,14 @@ class AuthController extends AbstractController
      * @throws RuntimeError
      * @throws LoaderError
      * @throws RandomException
+     *
+     * @return string|RedirectResponse
      */
-    public function loginForm(): string
+    public function loginForm(): string|RedirectResponse
     {
+        if ($this->isConnected()) {
+            return $this->redirectToRoute('index');
+        }
         $csrfToken = bin2hex(random_bytes(32));
         $this->session->put('csrf_token', $csrfToken);
         return $this->twig->render('login/login.html.twig', ['csrf_token' => $csrfToken]);
@@ -35,51 +40,96 @@ class AuthController extends AbstractController
     public function login(): string|RedirectResponse
     {
         if ($this->isPostRequest()) {
-            $csrfToken = $this->postManager->getPostParam('csrf_token');
-            if (!$this->session->has('csrf_token') || $csrfToken !== $this->session->get('csrf_token')) {
+
+            if (!$this->isValidCsrfToken()) {
                 $error = "Jeton CSRF invalide.";
                 return $this->twig->render('login/login.html.twig', ['error' => $error]);
             }
 
-            $email = $this->postManager->getPostParam('loginEmail');
-            $password = $this->postManager->getPostParam('loginPassword');
+            [$email, $password] = $this->getPostCredentials();
 
-
-
-            if (null === $email || '' === $email ||null === $password || '' === $password) {
-                // Gérer le cas où les données POST ne sont pas présentes
+            if (!$this->areCredentialsValid($email, $password)) {
                 $error = "Email ou mot de passe non renseigné.";
-                return $this->twig->render('login/login.html.twig', ['error' => $error]);
-            }
-
-
-            $userModel = new User();
-            $user = $userModel->findByUsermail($email);
-    
-            
-            if ($user && password_verify($password, $user->getPassword())) {                
-
-                $this->session->put('user', [
-                    'first_name' => $user->getFirstName(),
-                    'last_name' => $user->getLastName(),
-                    'email' => $user->getEmail(),
-                    'role' => $user->getRole(),
-                    'password' => $user->getPassword(),
-                    'picture_id' => $user->getpictureId(),   
-                    'created_at' => $user->getCreatedAt()->format('d/m/y'),
-                    'updated_at' => $user->getUpdatedAt()->format('d/m/y'),                 
-                ]);
-
-           return $this->redirectToRoute('contact');
+                return $this->renderError($error);
+            } elseif ($this->authenticateUser($email, $password)) {
+                return $this->redirectToRoute('contact');
             } else {
-
-                $error = "Identifiants invalides";
-                return $this->twig->render('login/login.html.twig', ['error' => $error]);
+               $error = "Identifiants invalides";
+                return $this->renderError($error);
             }
         }
     
         // Redirection vers la méthode showLoginForm en cas de requête GET
         return $this->loginForm();
+    }
+
+    private function isValidCsrfToken(): bool
+    {
+        $csrfToken = $this->postManager->getPostParam('csrf_token');
+        return $this->session->has('csrf_token') && $csrfToken === $this->session->get('csrf_token');
+    }
+
+    /**
+     * @return array<int, null|string>
+     */
+    private function getPostCredentials(): array
+    {
+        $email = $this->postManager->getPostParam('loginEmail');
+        $password = $this->postManager->getPostParam('loginPassword');
+        return [$email, $password];
+    }
+
+    private function areCredentialsValid(?string $email, ?string $password): bool
+    {
+        if (is_null($email) || $email === '') {
+            return false;
+        }
+
+        if (is_null($password) || $password === '') {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @throws \Exception
+     */
+    private function authenticateUser(string $email, string $password): bool
+    {
+        $userModel = new User();
+        $user = $userModel->findByUsermail($email);
+
+        if ($user && password_verify($password, $user->getPassword())) {
+            $this->initializeUserSession($user);
+            return true;
+        }
+
+        return false;
+    }
+
+    private function initializeUserSession(User $user): void
+    {
+        $this->session->put('user', [
+            'first_name' => $user->getFirstName(),
+            'last_name' => $user->getLastName(),
+            'email' => $user->getEmail(),
+            'role' => $user->getRole(),
+            'password' => $user->getPassword(),
+            'picture_id' => $user->getpictureId(),
+            'created_at' => $user->getCreatedAt()->format('d/m/y'),
+            'updated_at' => $user->getUpdatedAt()->format('d/m/y'),
+        ]);
+    }
+
+    /**
+     * @throws RuntimeError
+     * @throws SyntaxError
+     * @throws LoaderError
+     */
+    private function renderError(string $error): string
+    {
+        return $this->twig->render('login/login.html.twig', ['error' => $error]);
     }
 
 

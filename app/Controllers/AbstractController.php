@@ -124,6 +124,17 @@ abstract class AbstractController
         return new RedirectResponse($url, $this->headers, $this->response);
     }
 
+    public function isConnected(): bool
+    {
+        $user = $this->session->get('user');
+
+        if ($user && is_array($user) && isset($user['email']) && !empty($user['email'])) {
+            return true;
+        }
+
+        return false;
+    }
+
     public function isAdmin(): bool
     {
         $user = $this->session->get('user');
