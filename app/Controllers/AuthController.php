@@ -48,7 +48,7 @@ class AuthController extends AbstractController
 
             [$email, $password] = $this->getPostCredentials();
 
-            if (!$this->areCredentialsValid($email, $password)) {
+            if (null === $email || '' === $email || null === $password || '' === $password) {
                 $error = "Email ou mot de passe non renseigné.";
                 return $this->renderError($error);
             } elseif ($this->authenticateUser($email, $password)) {
@@ -77,19 +77,6 @@ class AuthController extends AbstractController
         $email = $this->postManager->getPostParam('loginEmail');
         $password = $this->postManager->getPostParam('loginPassword');
         return [$email, $password];
-    }
-
-    private function areCredentialsValid(?string $email, ?string $password): bool
-    {
-        if (null === $email || '' === $email) {
-            return false;
-        }
-
-        if (null === $password || '' === $password) {
-            return false;
-        }
-
-        return true;
     }
 
     /**
