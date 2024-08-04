@@ -81,11 +81,11 @@ class AuthController extends AbstractController
 
     private function areCredentialsValid(?string $email, ?string $password): bool
     {
-        if (is_null($email) || $email === '') {
+        if (null === $email || '' === $email) {
             return false;
         }
 
-        if (is_null($password) || $password === '') {
+        if (null === $password || '' === $password) {
             return false;
         }
 
