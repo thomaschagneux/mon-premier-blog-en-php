@@ -8,13 +8,19 @@
 				<div class="collapse navbar-collapse" id="navbarResponsive">
 					<ul class="navbar-nav ms-auto py-4 py-lg-0">
 						<li class="nav-item">
-							<a class="nav-link px-lg-3 py-3 py-lg-4" href="#">Home</a>
+							<a class="nav-link px-lg-3 py-3 py-lg-4" href={{ path('index')}}>Home</a>
 						</li>
 						<li class="nav-item">
 							<a class="nav-link px-lg-3 py-3 py-lg-4" href={{ path('about', { 'id': '4'})}}>About</a>
 						</li>
 						<li class="nav-item">
 							<a class="nav-link px-lg-3 py-3 py-lg-4" href={{ path('contact')}}>Contact</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link px-lg-3 py-3 py-lg-4" href={{ path('login')}}>Login</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link px-lg-3 py-3 py-lg-4" href={{ path('logout')}}>Logout</a>
 						</li>
 					</ul>
 				</div>

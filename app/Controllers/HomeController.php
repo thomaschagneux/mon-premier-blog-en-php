@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Models\User;
+use App\core\RedirectResponse;
 
 
 class HomeController extends AbstractController
@@ -20,15 +21,23 @@ class HomeController extends AbstractController
         return 'This is the about page of ' . $id;
     }
 
-    public function contact(): string
-    {
-        $userModel = new User;
-       $users = $userModel->getAllUsers();
-       
-       return $this->twig->render('contact.html.twig', [
-        'users' => $users
-       ]);
-            
-
+    /**
+     * @return RedirectResponse|string
+     */
+    public function contact() {
+    if ($this->isAdmin()) {
+        $userModel = new User();
+        
+        $testuser = $userModel->findByUsermail("marie.curie@example.com");
+    $users = $userModel->getAllUsers();
+   
+    return $this->twig->render('contact.html.twig', [
+        'users' => $users,
+        'test' => $testuser
+    ]);
+    }else {
+        return $this->redirectToRoute('index');
+    }
+        
     }
 }
