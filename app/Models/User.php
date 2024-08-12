@@ -37,6 +37,9 @@ class User
     private DateTime $updated_at;
 
 
+    /**
+     * @throws \Exception
+     */
     public function __construct()
     {
         $database = new Database();
@@ -48,7 +51,7 @@ class User
      *
      * @return array<int, array<string, mixed>> An associative array of all users
      */
-    public function getAllUsers()
+    public function getAllUsers(): array
     {
         if ($this->conn instanceof PDO) {
             $query = "SELECT * FROM user";
@@ -62,9 +65,11 @@ class User
     }
 
     /**
+     * @param string $mail
+     * @throws \Exception
      * @return self|null
      */
-    public function findByUsermail(string $mail)
+    public function findByUsermail(string $mail): ?User
     {
         if ($this->conn instanceof PDO) {
             $query = "SELECT * FROM user WHERE email = ?";

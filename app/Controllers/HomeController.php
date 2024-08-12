@@ -10,6 +10,7 @@ class HomeController extends AbstractController
 {
     public function index(): string
     {
+        var_dump($this->cookieManager->getCookie('user_data'));
         return $this->twig->render('index.html.twig', [
             'title' => 'Home Page',
             'content' => 'This is the content of the home page.',

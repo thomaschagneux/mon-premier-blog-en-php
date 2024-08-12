@@ -2,17 +2,20 @@
 
 namespace App\Controllers;
 
+use App\core\CookieManager;
 use App\core\HttpHeaders;
 use App\core\HttpHeadersInterface;
 use App\core\HttpResponse;
 use App\core\PostManager;
 use App\core\RedirectResponse;
 use App\core\Router;
-use App\core\SessionManager;
 use App\Twig\UrlExtension;
 use Respect\Validation\Validator as v;
 use Respect\Validation\Validatable;
 use Twig\Environment;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 use Twig\Loader\FilesystemLoader;
 use Twig\Extension\DebugExtension;
 
@@ -26,7 +29,7 @@ abstract class AbstractController
 
     protected HttpResponse $response;
 
-    protected SessionManager $session;
+    protected CookieManager $cookieManager;
 
     protected PostManager $postManager;
 
@@ -57,20 +60,23 @@ abstract class AbstractController
 
         $this->twig->addExtension(new UrlExtension($router)); // Add UrlExtension
 
-        $this->session = new SessionManager();
-        $this->session->start();
+        $this->cookieManager = new CookieManager();
 
         $this->postManager = new PostManager();
     }
 
     /**
-     * Render a Twig template.
+     * Render a twig template
      *
-     * @param string $template The template file
-     * @param array<string, mixed> $data The data to pass to the template
-     * @return string The rendered template
+     * @param string $template
+     * @param array<string, mixed> $data
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
+     *
+     * @return string
      */
-    protected function render($template, array $data = [])
+    protected function render(string $template, array $data = []): string
     {
         return $this->twig->render($template, $data);
     }
@@ -126,18 +132,14 @@ abstract class AbstractController
 
     public function isConnected(): bool
     {
-        $user = $this->session->get('user');
+        $user = json_decode($this->cookieManager->getCookie('user_data'), true);
 
-        if ($user && is_array($user) && isset($user['email']) && !empty($user['email'])) {
-            return true;
-        }
-
-        return false;
+        return $user && is_array($user) && isset($user['email']) && !empty($user['email']);
     }
 
     public function isAdmin(): bool
     {
-        $user = $this->session->get('user');
+        $user = json_decode($this->cookieManager->getCookie('user_data'), true);
         return is_array($user) && isset($user['role']) && $user['role'] === 'ROLE_ADMIN';
     }
 
@@ -156,5 +158,4 @@ abstract class AbstractController
     {
         return htmlspecialchars($input, ENT_QUOTES, 'UTF-8');
     }
-
 }

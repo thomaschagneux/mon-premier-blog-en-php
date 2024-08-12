@@ -3,8 +3,8 @@
 namespace App\Controllers;
 
 use App\core\RedirectResponse;
-use App\core\SessionManager;
 use App\Models\User;
+use Exception;
 use Random\RandomException;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
@@ -17,6 +17,7 @@ class AuthController extends AbstractController
      * @throws RuntimeError
      * @throws LoaderError
      * @throws RandomException
+     * @throws Exception
      *
      * @return string|RedirectResponse
      */
@@ -25,8 +26,10 @@ class AuthController extends AbstractController
         if ($this->isConnected()) {
             return $this->redirectToRoute('index');
         }
+
         $csrfToken = bin2hex(random_bytes(32));
-        $this->session->put('csrf_token', $csrfToken);
+        $this->cookieManager->setCookie('csrf_token', $csrfToken);
+
         return $this->twig->render('login/login.html.twig', ['csrf_token' => $csrfToken]);
     }
 
@@ -35,7 +38,7 @@ class AuthController extends AbstractController
      * @throws LoaderError
      * @throws RuntimeError
      * @throws SyntaxError
-     * @throws \Exception
+     * @throws Exception
      */
     public function login(): string|RedirectResponse
     {
@@ -66,7 +69,7 @@ class AuthController extends AbstractController
     private function isValidCsrfToken(): bool
     {
         $csrfToken = $this->postManager->getPostParam('csrf_token');
-        return $this->session->has('csrf_token') && $csrfToken === $this->session->get('csrf_token');
+        return $this->cookieManager->getCookie('csrf_token') === $csrfToken;
     }
 
     /**
@@ -80,7 +83,7 @@ class AuthController extends AbstractController
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     private function authenticateUser(string $email, string $password): bool
     {
@@ -97,7 +100,7 @@ class AuthController extends AbstractController
 
     private function initializeUserSession(User $user): void
     {
-        $this->session->put('user', [
+        $userData = [
             'first_name' => $user->getFirstName(),
             'last_name' => $user->getLastName(),
             'email' => $user->getEmail(),
@@ -106,7 +109,9 @@ class AuthController extends AbstractController
             'picture_id' => $user->getpictureId(),
             'created_at' => $user->getCreatedAt()->format('d/m/y'),
             'updated_at' => $user->getUpdatedAt()->format('d/m/y'),
-        ]);
+        ];
+
+        $this->cookieManager->setCookie('user_data', json_encode($userData), time() + (86400 * 30)); // 30 jours
     }
 
     /**
@@ -121,10 +126,11 @@ class AuthController extends AbstractController
 
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
-    public function logout(): RedirectResponse {
-        $this->session->destroy();
+    public function logout(): RedirectResponse
+    {
+        $this->cookieManager->deleteCookie('user_data');
         return $this->redirectToRoute('index');
     }
 }
