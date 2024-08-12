@@ -132,14 +132,27 @@ abstract class AbstractController
 
     public function isConnected(): bool
     {
-        $user = json_decode($this->cookieManager->getCookie('user_data'), true);
+        $cookieData = $this->cookieManager->getCookie('user_data');
 
-        return $user && is_array($user) && isset($user['email']) && !empty($user['email']);
+        if ($cookieData === null) {
+            return false;
+        }
+
+        $user = json_decode($cookieData, true);
+
+        return is_array($user) && !empty($user['email']);
     }
 
     public function isAdmin(): bool
     {
-        $user = json_decode($this->cookieManager->getCookie('user_data'), true);
+        $cookieData = $this->cookieManager->getCookie('user_data');
+
+        if ($cookieData === null) {
+            return false;
+        }
+
+        $user = json_decode($cookieData, true);
+
         return is_array($user) && isset($user['role']) && $user['role'] === 'ROLE_ADMIN';
     }
 

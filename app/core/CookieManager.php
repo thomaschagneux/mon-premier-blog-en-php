@@ -2,6 +2,8 @@
 
 namespace App\core;
 
+use Exception;
+
 class CookieManager
 {
     private string $encryptionKey;
@@ -21,7 +23,7 @@ class CookieManager
 
     public function getCookie(string $name, bool $decrypt = true): ?string
     {
-        $value = isset($_COOKIE[$name]) ? $_COOKIE[$name] : null;
+        $value = $_COOKIE[$name] ?? null;
         return $decrypt && $value ? $this->decrypt($value) : $value;
     }
 
@@ -30,13 +32,31 @@ class CookieManager
         setcookie($name, '', time() - 3600, $path, $domain);
     }
 
+    /**
+     * @throws Exception
+     */
     private function encrypt(string $data): string
     {
-        return openssl_encrypt($data, 'AES-128-ECB', $this->encryptionKey);
+        $encryptedData = openssl_encrypt($data, 'AES-128-ECB', $this->encryptionKey);
+
+        if (false === $encryptedData) {
+            throw new Exception('Encryption failed.');
+        }
+
+        return $encryptedData;
     }
 
-    private function decrypt(string $data): ?string
+    /**
+     * @throws Exception
+     */
+    private function decrypt(string $data): string
     {
-        return openssl_decrypt($data, 'AES-128-ECB', $this->encryptionKey);
+        $decryptData = openssl_decrypt($data, 'AES-128-ECB', $this->encryptionKey);
+
+        if (false === $decryptData) {
+            throw new Exception('Decryption failed.');
+        }
+
+        return $decryptData;
     }
 }

@@ -98,9 +98,12 @@ class AuthController extends AbstractController
         return false;
     }
 
+    /**
+     * @throws Exception
+     */
     private function initializeUserSession(User $user): void
     {
-        $userData = [
+        $userData = json_encode([
             'first_name' => $user->getFirstName(),
             'last_name' => $user->getLastName(),
             'email' => $user->getEmail(),
@@ -109,9 +112,12 @@ class AuthController extends AbstractController
             'picture_id' => $user->getpictureId(),
             'created_at' => $user->getCreatedAt()->format('d/m/y'),
             'updated_at' => $user->getUpdatedAt()->format('d/m/y'),
-        ];
+        ]);
+        if (null == $userData) {
+            throw new Exception("Erreur lors de l'enregistrement de l'utilisateur");
+        }
 
-        $this->cookieManager->setCookie('user_data', json_encode($userData), time() + (86400 * 30)); // 30 jours
+        $this->cookieManager->setCookie('user_data', $userData, time() + (60)); // temps en secondes
     }
 
     /**

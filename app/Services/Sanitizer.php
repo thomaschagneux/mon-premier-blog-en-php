@@ -18,8 +18,8 @@ class Sanitizer
     /**
      * Sanitize an array recursively.
      *
-     * @param array $data The array to sanitize.
-     * @return array The sanitized array.
+     * @param array<mixed> $data The array to sanitize.
+     * @return array<mixed> The sanitized array.
      */
     public static function sanitizeArray(array $data): array
     {
