@@ -4,6 +4,9 @@ namespace App\Controllers;
 
 use App\Models\User;
 use App\core\RedirectResponse;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 
 
 class HomeController extends AbstractController
@@ -23,20 +26,26 @@ class HomeController extends AbstractController
     }
 
     /**
-     * @return RedirectResponse|string
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
+     * @throws \Exception
+     * @return string|RedirectResponse
      */
-    public function contact() {
+    public function contact(): string|RedirectResponse
+    {
+
     if ($this->isAdmin()) {
         $userModel = new User();
         
         $testuser = $userModel->findByUsermail("marie.curie@example.com");
     $users = $userModel->getAllUsers();
-   
+
     return $this->twig->render('contact.html.twig', [
         'users' => $users,
         'test' => $testuser
     ]);
-    }else {
+    } else {
         return $this->redirectToRoute('index');
     }
         

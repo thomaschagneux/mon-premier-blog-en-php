@@ -9,6 +9,8 @@ use App\core\HttpResponse;
 use App\core\PostManager;
 use App\core\RedirectResponse;
 use App\core\Router;
+use App\Models\User;
+use App\Services\Sanitizer;
 use App\Twig\UrlExtension;
 use Respect\Validation\Validator as v;
 use Respect\Validation\Validatable;
@@ -130,28 +132,37 @@ abstract class AbstractController
         return new RedirectResponse($url, $this->headers, $this->response);
     }
 
-    public function isConnected(): bool
+    /**
+     * @throws \Exception
+     * @return mixed
+     */
+    private function getUserData(): mixed
     {
         $cookieData = $this->cookieManager->getCookie('user_data');
 
-        if ($cookieData === null) {
-            return false;
+        $decodedData = html_entity_decode($cookieData);
+
+
+        $user = json_decode($decodedData, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+
+            return null;
         }
 
-        $user = json_decode($cookieData, true);
+        return $user;
+    }
+
+    public function isConnected(): bool
+    {
+        $user = $this->getUserData();
 
         return is_array($user) && !empty($user['email']);
     }
 
     public function isAdmin(): bool
     {
-        $cookieData = $this->cookieManager->getCookie('user_data');
-
-        if ($cookieData === null) {
-            return false;
-        }
-
-        $user = json_decode($cookieData, true);
+        $user = $this->getUserData();
 
         return is_array($user) && isset($user['role']) && $user['role'] === 'ROLE_ADMIN';
     }

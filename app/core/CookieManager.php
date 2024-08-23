@@ -2,29 +2,47 @@
 
 namespace App\core;
 
+use App\Services\Sanitizer;
 use Exception;
 
 class CookieManager
 {
     private string $encryptionKey;
 
-    public function __construct(string $encryptionKey = 'votre_clé_de_chiffrement')
+    public function __construct(string $encryptionKey = '')
     {
         $this->encryptionKey = $encryptionKey;
     }
 
+    /**
+     * @throws Exception
+     */
     public function setCookie(string $name, string $value, int $expire = 0, string $path = "/", string $domain = "", bool $secure = false, bool $httpOnly = true, bool $encrypt = true): void
     {
         if ($encrypt) {
-            $value = $this->encrypt($value);
+            $encryptedValue = $this->encrypt($value);
+            $value = Sanitizer::sanitizeString($encryptedValue);
+        } else {
+            $value = Sanitizer::sanitizeString($value);
         }
-        setcookie($name, $value, $expire, $path, $domain, $secure, $httpOnly);
+
+        if (!setcookie($name, $value, $expire, $path, $domain, $secure, $httpOnly)) {
+            throw new Exception("Failed to set the cookie.");
+        }
     }
 
-    public function getCookie(string $name, bool $decrypt = true): ?string
+
+    /**
+     * @throws Exception
+     */
+    public function getCookie(string $name, bool $decrypt = true): string
     {
         $value = $_COOKIE[$name] ?? null;
-        return $decrypt && $value ? $this->decrypt($value) : $value;
+
+        if ($decrypt && $value) {
+            $value = $this->decrypt($value);
+        }
+        return Sanitizer::sanitizeString($value);
     }
 
     public function deleteCookie(string $name, string $path = "/", string $domain = ""): void
@@ -35,7 +53,7 @@ class CookieManager
     /**
      * @throws Exception
      */
-    private function encrypt(string $data): string
+    public function encrypt(string $data): string
     {
         $encryptedData = openssl_encrypt($data, 'AES-128-ECB', $this->encryptionKey);
 
@@ -49,7 +67,7 @@ class CookieManager
     /**
      * @throws Exception
      */
-    private function decrypt(string $data): string
+    public function decrypt(string $data): string
     {
         $decryptData = openssl_decrypt($data, 'AES-128-ECB', $this->encryptionKey);
 
