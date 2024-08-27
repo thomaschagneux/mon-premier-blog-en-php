@@ -30,7 +30,7 @@ class AuthController extends AbstractController
         $csrfToken = bin2hex(random_bytes(32));
         $this->cookieManager->setCookie('csrf_token', $csrfToken);
 
-        return $this->twig->render('login/login.html.twig', ['csrf_token' => $csrfToken]);
+        return $this->render('login/login.html.twig', ['csrf_token' => $csrfToken]);
     }
 
     /**
@@ -46,7 +46,7 @@ class AuthController extends AbstractController
 
             if (!$this->isValidCsrfToken()) {
                 $error = "Jeton CSRF invalide.";
-                return $this->twig->render('login/login.html.twig', ['error' => $error]);
+                return $this->render('login/login.html.twig', ['error' => $error]);
             }
 
             [$email, $password] = $this->getPostCredentials();

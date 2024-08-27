@@ -2,6 +2,14 @@
 
 namespace App\core;
 
+use App\Controllers\ErrorController;
+use Twig\Environment;
+use Twig\Error\Error;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
+use Twig\Loader\FilesystemLoader;
+
 /**
  * Class Router
  *
@@ -32,9 +40,10 @@ class Router
      * @param string $path The route path, with optional dynamic segments (e.g., '/user/{id}')
      * @param callable|array{class-string, string} $callback The callback to be executed when the route is matched. This can be
      *                                 a function or an array with a class and method (e.g., [HomeController::class, 'index'])
+     * @param string $name
      * @return void
      */
-    public function addRoute(string $method, string $path, $callback, string $name): void
+    public function addRoute(string $method, string $path, callable|array $callback, string $name): void
     {
         // Convert dynamic segments in the path to regular expression patterns
         $path = preg_replace('/{[a-zA-Z0-9_]+}/', '([^/]+)', $path);
@@ -105,7 +114,11 @@ class Router
         }
         // If no route was matched, return a 404 response
         http_response_code(404);
-        include __DIR__ . '/../Views/404.php';
+        $errorController = new ErrorController($this);
+
+        $response = $errorController->error404("La page demandée n'existe pas");
+
+        (new Response($response, 404))->send();
     }
 
     /**
