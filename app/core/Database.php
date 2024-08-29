@@ -77,7 +77,7 @@ class Database
      *
      * @return PDO|null The PDO connection instance
      */
-    public function getConnection()
+    public function getConnection(): ?PDO
     {
         $this->conn = null;
 

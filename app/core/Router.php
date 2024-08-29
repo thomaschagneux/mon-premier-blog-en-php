@@ -3,12 +3,6 @@
 namespace App\core;
 
 use App\Controllers\ErrorController;
-use Twig\Environment;
-use Twig\Error\Error;
-use Twig\Error\LoaderError;
-use Twig\Error\RuntimeError;
-use Twig\Error\SyntaxError;
-use Twig\Loader\FilesystemLoader;
 
 /**
  * Class Router
@@ -20,15 +14,15 @@ use Twig\Loader\FilesystemLoader;
 class Router
 {
     /**
-     * @var array<array{method: string, path: string, callback: callable|array{class-string, string}}> $routes 
-     * 
+     * @var array<array{method: string, path: string, callback: callable|array{class-string, string}}> $routes
+     *
      * Array of registered routes
      */
     private array $routes = [];
-    
-    /** 
+
+    /**
      * @var array<string, array{method: string, path: string, callback: callable|array{class-string, string}}> $namedRoutes
-     * 
+     *
      * Array of named routes for easier URL generation.
      */
     private array $namedRoutes = [];
@@ -65,7 +59,7 @@ class Router
      * Handles an incoming request and dispatches it to the appropriate route callback.
      *
      * @param HttpRequest $request The current HTTP request instance
-     * 
+     *
      * @return void
      */
     public function handleRequest(HttpRequest $request): void
@@ -93,10 +87,10 @@ class Router
                     /** @var callable $callable */
                     $callable = [$controller, $method];
                     // Call the controller method with the matched parameters
-                    $response = call_user_func_array($callable, $matches);
+                    $response = $callable(...$matches);
                 } else {
                     // Call the callback function with the matched parameters
-                    $response = call_user_func_array($route['callback'], $matches);
+                    $response = $route['callback'](...$matches);
                 }
 
                  // Check if the response is an instance of RedirectResponse
@@ -116,14 +110,12 @@ class Router
         http_response_code(404);
         $errorController = new ErrorController($this);
 
-        $response = $errorController->error404("La page demandée n'existe pas");
-
-        (new Response($response, 404))->send();
+        echo $errorController->error404("La page demandée n'existe pas");
     }
 
     /**
      * Generates a URL for a named route with the given parameters.
-     * 
+     *
      * @param string $name The name of the route
      * @param array<int|string, array<mixed>|string> $params
      * @return string The generated URL

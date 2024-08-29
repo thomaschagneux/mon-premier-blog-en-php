@@ -23,7 +23,7 @@ class HttpRequest
     /**
      * @var array<int|string, array<mixed>|string> The parameters of the current request
      */
-    private $param;
+    private array $param;
 
     /**
      * HttpRequest constructor.

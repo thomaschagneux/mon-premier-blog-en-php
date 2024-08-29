@@ -43,7 +43,15 @@ class User
     public function __construct()
     {
         $database = new Database();
-        $this->conn = $database::getInstance()->getConnection();
+        $dbInstance = $database::getInstance();
+        if ($dbInstance === null) {
+            throw new \Exception('Failed to get a valid Database instance.');
+        }
+
+        $this->conn = $dbInstance->getConnection();
+        if ($this->conn === null) {
+            throw new \Exception('Failed to connect to the database.');
+        }
     }
 
     /**
