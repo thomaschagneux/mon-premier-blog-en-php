@@ -110,6 +110,7 @@ class Router
         http_response_code(404);
         $errorController = new ErrorController($this);
 
+        // @codingStandardsIgnoreLine
         echo $errorController->error404("La page demandée n'existe pas");
     }
 
