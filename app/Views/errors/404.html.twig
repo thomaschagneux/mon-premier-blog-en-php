@@ -1,0 +1,14 @@
+
+{% extends "components/base/base.html.twig" %}
+
+{% block body %}
+    <div class="text-center">
+        <h1>Erreur 404</h1>
+        {% if error is defined %}
+            <img src="/assets/img/404.gif" alt="Erreur 404">
+            <p>{{ error }}</p>
+        {% endif %}
+    </div>
+
+
+{% endblock %}

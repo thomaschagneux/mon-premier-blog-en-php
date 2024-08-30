@@ -44,6 +44,9 @@ class Database
      */
     private static ?Database $instance = null;
 
+    /**
+     * @throws \Exception
+     */
     public function __construct()
     {
         $dotenv = Dotenv::createImmutable(__DIR__ . '/../../');
@@ -60,7 +63,7 @@ class Database
      *
      * @return Database The singleton instance
      */
-    public static function getInstance()
+    public static function getInstance(): ?Database
     {
         if (self::$instance == null) {
             self::$instance = new Database();
@@ -74,7 +77,7 @@ class Database
      *
      * @return PDO|null The PDO connection instance
      */
-    public function getConnection()
+    public function getConnection(): ?PDO
     {
         $this->conn = null;
 

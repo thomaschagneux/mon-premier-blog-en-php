@@ -140,8 +140,11 @@ abstract class AbstractController
     {
         $cookieData = $this->cookieManager->getCookie('user_data');
 
-        $decodedData = html_entity_decode($cookieData);
+        if (null === $cookieData){
+            return null;
+        }
 
+        $decodedData = html_entity_decode($cookieData);
 
         $user = json_decode($decodedData, true);
 

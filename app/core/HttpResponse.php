@@ -12,6 +12,7 @@ class HttpResponse
     /**
      * Terminates the script execution.
      *
+     * @throws SystemExit
      * @return void
      */
     public function terminate(): void

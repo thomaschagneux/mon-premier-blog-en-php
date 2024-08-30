@@ -35,15 +35,23 @@ class CookieManager
     /**
      * @throws Exception
      */
-    public function getCookie(string $name, bool $decrypt = true): string
+    public function getCookie(string $name, bool $decrypt = true): ?string
     {
         $value = $_COOKIE[$name] ?? null;
 
-        if ($decrypt && $value) {
+
+        if ($value === null) {
+            return null;
+        }
+
+        if ($decrypt) {
             $value = $this->decrypt($value);
         }
+
+
         return Sanitizer::sanitizeString($value);
     }
+
 
     public function deleteCookie(string $name, string $path = "/", string $domain = ""): void
     {

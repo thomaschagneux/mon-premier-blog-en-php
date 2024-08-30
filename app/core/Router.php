@@ -2,6 +2,8 @@
 
 namespace App\core;
 
+use App\Controllers\ErrorController;
+
 /**
  * Class Router
  *
@@ -12,15 +14,15 @@ namespace App\core;
 class Router
 {
     /**
-     * @var array<array{method: string, path: string, callback: callable|array{class-string, string}}> $routes 
-     * 
+     * @var array<array{method: string, path: string, callback: callable|array{class-string, string}}> $routes
+     *
      * Array of registered routes
      */
     private array $routes = [];
-    
-    /** 
+
+    /**
      * @var array<string, array{method: string, path: string, callback: callable|array{class-string, string}}> $namedRoutes
-     * 
+     *
      * Array of named routes for easier URL generation.
      */
     private array $namedRoutes = [];
@@ -32,9 +34,10 @@ class Router
      * @param string $path The route path, with optional dynamic segments (e.g., '/user/{id}')
      * @param callable|array{class-string, string} $callback The callback to be executed when the route is matched. This can be
      *                                 a function or an array with a class and method (e.g., [HomeController::class, 'index'])
+     * @param string $name
      * @return void
      */
-    public function addRoute(string $method, string $path, $callback, string $name): void
+    public function addRoute(string $method, string $path, callable|array $callback, string $name): void
     {
         // Convert dynamic segments in the path to regular expression patterns
         $path = preg_replace('/{[a-zA-Z0-9_]+}/', '([^/]+)', $path);
@@ -56,7 +59,7 @@ class Router
      * Handles an incoming request and dispatches it to the appropriate route callback.
      *
      * @param HttpRequest $request The current HTTP request instance
-     * 
+     *
      * @return void
      */
     public function handleRequest(HttpRequest $request): void
@@ -84,10 +87,10 @@ class Router
                     /** @var callable $callable */
                     $callable = [$controller, $method];
                     // Call the controller method with the matched parameters
-                    $response = call_user_func_array($callable, $matches);
+                    $response = $callable(...$matches);
                 } else {
                     // Call the callback function with the matched parameters
-                    $response = call_user_func_array($route['callback'], $matches);
+                    $response = $route['callback'](...$matches);
                 }
 
                  // Check if the response is an instance of RedirectResponse
@@ -105,12 +108,15 @@ class Router
         }
         // If no route was matched, return a 404 response
         http_response_code(404);
-        include __DIR__ . '/../Views/404.php';
+        $errorController = new ErrorController($this);
+
+        // @codingStandardsIgnoreLine
+        echo $errorController->error404("La page demandée n'existe pas");
     }
 
     /**
      * Generates a URL for a named route with the given parameters.
-     * 
+     *
      * @param string $name The name of the route
      * @param array<int|string, array<mixed>|string> $params
      * @return string The generated URL
