@@ -5,8 +5,6 @@ namespace App\Manager;
 use App\Services\Sanitizer;
 use Exception;
 
-
-
 class ServerManager
 {
     /**
@@ -43,11 +41,10 @@ class ServerManager
      */
     public function getRequiredServerParam(string $key): string
     {
-        if (empty($_SERVER[$key]) || !is_string($_SERVER[$key])) {
-            throw new Exception("The server parameter '{$key}' is required but not set or empty.");
+        if (empty($this->server[$key]) || !is_string($this->server[$key])) {
+            throw new Exception("The server parameter is required but not set or empty.");
         }
 
-        return Sanitizer::sanitizeString($_SERVER[$key]);
+        return Sanitizer::sanitizeString($this->server[$key]);
     }
-
 }

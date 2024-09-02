@@ -1,3 +1,3 @@
 $(function () {
-  console.log($('container'))
+  // Scripts for general app
 })
