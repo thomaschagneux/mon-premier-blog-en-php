@@ -1,5 +1,7 @@
 <?php
 
+use App\Controllers\Admincontroller;
+use App\Controllers\UserController;
 use App\core\Router;
 use App\Controllers\HomeController;
 use App\Controllers\AuthController;
@@ -28,4 +30,8 @@ function defineRoutes(Router $router): void
     $router->addRoute('POST', '/login', [AuthController::class, 'login'], 'login');
 
     $router->addRoute('GET', '/logout', [AuthController::class, 'logout'], 'logout');
+
+    $router->addRoute('GET', '/admin/home', [Admincontroller::class, 'adminHome'], 'admin_home');
+
+    $router->addRoute('GET', '/admin/user/list', [Usercontroller::class, 'adminListUser'], 'admin_list_user');
 }

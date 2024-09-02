@@ -2,6 +2,8 @@
 
 namespace App\Twig;
 
+use App\Controllers\AbstractController;
+use App\Manager\ServerManager;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 use App\core\Router;
@@ -19,14 +21,18 @@ class UrlExtension extends AbstractExtension
      */
     private Router $router;
 
+    private ServerManager $serverManager;
+
     /**
      * UrlExtension constructor.
      *
      * @param Router $router The router instance used to generate URLs.
      */
+
     public function __construct(Router $router)
     {
         $this->router = $router;
+        $this->serverManager = new ServerManager();
     }
 
     /**
@@ -38,6 +44,7 @@ class UrlExtension extends AbstractExtension
     {
         return [
             new TwigFunction('path', [$this, 'generatePath']),
+            new TwigFunction('referer', [$this, 'getReferer']),
         ];
     }
 
@@ -51,5 +58,10 @@ class UrlExtension extends AbstractExtension
     public function generatePath(string $routeName, array $params = []): string
     {
         return $this->router->getRouteUrl($routeName, $params);
+    }
+
+    public function getReferer(): ?string
+    {
+        return $this->serverManager->getServerParams('HTTP_REFERER') ?? null;
     }
 }

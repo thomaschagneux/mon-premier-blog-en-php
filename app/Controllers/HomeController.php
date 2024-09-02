@@ -2,8 +2,10 @@
 
 namespace App\Controllers;
 
+use App\Manager\ServerManager;
 use App\Models\User;
 use App\core\RedirectResponse;
+use App\Services\Sanitizer;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
@@ -18,9 +20,11 @@ class HomeController extends AbstractController
      */
     public function index(): string
     {
+        $content = 'index';
+
         return $this->twig->render('index.html.twig', [
             'title' => 'Home Page',
-            'content' => 'This is the content of the home page.',
+            'content' => $content,
         ]);
     }
 
@@ -52,6 +56,6 @@ class HomeController extends AbstractController
     } else {
         return $this->redirectToRoute('index');
     }
-        
+
     }
 }

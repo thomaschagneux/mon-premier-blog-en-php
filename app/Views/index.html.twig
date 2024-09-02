@@ -2,6 +2,12 @@
 
 {% block body %}
     <h1>Accueil</h1>
-<p>{{ content }}</p>
+    <ul class="list-unstyled">
+        {% for element in content %}
+            <li>{{ element }}</li>
+        {% endfor %}
+    </ul>
+
+<pre>{{ content }}</pre>
 
 {% endblock %}
