@@ -27,6 +27,13 @@ class Router
      */
     private array $namedRoutes = [];
 
+    private ErrorController $errorController;
+
+    public function __construct()
+    {
+        $this->errorController = new ErrorController($this);
+    }
+
     /**
      * Adds a route to the routing table.
      *
@@ -77,6 +84,7 @@ class Router
 
                     // Check if the controller class exists
                     if (!class_exists($controllerName)) {
+                        echo $this->errorController->error500('Internal Server Error');
                         throw new \RuntimeException("Controller class $controllerName does not exist");
                     }
 
@@ -108,10 +116,10 @@ class Router
         }
         // If no route was matched, return a 404 response
         http_response_code(404);
-        $errorController = new ErrorController($this);
+
 
         // @codingStandardsIgnoreLine
-        echo $errorController->error404("La page demandée n'existe pas");
+        echo $this->errorController->error404("La page demandée n'existe pas");
     }
 
     /**
@@ -126,6 +134,7 @@ class Router
     {
         // Check if the named route exists
         if (!isset($this->namedRoutes[$name])) {
+            echo $this->errorController->error404('Route does not exist');
             throw new \RuntimeException("Route does not exist");
         }
 
@@ -137,6 +146,7 @@ class Router
             $route = preg_replace('/\(\[\^\/\]\+\)/', $value, $route, 1);
              // Check if preg_replace returned null, indicating an error
             if ($route === null) {
+                echo $this->errorController->error500('Internal server error');
                 throw new \RuntimeException("Error processing route");
             }
         }
@@ -144,6 +154,7 @@ class Router
         $finalRoute = preg_replace('/#\^|\$#/', '', $route);
         // Check if preg_replace returned null, indicating an error
         if ($finalRoute === null) {
+            echo $this->errorController->error500('Internal server error');
             throw new \RuntimeException("Error processing final route regex");
         }
         // Return the generated URL

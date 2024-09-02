@@ -1,0 +1,9 @@
+{% extends "errors/errors.html.twig" %}
+
+{% block title %}Erreur 500{% endblock %}
+
+{% block img %}
+    <img src="/assets/img/500.jpg" alt="Erreur 500">
+{% endblock %}
+
+{% block error %}{{ error }}{% endblock %}

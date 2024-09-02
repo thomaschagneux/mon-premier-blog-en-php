@@ -1,0 +1,26 @@
+{% extends "components/base/base.html.twig" %}
+
+{% block body %}
+    <div class="text-center">
+        <h1>{% block title %}Erreur{% endblock %}</h1>
+        {% block img %}
+            <img src="/assets/img/error.jpg" alt="Erreur 404">
+        {% endblock %}
+
+        {% if error is defined %}
+            <p>
+                {% block error %}
+                    {{ error }}
+                {% endblock %}
+            </p>
+        {% endif %}
+
+        {% if referer() is not null %}
+        <a class="btn btn-secondary" href="{{ referer() }}">Retour à la page précédente</a>
+        {% else %}
+            <a class="btn btn-secondary" href="{{ path('index') }}">Retour à l'accueil</a>
+        {% endif %}
+    </div>
+
+
+{% endblock %}

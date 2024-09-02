@@ -2,24 +2,24 @@
 
 namespace App\Controllers;
 
-use App\core\CookieManager;
 use App\core\HttpHeaders;
 use App\core\HttpHeadersInterface;
 use App\core\HttpResponse;
-use App\core\PostManager;
 use App\core\RedirectResponse;
 use App\core\Router;
-use App\Models\User;
+use App\Manager\CookieManager;
+use App\Manager\PostManager;
+use App\Manager\ServerManager;
 use App\Services\Sanitizer;
 use App\Twig\UrlExtension;
-use Respect\Validation\Validator as v;
 use Respect\Validation\Validatable;
+use Respect\Validation\Validator as v;
 use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
-use Twig\Loader\FilesystemLoader;
 use Twig\Extension\DebugExtension;
+use Twig\Loader\FilesystemLoader;
 
 abstract class AbstractController
 {
@@ -35,6 +35,8 @@ abstract class AbstractController
 
     protected PostManager $postManager;
 
+    protected ServerManager $serverManager;
+
     /**
      * AbstractController constructor.
      *
@@ -49,9 +51,12 @@ abstract class AbstractController
         $this->response = new HttpResponse();
 
         $loader = new FilesystemLoader(
-            [__DIR__ . '/../Views',
-            __DIR__ . '/../Views/components',
-            __DIR__ . '/../Views/components/base',]
+            [
+                __DIR__ . '/../Views',
+                __DIR__ . '/../Views/components',
+                __DIR__ . '/../Views/components/base',
+                __DIR__ . '/../Views/admin',
+                ]
         );
 
         $this->twig = new Environment($loader, [
@@ -65,6 +70,8 @@ abstract class AbstractController
         $this->cookieManager = new CookieManager();
 
         $this->postManager = new PostManager();
+
+        $this->serverManager = new ServerManager();
     }
 
     /**
@@ -134,6 +141,28 @@ abstract class AbstractController
 
     /**
      * @throws \Exception
+     */
+    protected function redirectToUrl(string $url): RedirectResponse
+    {
+        $url = Sanitizer::sanitizeString($url);
+        return new RedirectResponse($url, $this->headers, $this->response);
+    }
+
+    public function getReferer(): string
+    {
+        return  $this->serverManager->getServerParams('HTTP_REFERER') ?? $this->router->getRouteUrl('index');
+    }
+
+    /**
+     * @throws \Exception
+     */
+    protected function redirectToReferer(): RedirectResponse
+    {
+        return new RedirectResponse($this->getReferer(), $this->headers, $this->response);
+    }
+
+    /**
+     * @throws \Exception
      * @return mixed
      */
     private function getUserData(): mixed
@@ -172,17 +201,6 @@ abstract class AbstractController
 
     protected function isPostRequest(): bool
     {
-        return $this->getServerParam('REQUEST_METHOD') === 'POST';
-    }
-    
-    protected function getServerParam(string $key): ?string
-    {
-        // @codingStandardsIgnoreLine
-        return isset($_SERVER[$key]) ? $this->sanitizeInput($_SERVER[$key]) : null;
-    }
-
-    private function sanitizeInput(string $input): string
-    {
-        return htmlspecialchars($input, ENT_QUOTES, 'UTF-8');
+        return $this->serverManager->getServerParams('REQUEST_METHOD') === 'POST';
     }
 }

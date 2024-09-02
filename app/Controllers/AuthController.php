@@ -55,7 +55,7 @@ class AuthController extends AbstractController
                 $error = "Email ou mot de passe non renseigné.";
                 return $this->renderError($error);
             } elseif ($this->authenticateUser($email, $password)) {
-                return $this->redirectToRoute('contact');
+                return $this->redirectToReferer();
             } else {
                $error = "Identifiants invalides";
                 return $this->renderError($error);
@@ -117,7 +117,7 @@ class AuthController extends AbstractController
             throw new Exception("Erreur lors de l'enregistrement de l'utilisateur");
         }
 
-        $this->cookieManager->setCookie('user_data', $userData, time() + (60)); // temps en secondes
+        $this->cookieManager->setCookie('user_data', $userData, time() + (60 * 60 * 24)); // temps en secondes
     }
 
     /**

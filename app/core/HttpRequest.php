@@ -2,6 +2,8 @@
 
 namespace App\core;
 
+use App\Manager\ServerManager;
+
 /**
  * Class HttpRequest
  *
@@ -25,15 +27,19 @@ class HttpRequest
      */
     private array $param;
 
+    private ServerManager $server;
+
     /**
      * HttpRequest constructor.
      *
      * Initializes the HttpRequest object with the current URL and HTTP method.
+     * @throws \Exception
      */
     public function __construct()
     {
-        $this->url = $_SERVER['REQUEST_URI'];
-        $this->method = $_SERVER['REQUEST_METHOD'];
+        $this->server = new ServerManager();
+        $this->url = $this->server->getRequiredServerParam('REQUEST_URI');
+        $this->method = $this->server->getRequiredServerParam('REQUEST_METHOD');
         $this->param = $this->initializeParams();
     }
 
@@ -42,7 +48,7 @@ class HttpRequest
      *
      * @return array<int|string, array<mixed>|string> The parameters of the current request
      */
-    private function initializeParams()
+    private function initializeParams(): array
     {
         switch ($this->method) {
             case 'GET':
@@ -67,7 +73,7 @@ class HttpRequest
      *
      * @return string The URL of the current request
      */
-    public function getUrl()
+    public function getUrl(): string
     {
         return $this->url;
     }
@@ -77,7 +83,7 @@ class HttpRequest
      *
      * @return string The HTTP method of the current request
      */
-    public function getMethod()
+    public function getMethod(): string
     {
         return $this->method;
     }
@@ -87,7 +93,7 @@ class HttpRequest
      *
      * @return array<int|string, array<mixed>|string> The parameters of the current request, or null if none are set
      */
-    public function getParams()
+    public function getParams(): array
     {
         return $this->param;
     }

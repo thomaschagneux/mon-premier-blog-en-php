@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-lg navbar-light" id="mainNav">
+<nav class="navbar navbar-expand-lg navbar-light bg-primary mb-md-3" id="adminNav">
 			<div class="container px-4 px-lg-5">
 				<a class="navbar-brand" href="{{ path('index')}}">Mon premier blog en PHP</a>
 				<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
@@ -11,18 +11,12 @@
 							<a class="nav-link px-lg-3 py-3 py-lg-4" href={{ path('index')}}>Home</a>
 						</li>
 						<li class="nav-item">
-							<a class="nav-link px-lg-3 py-3 py-lg-4" href={{ path('about', { 'id': '4'})}}>About</a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link px-lg-3 py-3 py-lg-4" href={{ path('contact')}}>Contact</a>
-						</li>
-						<li class="nav-item">
 							<div class="dropdown px-lg-2 py-2 py-lg-3 text-light">
 								<a class="dropdown-toggle text-light" data-bs-toggle="dropdown" aria-expanded="false">
 									<i class="fa-solid fa-user-tie"></i>
 								</a>
 								<ul class="dropdown-menu dropdown rounded">
-									<li><a class="dropdown-item " href="{{ path('admin_home') }}">Mon espace</a></li>
+									<li><a class="dropdown-item " href="{{ 'admin_area' }}">Mon espace</a></li>
 									<li class="dropdown-item">
 										<a class="" href={{ path('login')}}>Login</a>
 									</li>
