@@ -1,0 +1,16 @@
+{% extends "components/base/base_admin.html.twig" %}
+
+{% block body %}
+    <div class="card">
+        <div class="card-header">
+            <h1>Liste des utilisateurs</h1>
+        </div>
+
+        <div class="card-body">
+            {% if users is defined and users is not null %}
+                {{ table | raw }}
+            {% endif %}
+        </div>
+    </div>
+
+{% endblock %}

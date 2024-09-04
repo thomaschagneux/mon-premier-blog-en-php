@@ -1,0 +1,33 @@
+<div class="table-container table-responsive my-4">
+
+    <table class="custom-table table table-bordered table-hover table-striped align-middle">
+        <thead class="custom-table-head table-dark">
+        <tr>
+            {% for column in columns %}
+                <th>{{ column.title }}</th>
+            {% endfor %}
+        </tr>
+        </thead>
+        <tbody>
+        {% for row in rows %}
+            <tr>
+                {% for column in columns %}
+                    <td>
+                        {% if column.key == 'actions' %}
+                            {{ row[column.key] | raw}}
+
+                        {% else %}
+                            {{ row[column.key]}}
+                        {% endif %}
+                    </td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <div class="custom-pagination d-flex justify-content-center my-3">
+        <button class="btn-prev btn btn-primary mx-2">Précédent</button>
+        <span class="page-numbers align-self-center mx-2"></span>
+        <button class="btn-next btn btn-primary mx-2">Suivant</button>
+    </div>
+</div>

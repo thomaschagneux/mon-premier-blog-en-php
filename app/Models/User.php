@@ -5,6 +5,7 @@ namespace App\Models;
 use App\core\Database;
 use DateTime;
 use PDO;
+use Exception;
 
 /**
  * Class User
@@ -38,7 +39,7 @@ class User
 
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function __construct()
     {
@@ -55,11 +56,37 @@ class User
     }
 
     /**
+     * Creates a User instance from an associative array.
+     *
+     * @param array<string, mixed> $userData
+     *
+     * @throws Exception
+     * @return self
+     */
+    public static function fromArray(array $userData): self
+    {
+        $user = new self();
+
+        // Vérification des types avant de caster
+        $user->setId(isset($userData['id']) && is_int($userData['id']) ? $userData['id'] : 0);
+        $user->setFirstName(isset($userData['first_name']) && is_string($userData['first_name']) ? $userData['first_name'] : '');
+        $user->setLastName(isset($userData['last_name']) && is_string($userData['last_name']) ? $userData['last_name'] : '');
+        $user->setEmail(isset($userData['email']) && is_string($userData['email']) ? $userData['email'] : '');
+        $user->setPassword(isset($userData['password']) && is_string($userData['password']) ? $userData['password'] : '');
+        $user->setRole(isset($userData['role']) && is_string($userData['role']) ? $userData['role'] : '');
+        $user->setPictureId(isset($userData['picture_id']) && is_int($userData['picture_id']) ? $userData['picture_id'] : null);
+        $user->setCreatedAt(isset($userData['created_at']) && is_string($userData['created_at']) ? new \DateTime($userData['created_at']) : new \DateTime());
+        $user->setUpdatedAt(isset($userData['updated_at']) && is_string($userData['updated_at']) ? new \DateTime($userData['updated_at']) : new \DateTime());
+
+        return $user;
+    }
+
+    /**
      * Retrieves all users from the user table.
      *
      * @return array<int, array<string, mixed>> An associative array of all users
      */
-    public function getAllUsers(): array
+    public function findAllUsers(): array
     {
         if ($this->conn instanceof PDO) {
             $query = "SELECT * FROM user";
@@ -73,61 +100,70 @@ class User
     }
 
     /**
+     * Retrieves all User objects from the user table.
+     *
+     * @throws Exception
+     * @return array<int, self>
+     */
+    public function getAllUsers(): array
+    {
+        if ($this->conn instanceof PDO) {
+            $query = "SELECT * FROM user";
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute();
+
+            $users = [];
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                if (is_array($row)) {
+                    $users[] = self::fromArray($row);
+                }
+            }
+
+            return $users;
+        }
+
+        return [];
+    }
+
+    /**
+     * Finds a user by email.
+     *
      * @param string $mail
-     * @throws \Exception
+     * @throws Exception
      * @return self|null
      */
-    public function findByUsermail(string $mail): ?User
+    public function findByUsermail(string $mail): ?self
     {
         if ($this->conn instanceof PDO) {
             $query = "SELECT * FROM user WHERE email = ?";
             $stmt = $this->conn->prepare($query);
 
             if (!$stmt) {
-                throw new \Exception('Failed to prepare the SQL statement.');
+                throw new Exception('Failed to prepare the SQL statement.');
             }
 
             if (!$stmt->execute([$mail])) {
-                throw new \Exception('Failed to execute the SQL statement.');
+                throw new Exception('Failed to execute the SQL statement.');
             }
 
             $userData = $stmt->fetch(PDO::FETCH_ASSOC);
 
-
             if ($userData === false) {
                 return null; // Aucun utilisateur trouvé
             }
-
+            $userArray = [];
             if (is_array($userData)) {
-                $user = new self();
-                $user->setId((int) $userData['id']);
-                $user->setFirstName((string) $userData['first_name']);
-                $user->setLastName((string) $userData['last_name']);
-                $user->setEmail((string) $userData['email']);
-                $user->setPassword((string) $userData['password']);
-                $user->setRole((string) $userData['role']);
-                $user->setPictureId($userData['picture_id'] !== null ? (int) $userData['picture_id'] : null);
-                $user->setCreatedAt(new DateTime((string) $userData['created_at']));
-                $user->setUpdatedAt(new DateTime((string) $userData['updated_at']));
-
-                return $user;
-            } else {
-                throw new \Exception("Failed to fetch user data.");
-
+                $userArray = $userData;
             }
-
-
-
-
+            return self::fromArray($userArray);
         }
 
-        throw new \Exception("Server Error: Not connected to the database.");
+        throw new Exception("Server Error: Not connected to the database.");
     }
 
     /**
-     *  GETTTERS AND SETTERS
+     * GETTERS AND SETTERS
      */
-
 
     public function getId(): int
     {
@@ -218,5 +254,4 @@ class User
     {
         $this->updated_at = $updated_at;
     }
-
 }

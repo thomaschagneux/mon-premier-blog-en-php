@@ -42,20 +42,6 @@ class HomeController extends AbstractController
      */
     public function contact(): string|RedirectResponse
     {
-
-    if ($this->isAdmin()) {
-        $userModel = new User();
-        
-        $testuser = $userModel->findByUsermail("marie.curie@example.com");
-    $users = $userModel->getAllUsers();
-
-    return $this->twig->render('contact.html.twig', [
-        'users' => $users,
-        'test' => $testuser
-    ]);
-    } else {
-        return $this->redirectToRoute('index');
-    }
-
+        return $this->twig->render('contact.html.twig');
     }
 }
