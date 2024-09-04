@@ -1,0 +1,12 @@
+{# tables/_actions.html.twig #}
+<div class="action-buttons">
+    {% if show is defined %}
+        {{ show | raw }}
+    {% endif %}
+    {% if edit is defined %}
+        {{ edit | raw }}
+    {% endif %}
+    {% if remove is defined %}
+        {{ remove | raw }}
+    {% endif %}
+</div>

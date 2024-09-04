@@ -56,7 +56,10 @@ abstract class AbstractController
                 __DIR__ . '/../Views/components',
                 __DIR__ . '/../Views/components/base',
                 __DIR__ . '/../Views/admin',
-                ]
+                __DIR__ . '/../Views/user',
+                __DIR__ . '/../Views/components/tables',
+
+            ]
         );
 
         $this->twig = new Environment($loader, [
