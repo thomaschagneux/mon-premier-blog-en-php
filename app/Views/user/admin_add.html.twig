@@ -1,0 +1,54 @@
+{% extends "components/base/base_admin.html.twig" %}
+
+{% block body %}
+    {% if message is defined and message is not null %}
+        <div class="alert alert-danger" role="alert">
+            <span><i class="fa fa-warning"></i> </span>
+            <span>{{ message }}</span>
+        </div>
+    {% endif %}
+    <div class="card mb-md-5">
+        <div class="card-header">
+            <h1>Ajout d'un utilisateur</h1>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{path('admin_add_user_action')}}" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label for="first_name" class="form-label">Prénom</label>
+                    <input type="text" class="form-control" name="first_name" id="first_name" aria-describedby="first_nameHelp" required>
+                    <div id="first_nameHelp" class="form-text"></div>
+                </div>
+                <div class="mb-3">
+                    <label for="last_name" class="form-label">Nom</label>
+                    <input type="text" class="form-control" name="last_name" id="last_name" aria-describedby="last_nameHelp" required>
+                    <div id="last_nameHelp" class="form-text"></div>
+                </div>
+                <div class="mb-3">
+                    <label for="avatar" class="form-label">Avatar</label>
+                    <input type="file" id="avatar" name="avatar" accept="image/png, image/jpeg" />
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email address</label>
+                    <input type="email" class="form-control" name="email" id="email" aria-describedby="emailHelp" required>
+                    <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="form-control" name="password" id="password" required>
+                </div>
+                <div class="mb-3">
+                    <label for="role" class="form-label">Role</label>
+                    <select id="role" class="form-select" aria-label="role" required>
+                        <option selected disabled>Choisissez un rôle pour l'utilisateur</option>
+                        <option value="1">Utilisateur</option>
+                        <option value="2">Administrateur</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+
+    </div>
+
+{% endblock %}
