@@ -162,6 +162,100 @@ class User
     }
 
     /**
+     * @throws Exception
+     */
+    public function emailExists(string $email): bool
+    {
+        if (!$this->conn instanceof PDO) {
+            throw new Exception("Database connection not established.");
+        }
+
+        try {
+            $query = "SELECT id FROM user WHERE email = :email LIMIT 1";
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute([':email' => $email]);
+
+            // Si une ligne est trouvée, l'email existe déjà
+            return $stmt->fetch(PDO::FETCH_ASSOC) !== false;
+        } catch (Exception $e) {
+            throw new Exception('Erreur lors de la vérification de l\'email : ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function save(): int
+    {
+        // Vérification de la connexion à la base de données
+        if (!$this->conn instanceof PDO) {
+            throw new Exception("Database connection not established.");
+        }
+
+        // Déterminer si l'on fait une mise à jour ou une insertion
+        $isUpdate = isset($this->id) && $this->id > 0;
+
+        // Construire la requête dynamiquement en fonction du type d'opération
+        if ($isUpdate) {
+            $query = "UPDATE user SET 
+                        first_name = :first_name,
+                        last_name = :last_name,
+                        email = :email,
+                        password = :password,
+                        role = :role,
+                        picture_id = :picture_id,
+                        updated_at = :updated_at
+                      WHERE id = :id";
+        } else {
+            $query = "INSERT INTO user (first_name, last_name, email, password, role, picture_id, created_at) 
+                      VALUES (:first_name, :last_name, :email, :password, :role, :picture_id, :created_at)";
+        }
+
+        try {
+            $stmt = $this->conn->prepare($query);
+
+            // Si c'est une mise à jour, on définit la date de mise à jour
+            if ($isUpdate) {
+                $this->updatedAt = new DateTime();
+            } else {
+                // Pour une insertion, on définit la date de création
+                $this->createdAt = new DateTime();
+            }
+
+            // Préparer les paramètres communs
+            $params = [
+                ':first_name' => $this->getFirstName(),
+                ':last_name' => $this->getLastName(),
+                ':email' => $this->getEmail(),
+                ':password' => $this->getPassword(),
+                ':role' => $this->getRole(),
+                ':picture_id' => $this->getPictureId(),
+            ];
+
+            // Ajouter la date et l'ID si c'est une mise à jour
+            if ($isUpdate) {
+                $params[':updated_at'] = $this->getUpdatedAt()->format('Y-m-d H:i:s');
+                $params[':id'] = $this->getId();
+            } else {
+                // Ajouter la date de création si c'est une insertion
+                $params[':created_at'] = $this->getCreatedAt()->format('Y-m-d H:i:s');
+            }
+
+            // Exécuter la requête
+            $stmt->execute($params);
+
+            // Si c'est une insertion, récupérer l'ID généré
+            if (!$isUpdate) {
+                $this->id = (int) $this->conn->lastInsertId();
+            }
+
+            return $this->id; // Retourner l'ID de l'utilisateur
+        } catch (Exception $e) {
+            throw new Exception('Erreur lors de la sauvegarde de l\'utilisateur : ' . $e->getMessage());
+        }
+    }
+
+    /**
      * GETTERS AND SETTERS
      */
 
