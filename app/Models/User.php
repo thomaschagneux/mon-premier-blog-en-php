@@ -12,71 +12,42 @@ use Exception;
  *
  * This class provides methods to interact with the user table in the database.
  */
-class User
+class User extends AbstractModel
 {
-    /**
-     * @var PDO|null The PDO connection instance
-     */
-    private ?PDO $conn;
-
     private int $id;
-
     private string $first_name;
-
     private string $last_name;
-
     private string $email;
-
     private string $password;
-
     private string $role;
-
     private ?int $picture_id = null;
 
-    private DateTime $created_at;
-
-    private DateTime $updated_at;
-
-
-    /**
-     * @throws Exception
-     */
     public function __construct()
     {
-        $database = new Database();
-        $dbInstance = $database::getInstance();
-        if ($dbInstance === null) {
-            throw new \Exception('Failed to get a valid Database instance.');
-        }
-
-        $this->conn = $dbInstance->getConnection();
-        if ($this->conn === null) {
-            throw new \Exception('Failed to connect to the database.');
-        }
+        parent::__construct();
+        $this->role = 'ROLE_USER';
     }
 
     /**
      * Creates a User instance from an associative array.
      *
-     * @param array<string, mixed> $userData
-     *
+     * @param array<string, mixed> $data
      * @throws Exception
      * @return self
      */
-    public static function fromArray(array $userData): self
+    public static function fromArray(array $data): self
     {
         $user = new self();
 
-        // Vérification des types avant de caster
-        $user->setId(isset($userData['id']) && is_int($userData['id']) ? $userData['id'] : 0);
-        $user->setFirstName(isset($userData['first_name']) && is_string($userData['first_name']) ? $userData['first_name'] : '');
-        $user->setLastName(isset($userData['last_name']) && is_string($userData['last_name']) ? $userData['last_name'] : '');
-        $user->setEmail(isset($userData['email']) && is_string($userData['email']) ? $userData['email'] : '');
-        $user->setPassword(isset($userData['password']) && is_string($userData['password']) ? $userData['password'] : '');
-        $user->setRole(isset($userData['role']) && is_string($userData['role']) ? $userData['role'] : '');
-        $user->setPictureId(isset($userData['picture_id']) && is_int($userData['picture_id']) ? $userData['picture_id'] : null);
-        $user->setCreatedAt(isset($userData['created_at']) && is_string($userData['created_at']) ? new \DateTime($userData['created_at']) : new \DateTime());
-        $user->setUpdatedAt(isset($userData['updated_at']) && is_string($userData['updated_at']) ? new \DateTime($userData['updated_at']) : new \DateTime());
+        $user->setId(isset($data['id']) && is_int($data['id']) ? $data['id'] : 0);
+        $user->setFirstName(isset($data['first_name']) && is_string($data['first_name']) ? $data['first_name'] : '');
+        $user->setLastName(isset($data['last_name']) && is_string($data['last_name']) ? $data['last_name'] : '');
+        $user->setEmail(isset($data['email']) && is_string($data['email']) ? $data['email'] : '');
+        $user->setPassword(isset($data['password']) && is_string($data['password']) ? $data['password'] : '');
+        $user->setRole(isset($data['role']) && is_string($data['role']) ? $data['role'] : '');
+        $user->setPictureId(isset($data['picture_id']) && is_int($data['picture_id']) ? $data['picture_id'] : null);
+        $user->setCreatedAt(isset($data['created_at']) && is_string($data['created_at']) ? new \DateTime($data['created_at']) : new \DateTime());
+        $user->setUpdatedAt(isset($data['updated_at']) && is_string($data['updated_at']) ? new \DateTime($data['updated_at']) : new \DateTime());
 
         return $user;
     }
@@ -125,6 +96,7 @@ class User
         return [];
     }
 
+
     /**
      * Finds a user by email.
      *
@@ -148,17 +120,100 @@ class User
 
             $userData = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            if ($userData === false) {
-                return null; // Aucun utilisateur trouvé
-            }
-            $userArray = [];
             if (is_array($userData)) {
-                $userArray = $userData;
+                return self::fromArray($userData);
             }
-            return self::fromArray($userArray);
+
+            return null;
         }
 
         throw new Exception("Server Error: Not connected to the database.");
+    }
+
+
+    /**
+     * @throws Exception
+     */
+    public function emailExists(string $email): bool
+    {
+        if (!$this->conn instanceof PDO) {
+            throw new Exception("La connexion à la base de données n'est pas disponible.");
+        }
+
+        try {
+            $query = "SELECT id FROM user WHERE email = :email LIMIT 1";
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute([':email' => $email]);
+
+            // Si une ligne est trouvée, l'email existe déjà
+            return $stmt->fetch(PDO::FETCH_ASSOC) !== false;
+        } catch (Exception $e) {
+            throw new Exception('Erreur lors de la vérification de l\'email : ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function save(): int
+    {
+        // Vérification de la connexion à la base de données
+        if (!$this->conn instanceof PDO) {
+            throw new Exception("La connexion à la base de données n'est pas disponible.");
+        }
+
+        $isUpdate = isset($this->id) && $this->id > 0;
+
+        if ($isUpdate) {
+            $query = "UPDATE user SET 
+                        first_name = :first_name,
+                        last_name = :last_name,
+                        email = :email,
+                        password = :password,
+                        role = :role,
+                        picture_id = :picture_id,
+                        updated_at = :updated_at
+                      WHERE id = :id";
+        } else {
+            $query = "INSERT INTO user (first_name, last_name, email, password, role, picture_id, created_at) 
+                      VALUES (:first_name, :last_name, :email, :password, :role, :picture_id, :created_at)";
+        }
+
+        try {
+            $stmt = $this->conn->prepare($query);
+
+            if ($isUpdate) {
+                $this->updatedAt = new DateTime();
+            } else {
+                $this->createdAt = new DateTime();
+            }
+
+            $params = [
+                ':first_name' => $this->getFirstName(),
+                ':last_name' => $this->getLastName(),
+                ':email' => $this->getEmail(),
+                ':password' => $this->getPassword(),
+                ':role' => $this->getRole(),
+                ':picture_id' => $this->getPictureId(),
+            ];
+
+            if ($isUpdate) {
+                $params[':updated_at'] = $this->getUpdatedAt()->format('Y-m-d H:i:s');
+                $params[':id'] = $this->getId();
+            } else {
+                $params[':created_at'] = $this->getCreatedAt()->format('Y-m-d H:i:s');
+            }
+
+            $stmt->execute($params);
+
+            if (!$isUpdate) {
+                $this->id = (int) $this->conn->lastInsertId();
+            }
+
+            return $this->id;
+        } catch (Exception $e) {
+            throw new Exception('Erreur lors de la sauvegarde de l\'utilisateur : ' . $e->getMessage());
+        }
     }
 
     /**
@@ -233,25 +288,5 @@ class User
     public function setPictureId(?int $picture_id): void
     {
         $this->picture_id = $picture_id;
-    }
-
-    public function getCreatedAt(): DateTime
-    {
-        return $this->created_at;
-    }
-
-    public function setCreatedAt(DateTime $created_at): void
-    {
-        $this->created_at = $created_at;
-    }
-
-    public function getUpdatedAt(): DateTime
-    {
-        return $this->updated_at;
-    }
-
-    public function setUpdatedAt(DateTime $updated_at): void
-    {
-        $this->updated_at = $updated_at;
     }
 }

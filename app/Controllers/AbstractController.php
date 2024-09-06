@@ -8,6 +8,7 @@ use App\core\HttpResponse;
 use App\core\RedirectResponse;
 use App\core\Router;
 use App\Manager\CookieManager;
+use App\Manager\FileManager;
 use App\Manager\PostManager;
 use App\Manager\ServerManager;
 use App\Services\Sanitizer;
@@ -36,6 +37,8 @@ abstract class AbstractController
     protected PostManager $postManager;
 
     protected ServerManager $serverManager;
+
+    protected FileManager $fileManager;
 
     /**
      * AbstractController constructor.
@@ -75,6 +78,8 @@ abstract class AbstractController
         $this->postManager = new PostManager();
 
         $this->serverManager = new ServerManager();
+
+        $this->fileManager = new FileManager();
     }
 
     /**

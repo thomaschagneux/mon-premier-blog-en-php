@@ -3,6 +3,9 @@ CSS stylesheet for administration app.
 For general app check app.css
  */
 
+body {
+    background-color: #6abeef33;
+}
 
 /**
 header nav

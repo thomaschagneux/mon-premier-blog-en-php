@@ -34,4 +34,12 @@ function defineRoutes(Router $router): void
     $router->addRoute('GET', '/admin/home', [Admincontroller::class, 'adminHome'], 'admin_home');
 
     $router->addRoute('GET', '/admin/user/list', [Usercontroller::class, 'adminListUser'], 'admin_list_user');
+
+    $router->addRoute('GET', '/admin/user/add', [Usercontroller::class, 'adminAddUserForm'], 'admin_add_user_form');
+
+    $router->addRoute('POST', '/admin/user/add', [Usercontroller::class, 'addUser'], 'add_user_action');
+
+    $router->addRoute('GET', '/register', [Usercontroller::class, 'registerForm'], 'register_form');
+
+    $router->addRoute('POST', '/register', [Usercontroller::class, 'register'], 'register');
 }

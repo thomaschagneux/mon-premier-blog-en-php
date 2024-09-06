@@ -28,7 +28,6 @@ class AuthController extends AbstractController
         }
 
         $csrfToken = bin2hex(random_bytes(32));
-        $this->cookieManager->setCookie('csrf_token', $csrfToken);
 
         return $this->render('login/login.html.twig', ['csrf_token' => $csrfToken]);
     }
@@ -43,11 +42,6 @@ class AuthController extends AbstractController
     public function login(): string|RedirectResponse
     {
         if ($this->isPostRequest()) {
-
-            if (!$this->isValidCsrfToken()) {
-                $error = "Jeton CSRF invalide.";
-                return $this->render('login/login.html.twig', ['error' => $error]);
-            }
 
             [$email, $password] = $this->getPostCredentials();
 
@@ -64,12 +58,6 @@ class AuthController extends AbstractController
     
         // Redirection vers la méthode showLoginForm en cas de requête GET
         return $this->loginForm();
-    }
-
-    private function isValidCsrfToken(): bool
-    {
-        $csrfToken = $this->postManager->getPostParam('csrf_token');
-        return $this->cookieManager->getCookie('csrf_token') === $csrfToken;
     }
 
     /**
