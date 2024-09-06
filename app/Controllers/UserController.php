@@ -217,10 +217,10 @@ class UserController extends AbstractController
         $name = $user->getFirstName() . ' ' . $user->getLastName();
 
         if ($user->remove()) {
-            $this->cookieManager->setCookie('validate_message', 'L\'utilisateur a bien été supprimé', 60);
+            $this->cookieManager->setCookie('validate_message', 'L\'utilisateur' . $name . ' a bien été supprimé', 60);
             return $this->redirectToRoute('admin_list_user');
         }
-        $this->cookieManager->setCookie('error_message', 'Il y a eu un problème dans la suppression de l\'utilisateur', 60);
+        $this->cookieManager->setCookie('error_message', 'Il y a eu un problème dans la suppression de l\'utilisateur ' . $name, 60);
         return $this->redirectToRoute('admin_list_user');
     }
 }

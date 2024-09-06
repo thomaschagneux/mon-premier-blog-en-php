@@ -217,8 +217,8 @@ class User extends AbstractModel
             }
 
             return $this->id;
-        } catch (Exception $e) {
-            throw new Exception('Erreur lors de la sauvegarde de l\'utilisateur : ' . $e->getMessage());
+        } catch (Exception) {
+            throw new Exception('Erreur lors de la sauvegarde de l\'utilisateur');
         }
     }
 
