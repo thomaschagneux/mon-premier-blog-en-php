@@ -1,3 +1,15 @@
+<?php
+
+namespace App\Models;
+
+use App\core\Database;
+use DateTime;
+use Exception;
+use PDO;
+
+class AbstractModel
+{
+    protected ?PDO $conn;
 
     protected DateTime $createdAt;
 
@@ -18,6 +30,7 @@
         if ($this->conn === null) {
             throw new Exception('Failed to connect to the database.');
         }
+
     }
 
     /**

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use DateTime;
 use Exception;
+use PDO;
 
 class Picture extends AbstractModel
 {
@@ -19,17 +20,17 @@ class Picture extends AbstractModel
     }
 
     /**
-     * @param array{id: int, file_name: string, path_name: string, mime_type: string} $data
+     * @param array<string, mixed> $data
      * @return self
      */
     public function fromArray(array $data): self
     {
         $picture = new self();
 
-        $picture->id = (int) $data['id'];
-        $picture->fileName = (string) $data['file_name'];
-        $picture->pathName = (string) $data['path_name'];
-        $picture->mimeType = (string) $data['mime_type'];
+        $picture->setId(isset($data['id']) && is_int($data['id']) ? $data['id'] : 0);
+        $picture->setFileName(isset($data['file_name']) && is_string($data['file_name']) ? $data['file_name'] : '');
+        $picture->setPathName(isset($data['path_name']) && is_string($data['path_name']) ? $data['path_name'] : '');
+        $picture->setMimeType(isset($data['mime_type']) && is_string($data['mime_type']) ? $data['mime_type'] : '');
 
         return $picture;
     }
@@ -40,7 +41,7 @@ class Picture extends AbstractModel
     public function save(): int
     {
         // Vérification de la connexion
-        if (!$this->conn instanceof \PDO) {
+        if (!$this->conn instanceof PDO) {
             throw new Exception('Failed to save picture: no database connection.');
         }
 
@@ -67,7 +68,6 @@ class Picture extends AbstractModel
             return $this->id; // Retourner l'ID de l'image insérée
 
         } catch (Exception $e) {
-            // Gestion de l'exception, par exemple journalisation
             throw new Exception('Erreur lors de la sauvegarde de l\'image : ' . $e->getMessage());
         }
     }
@@ -115,6 +115,4 @@ class Picture extends AbstractModel
     {
         $this->mimeType = $mimeType;
     }
-
-
 }

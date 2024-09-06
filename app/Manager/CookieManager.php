@@ -26,7 +26,7 @@ class CookieManager
             $value = Sanitizer::sanitizeString($value);
         }
 
-        if (!setcookie($name, $value, $expire, $path, $domain, $secure, $httpOnly)) {
+        if (!setcookie($name, $value, time() + $expire, $path, $domain, $secure, $httpOnly)) {
             throw new Exception("Failed to set the cookie.");
         }
     }
