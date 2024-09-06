@@ -16,13 +16,10 @@ use App\Controllers\AuthController;
  */
 function defineRoutes(Router $router): void
 {
-    // Define the route for the home page
     $router->addRoute('GET', '/', [HomeController::class, 'index'], 'index');
 
-    // Define the route for the about page with a dynamic {id} parameter
     $router->addRoute('GET', '/about/{id}', [HomeController::class, 'about'], 'about');
 
-    // Define the route for the contact page
     $router->addRoute('GET', '/contact', [HomeController::class, 'contact'], 'contact');
 
     $router->addRoute('GET', '/login', [AuthController::class, 'loginForm'], 'login_form');
@@ -42,4 +39,7 @@ function defineRoutes(Router $router): void
     $router->addRoute('GET', '/register', [Usercontroller::class, 'registerForm'], 'register_form');
 
     $router->addRoute('POST', '/register', [Usercontroller::class, 'register'], 'register');
+
+    $router->addRoute('GET', '/admin/user/{id}/remove', [Usercontroller::class, 'removeUser'], 'user_remove');
+
 }
