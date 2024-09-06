@@ -38,7 +38,17 @@ class UserController extends AbstractController
             $users = $this->user->getAllUsers();
             $table = $this->userTableService->getUserTable();
 
-            return $this->render('user/list.html.twig', ['users' => $users, 'table' => $table]);
+            $validateMessage = $this->cookieManager->getCookie('validate_message');
+            $this->cookieManager->deleteCookie('validate_message');
+            $errorMessage = $this->cookieManager->getCookie('error_message');
+            $this->cookieManager->deleteCookie('error_message');
+
+            return $this->render('user/list.html.twig', [
+                'users' => $users,
+                'table' => $table,
+                'validate_message' => $validateMessage,
+                'error_message' => $errorMessage
+            ]);
         }
         return $this->redirectToReferer();
     }
@@ -127,6 +137,8 @@ class UserController extends AbstractController
                 $picture->save();
 
                 $user->setPictureId($picture->getId());
+            } else{
+                $user->setPictureId(null);
             }
 
             $user->save();
@@ -183,6 +195,8 @@ class UserController extends AbstractController
                 $picture->save();
 
                 $user->setPictureId($picture->getId());
+            } else {
+                $user->setPictureId(null);
             }
 
             $user->save();
@@ -191,5 +205,22 @@ class UserController extends AbstractController
 
         $this->cookieManager->setCookie('error_message', 'Il y a une erreur dans la soumission du formulaire, veuillez recommencer', 60);
         return $this->redirectToRoute('adminAddUserForm');
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function removeUser(int $id): RedirectResponse
+    {
+        $user = new User();
+        $user->setId($id);
+        $name = $user->getFirstName() . ' ' . $user->getLastName();
+
+        if ($user->remove()) {
+            $this->cookieManager->setCookie('validate_message', 'L\'utilisateur a bien été supprimé', 60);
+            return $this->redirectToRoute('admin_list_user');
+        }
+        $this->cookieManager->setCookie('error_message', 'Il y a eu un problème dans la suppression de l\'utilisateur', 60);
+        return $this->redirectToRoute('admin_list_user');
     }
 }

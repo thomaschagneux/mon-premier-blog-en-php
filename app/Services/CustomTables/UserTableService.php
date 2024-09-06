@@ -60,7 +60,7 @@ class UserTableService extends AbstractTableService
 
     private function remove(User $user): string
     {
-        return sprintf('<a href="%s" class="btn btn-sm btn-danger rounded">%s</a>', $this->router->getRouteUrl('index'), 'Supprimer');
+        return sprintf('<a href="%s" class="btn btn-sm btn-danger rounded">%s</a>', $this->router->getRouteUrl('user_remove', ['id' => $user->getId()]), 'Supprimer');
     }
 
     private function show(User $user): string

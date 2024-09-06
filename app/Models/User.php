@@ -25,7 +25,13 @@ class User extends AbstractModel
     public function __construct()
     {
         parent::__construct();
+        $this->id = 0;
+        $this->first_name = "";
+        $this->last_name = "";
+        $this->email = "";
+        $this->password = "";
         $this->role = 'ROLE_USER';
+        $this->picture_id = 0;
     }
 
     /**
@@ -214,6 +220,29 @@ class User extends AbstractModel
         } catch (Exception $e) {
             throw new Exception('Erreur lors de la sauvegarde de l\'utilisateur : ' . $e->getMessage());
         }
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function remove()
+    {
+        if (!$this->conn instanceof PDO) {
+            throw new Exception("La connexion à la base de données n'est pas disponible.");
+        }
+
+        if (!isset($this->id) || $this->id <= 0) {
+            throw new Exception("ID de l'utilisateur non valide.");
+        }
+
+        try {
+            $query = "DELETE FROM user WHERE id = :id";
+            $stmt = $this->conn->prepare($query);
+           return $stmt->execute([':id' => $this->id]);
+        } catch (Exception $e) {
+            throw new Exception('Erreur lors de la suppression de l\'utilisateur : ' . $e->getMessage());
+        }
+
     }
 
     /**
