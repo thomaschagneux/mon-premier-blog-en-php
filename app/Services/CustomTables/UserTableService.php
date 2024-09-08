@@ -5,6 +5,9 @@ namespace App\Services\CustomTables;
 use App\core\Router;
 use App\Models\User;
 use Twig\Environment;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 
 class UserTableService extends AbstractTableService
 {
@@ -23,7 +26,12 @@ class UserTableService extends AbstractTableService
         parent::__construct($twig, $router);
     }
 
-
+    /**
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
+     * @return string
+     */
     public function getUserTable(): string
     {
         $users = $this->userModel->getAllUsers();
@@ -43,7 +51,13 @@ class UserTableService extends AbstractTableService
     }
 
 
-
+    /**
+     * @param User $user
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
+     * @return string
+     */
     private function getActions(User $user): string
     {
         return $this->twig->render('tables/_actions.html.twig', [
@@ -55,12 +69,12 @@ class UserTableService extends AbstractTableService
 
     private function edit(User $user): string
     {
-        return sprintf('<a href="%s" class="btn btn-sm btn-warning rounded">%s</a>', $this->router->getRouteUrl('index'), 'Modifier');
+        return sprintf('<a href="%s" class="btn btn-sm btn-warning rounded">%s</a>', $this->router->getRouteUrl('user_edit_form', ['id' => (string) $user->getId()]), 'Modifier');
     }
 
     private function remove(User $user): string
     {
-        return sprintf('<a href="%s" class="btn btn-sm btn-danger rounded">%s</a>', $this->router->getRouteUrl('user_remove', ['id' => $user->getId()]), 'Supprimer');
+        return sprintf('<a href="%s" class="btn btn-sm btn-danger rounded">%s</a>', $this->router->getRouteUrl('user_remove', ['id' => (string) $user->getId()]), 'Supprimer');
     }
 
     private function show(User $user): string

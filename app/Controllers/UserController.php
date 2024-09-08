@@ -223,4 +223,89 @@ class UserController extends AbstractController
         $this->cookieManager->setCookie('error_message', 'Il y a eu un problème dans la suppression de l\'utilisateur ' . $name, 60);
         return $this->redirectToRoute('admin_list_user');
     }
+
+    /**
+     * @throws SyntaxError
+     * @throws RuntimeError
+     * @throws LoaderError
+     * @throws Exception
+     */
+    public function editUserForm(int $id): string|RedirectResponse
+    {
+        $message = $this->cookieManager->getCookie('error_message') ?? null;
+
+        if ($message !== null) {
+            $this->cookieManager->deleteCookie('error_message');
+        }
+
+        if ($this->isAdmin()) {
+            $user = $this->user->findById($id);
+            if (null === $user) {
+                return $this->redirectToRoute('admin_list_user');
+            }
+            return $this->render('user/edit.html.twig', [
+                'user' => $user,
+                'message' => $message]);
+        } else {
+            return $this->redirectToReferer();
+        }
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function editUser(int $id): RedirectResponse
+    {
+
+        $user = $this->user->findById($id);
+        if (null === $user) {
+            return $this->redirectToRoute('admin_list_user');
+        }
+        if ($this->isPostRequest()) {
+            $firstName = $this->postManager->getPostParam('first_name');
+            $lastName = $this->postManager->getPostParam('last_name');
+            $email = $this->postManager->getPostParam('email');
+            $password = $this->postManager->getPostParam('password');
+            $role = $this->postManager->getPostParam('role') ?? 'ROLE_USER';
+
+            if (empty($password)) {
+                $password = $user->getPassword();
+            }
+
+            if (empty($firstName) || empty($lastName) || empty($email)) {
+                $this->cookieManager->setCookie('error_message', 'Veuillez remplir les champs requis', 60);
+                return $this->redirectToRoute('user_edit_form', ['id' => (string) $id]);
+            }
+            $user->setFirstName($firstName);
+            $user->setLastName($lastName);
+            $user->setEmail($email);
+            $user->setPassword(password_hash($password, PASSWORD_DEFAULT));
+            $user->setRole($role);
+
+            $picture = new Picture();
+            $fileData = $this->fileManager->getFile('avatar');
+
+            if (null !== $fileData) {
+                $extension = pathinfo($fileData['name'], PATHINFO_EXTENSION);
+                $uniqueFileName = 'avatar_' . $user->getFirstName() . '_' . $user->getLastName() . '_' . uniqid() . '.' . $extension;
+                $uniqueFileName = Sanitizer::sanitizeString($uniqueFileName);
+
+                $picture->setFileName($uniqueFileName);
+                $picture->setPathName('assets/img/avatars/');
+                $picture->setMimeType($fileData['type']);
+
+                $this->fileManager->setDestination($picture->getPathName());
+                $this->fileManager->moveFile($fileData['tmp_name'], $picture->getFileName());
+                $picture->save();
+
+                $user->setPictureId($picture->getId());
+            } else {
+                $user->setPictureId($user->getPictureId());
+            }
+            $user->save();
+            return $this->redirectToRoute('admin_list_user');
+        }
+        return $this->redirectToRoute('user_edit_form', ['id' => (string) $id]);
+    }
+
 }

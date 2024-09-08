@@ -136,6 +136,25 @@ class User extends AbstractModel
         throw new Exception("Server Error: Not connected to the database.");
     }
 
+    /**
+     * @param int $id
+     * @throws Exception
+     * @return self|null
+     */
+    public function findById(int $id): ?self
+    {
+        if ($this->conn instanceof PDO) {
+            $query = "SELECT * FROM user WHERE id = ?";
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute([$id]);
+
+            $userData = $stmt->fetch(PDO::FETCH_ASSOC);
+            if (is_array($userData)) {
+                return self::fromArray($userData);
+            }
+        }
+        return null;
+    }
 
     /**
      * @throws Exception
@@ -224,8 +243,9 @@ class User extends AbstractModel
 
     /**
      * @throws Exception
+     * @return bool
      */
-    public function remove()
+    public function remove(): bool
     {
         if (!$this->conn instanceof PDO) {
             throw new Exception("La connexion à la base de données n'est pas disponible.");
