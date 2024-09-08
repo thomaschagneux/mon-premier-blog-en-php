@@ -1,6 +1,4 @@
-{% if assets_path is not defined or assets_path is null %}
-{% set assets_path = '../../assets' %}
-{% endif %}
+{% set assets_path = assets_path ?? '/assets' %}
 <!DOCTYPE html>
 <html lang="fr">
 <head>

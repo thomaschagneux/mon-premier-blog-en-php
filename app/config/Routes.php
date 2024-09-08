@@ -42,4 +42,8 @@ function defineRoutes(Router $router): void
 
     $router->addRoute('GET', '/admin/user/{id}/remove', [Usercontroller::class, 'removeUser'], 'user_remove');
 
+    $router->addRoute('GET', '/admin/user/{id}/edit', [Usercontroller::class, 'editUserForm'], 'user_edit_form');
+
+    $router->addRoute('POST', '/admin/user/{id}/edit', [Usercontroller::class, 'editUser'], 'edit_user_action');
+
 }
