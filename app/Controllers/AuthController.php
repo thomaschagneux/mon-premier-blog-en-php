@@ -29,7 +29,16 @@ class AuthController extends AbstractController
 
         $csrfToken = bin2hex(random_bytes(32));
 
-        return $this->render('login/login.html.twig', ['csrf_token' => $csrfToken]);
+
+        $errorMessage = $this->cookieManager->getCookie('error_message');
+        if ($errorMessage) {
+            $this->cookieManager->deleteCookie('error_message');
+        }
+
+        return $this->render('login/login.html.twig', [
+            'csrf_token' => $csrfToken,
+            'error_message' => $errorMessage
+        ]);
     }
 
     /**
@@ -42,21 +51,20 @@ class AuthController extends AbstractController
     public function login(): string|RedirectResponse
     {
         if ($this->isPostRequest()) {
-
             [$email, $password] = $this->getPostCredentials();
 
             if (null === $email || '' === $email || null === $password || '' === $password) {
-                $error = "Email ou mot de passe non renseigné.";
-                return $this->renderError($error);
+                $this->cookieManager->setCookie('error_message', "Email ou mot de passe non renseigné.", 60);
+                return $this->redirectToRoute('login_form');
             } elseif ($this->authenticateUser($email, $password)) {
-                return $this->redirectToReferer();
+                $this->cookieManager->setCookie('success_message', 'Vous vous êtes bien connecté', 60);
+                return $this->redirectToRoute('index');
             } else {
-               $error = "Identifiants invalides";
-                return $this->renderError($error);
+                $this->cookieManager->setCookie('error_message', "Identifiants invalides", 60);
+                return $this->redirectToRoute('login_form'); // Redirection pour recharger les cookies
             }
         }
-    
-        // Redirection vers la méthode showLoginForm en cas de requête GET
+
         return $this->loginForm();
     }
 
@@ -113,9 +121,13 @@ class AuthController extends AbstractController
      * @throws SyntaxError
      * @throws LoaderError
      */
-    private function renderError(string $error): string
+    private function renderError(): string
     {
-        return $this->twig->render('login/login.html.twig', ['error' => $error]);
+        $errorMessage = $this->cookieManager->getCookie('error_message');
+        if (null !== $errorMessage) {
+            $this->cookieManager->deleteCookie('error_message');
+        }
+        return $this->twig->render('login/login.html.twig', ['error_message' => $errorMessage]);
     }
 
 
@@ -125,6 +137,7 @@ class AuthController extends AbstractController
     public function logout(): RedirectResponse
     {
         $this->cookieManager->deleteCookie('user_data');
+        $this->cookieManager->setCookie('success_message', "Vous vous êtes bien déconnecté", 60);
         return $this->redirectToRoute('index');
     }
 }

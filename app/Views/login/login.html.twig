@@ -1,9 +1,6 @@
 {% extends "components/base/base.html.twig" %}
 
 {% block body %}
-{% if error is defined %}
-  <div class="text-danger">{{ error}}</div>
-{% endif %}
 <form method="POST" action={{path('login')}}>
   <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
   <div class="mb-3">
