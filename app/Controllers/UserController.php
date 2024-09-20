@@ -7,6 +7,7 @@ use App\core\Router;
 use App\Models\Picture;
 use App\Models\User;
 use App\Services\CustomTables\UserTableService;
+use App\Services\HelperServices;
 use App\Services\Sanitizer;
 use Exception;
 use Twig\Error\LoaderError;
@@ -290,6 +291,7 @@ class UserController extends AbstractController
             $picture = new Picture();
             $fileData = $this->fileManager->getFile('avatar');
 
+
             if (null !== $fileData) {
                 $extension = pathinfo($fileData['name'], PATHINFO_EXTENSION);
                 $uniqueFileName = 'avatar_' . $user->getFirstName() . '_' . $user->getLastName() . '_' . uniqid() . '.' . $extension;
@@ -304,8 +306,11 @@ class UserController extends AbstractController
                 $picture->save();
 
                 $user->setPictureId($picture->getId());
-            } else {
+            } elseif(null !== $user->getPictureId()) {
                 $user->setPictureId($user->getPictureId());
+            }else {
+                $this->cookieManager->setCookie('error_message', 'Erreur dans le chargement de cette image', 60);
+                return $this->redirectToRoute('user_edit_form', ['id' => (string) $id]);
             }
             $user->save();
             $this->cookieManager->setCookie('success_message', 'Cet utilisateur a bien été modifié', 60);
@@ -319,11 +324,16 @@ class UserController extends AbstractController
      * @throws SyntaxError
      * @throws LoaderError
      */
-    public function showUser(int $id): string|RedirectResponse
+    public function adminUserShow(int $id): string|RedirectResponse
     {
         if ($this->isAdmin()) {
             $user = $this->user->findById($id);
-            return $this->render('user/show.html.twig', ['user' => $user]);
+            $picture = null;
+            if (null !== $user->getPictureId()) {
+                $pictureModel = new Picture();
+                $picture = $pictureModel->findById($user->getPictureId());
+            }
+            return $this->render('user/show.html.twig', ['user' => $user, 'picture' => $picture]);
         }
         return $this->redirectToReferer();
     }

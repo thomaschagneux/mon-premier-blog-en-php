@@ -1,0 +1,19 @@
+{% extends "components/base/base_admin.html.twig" %}
+{% block body %}
+<div class="card">
+    <div class="card-header">
+        <h1>Détails de l'utilisateur {{ user.firstName }} {{ user.lastName }}</h1>
+    </div>
+    <div class="card-body">
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">Prénom: {{ user.firstName }}</li>
+            <li class="list-group-item">Nom: {{ user.lastName }}</li>
+            {% if picture is defined and not null %}
+                <li class="list-group-item"><img src="/../../{{ picture.pathName }}{{ picture.fileName }}" alt="" ></li>
+                <li class="list-group-item">{{ dump(picture) }}</li>
+            {% endif %}
+            <li class="list-group-item">{{ user.createdAt.format('d/m/Y H:i:s') }}</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

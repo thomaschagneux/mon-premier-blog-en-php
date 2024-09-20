@@ -79,7 +79,7 @@ class UserTableService extends AbstractTableService
 
     private function show(User $user): string
     {
-        return sprintf('<a href="%s" class="btn btn-sm btn-primary rounded">%s</a>', $this->router->getRouteUrl('index'), 'Voir');
+        return sprintf('<a href="%s" class="btn btn-sm btn-primary rounded">%s</a>', $this->router->getRouteUrl('user_show', ['id' => (string) $user->getId()]), 'Voir');
     }
 
     private function getRole(User $user): string
