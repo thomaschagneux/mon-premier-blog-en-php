@@ -72,6 +72,31 @@ class Picture extends AbstractModel
         }
     }
 
+    public function findById(int $id): ?Picture
+    {
+        if (!$this->conn instanceof PDO) {
+            throw new Exception('Failed to fetch picture by id: ' . $id);
+        }
+
+        try {
+            $query = "SELECT * FROM picture WHERE id = :id";
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute([':id' => $id]);
+
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($result) {
+                return $this->fromArray($result);
+            }
+
+            return null;
+
+        } catch (Exception $e) {
+            error_log('Erreur lors de la récupération de l\'image : ' . $e->getMessage());
+            return null;
+        }
+    }
+
     /**
      * GETTERS AND SETTERS
      */

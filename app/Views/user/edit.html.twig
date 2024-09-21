@@ -2,12 +2,6 @@
 {% extends "components/base/base_admin.html.twig"%}
 
 {% block body %}
-    {% if message is defined and message is not null %}
-        <div class="alert alert-danger" role="alert">
-            <span><i class="fa fa-warning"></i> </span>
-            <span>{{ message }}</span>
-        </div>
-    {% endif %}
     <div class="card mb-md-5">
         <div class="card-header">
             <h1>Modification d'un utilisateur</h1>
@@ -31,7 +25,7 @@
                 <div class="row mb-3">
                     <div class="col col-md-6">
                         <label for="avatar" class="form-label">Avatar</label>
-                        <input type="file" class="form-control" id="avatar" name="avatar" accept="image/png, image/jpeg" />
+                        <input type="file" class="form-control" id="avatar" name="avatar" accept="image/png, image/jpeg, image/jpg" />
                     </div>
                     <div class="col col-md-6">
                         <label for="role" class="form-label">Rôle</label>

@@ -6,6 +6,7 @@ use App\Manager\ServerManager;
 use App\Models\User;
 use App\core\RedirectResponse;
 use App\Services\Sanitizer;
+use Exception;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
@@ -17,14 +18,20 @@ class HomeController extends AbstractController
      * @throws RuntimeError
      * @throws SyntaxError
      * @throws LoaderError
+     * @throws Exception
      */
     public function index(): string
     {
         $content = 'index';
 
+        $successMessage = $this->cookieManager->getCookie('success_message');
+        if ($successMessage) {
+            $this->cookieManager->deleteCookie('success_message');
+        }
         return $this->twig->render('index.html.twig', [
             'title' => 'Home Page',
             'content' => $content,
+            'success_message' => $successMessage,
         ]);
     }
 
@@ -37,7 +44,7 @@ class HomeController extends AbstractController
      * @throws LoaderError
      * @throws RuntimeError
      * @throws SyntaxError
-     * @throws \Exception
+     * @throws Exception
      * @return string|RedirectResponse
      */
     public function contact(): string|RedirectResponse

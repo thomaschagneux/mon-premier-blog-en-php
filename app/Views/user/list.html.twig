@@ -1,18 +1,6 @@
 {% extends "components/base/base_admin.html.twig" %}
 
 {% block body %}
-    {% if validate_message is defined and validate_message is not null %}
-        <div class="alert alert-danger" role="alert">
-            <span><i class="fa fa-warning"></i> </span>
-            <span>{{ validate_message }}</span>
-        </div>
-    {% endif %}
-    {% if error_message is defined and error_message is not null %}
-        <div class="alert alert-danger" role="alert">
-            <span><i class="fa fa-warning"></i> </span>
-            <span>{{ error_message }}</span>
-        </div>
-    {% endif %}
     <div class="card mb-5">
         <div class="card-header">
             <h1>Liste des utilisateurs</h1>
@@ -20,7 +8,20 @@
 
         <div class="card-body">
             {% if users is defined and users is not null %}
-                {{ table | raw }}
+                <div>
+                    <div class="row justify-content-end">
+                        <div class="col col-md-4 text-end">
+                            <a class="btn btn-primary" href={{ path('admin_add_user_form')}}>
+                                <span><i class="fa-solid fa-plus"></i></span>
+                                <span>Ajouter un utilisateur</span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="row">
+                        {{ table | raw }}
+                    </div>
+                </div>
+
             {% endif %}
         </div>
     </div>

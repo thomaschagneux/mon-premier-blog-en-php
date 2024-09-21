@@ -7,6 +7,7 @@ use App\core\Router;
 use App\Models\Picture;
 use App\Models\User;
 use App\Services\CustomTables\UserTableService;
+use App\Services\HelperServices;
 use App\Services\Sanitizer;
 use Exception;
 use Twig\Error\LoaderError;
@@ -38,15 +39,19 @@ class UserController extends AbstractController
             $users = $this->user->getAllUsers();
             $table = $this->userTableService->getTableContent();
 
-            $validateMessage = $this->cookieManager->getCookie('validate_message');
-            $this->cookieManager->deleteCookie('validate_message');
+            $validateMessage = $this->cookieManager->getCookie('success_message');
+            if (null !== $validateMessage) {
+                $this->cookieManager->deleteCookie('success_message');
+            }
             $errorMessage = $this->cookieManager->getCookie('error_message');
-            $this->cookieManager->deleteCookie('error_message');
+            if (null !== $errorMessage) {
+                $this->cookieManager->deleteCookie('error_message');
+            }
 
             return $this->render('user/list.html.twig', [
                 'users' => $users,
                 'table' => $table,
-                'validate_message' => $validateMessage,
+                'success_message' => $validateMessage,
                 'error_message' => $errorMessage
             ]);
         }
@@ -200,6 +205,7 @@ class UserController extends AbstractController
             }
 
             $user->save();
+            $this->cookieManager->setCookie('success_message', 'Cet utilisateur a bien été ajouté', 60);
             return $this->redirectToRoute('admin_list_user');
         }
 
@@ -217,7 +223,7 @@ class UserController extends AbstractController
         $name = $user->getFirstName() . ' ' . $user->getLastName();
 
         if ($user->remove()) {
-            $this->cookieManager->setCookie('validate_message', 'L\'utilisateur' . $name . ' a bien été supprimé', 60);
+            $this->cookieManager->setCookie('success_message', 'Cet utilisateur a bien été supprimé', 60);
             return $this->redirectToRoute('admin_list_user');
         }
         $this->cookieManager->setCookie('error_message', 'Il y a eu un problème dans la suppression de l\'utilisateur ' . $name, 60);
@@ -285,6 +291,7 @@ class UserController extends AbstractController
             $picture = new Picture();
             $fileData = $this->fileManager->getFile('avatar');
 
+
             if (null !== $fileData) {
                 $extension = pathinfo($fileData['name'], PATHINFO_EXTENSION);
                 $uniqueFileName = 'avatar_' . $user->getFirstName() . '_' . $user->getLastName() . '_' . uniqid() . '.' . $extension;
@@ -299,13 +306,36 @@ class UserController extends AbstractController
                 $picture->save();
 
                 $user->setPictureId($picture->getId());
-            } else {
+            } elseif(null !== $user->getPictureId()) {
                 $user->setPictureId($user->getPictureId());
+            }else {
+                $this->cookieManager->setCookie('error_message', 'Erreur dans le chargement de cette image', 60);
+                return $this->redirectToRoute('user_edit_form', ['id' => (string) $id]);
             }
             $user->save();
+            $this->cookieManager->setCookie('success_message', 'Cet utilisateur a bien été modifié', 60);
             return $this->redirectToRoute('admin_list_user');
         }
         return $this->redirectToRoute('user_edit_form', ['id' => (string) $id]);
+    }
+
+    /**
+     * @throws RuntimeError
+     * @throws SyntaxError
+     * @throws LoaderError
+     */
+    public function adminUserShow(int $id): string|RedirectResponse
+    {
+        if ($this->isAdmin()) {
+            $user = $this->user->findById($id);
+            $picture = null;
+            if (null !== $user->getPictureId()) {
+                $pictureModel = new Picture();
+                $picture = $pictureModel->findById($user->getPictureId());
+            }
+            return $this->render('user/show.html.twig', ['user' => $user, 'picture' => $picture]);
+        }
+        return $this->redirectToReferer();
     }
 
 }

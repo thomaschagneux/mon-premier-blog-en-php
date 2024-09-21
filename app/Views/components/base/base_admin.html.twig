@@ -32,6 +32,18 @@
 <!-- Main Content-->
 <div class="container px-4 px-lg-5">
     <div class="row gx-4 gx-lg-5 justify-content-center">
+        {% if success_message is defined and success_message is not null %}
+            <div class="alert alert-success" role="alert">
+                <span><i class="fa-solid fa-check"></i> </span>
+                <span>{{ success_message }}</span>
+            </div>
+        {% endif %}
+        {% if error_message is defined and error_message is not null %}
+            <div class="alert alert-danger" role="alert">
+                <span><i class="fa fa-warning"></i> </span>
+                <span>{{ error_message }}</span>
+            </div>
+        {% endif %}
         {% block body %}
         {% endblock %}
     </div>
