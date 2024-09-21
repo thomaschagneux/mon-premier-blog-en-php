@@ -22,7 +22,6 @@ class Post extends AbstractModel
         parent::__construct();
     }
 
-
     /**
      * @param array<string, mixed> $data
      * @return self
@@ -40,10 +39,8 @@ class Post extends AbstractModel
         $post->setCreatedAt(isset($data['created_at']) && is_string($data['created_at'])? new DateTime($data['created_at']) : new DateTime());
         $post->setUpdatedAt(isset($data['updated_at']) && is_string($data['updated_at'])? new DateTime($data['updated_at']) : null);
 
-
         return $post;
     }
-
 
     /**
      * @return array<int, Post>
@@ -121,7 +118,4 @@ class Post extends AbstractModel
     {
         $this->user_id = $user_id;
     }
-
-
-
 }
