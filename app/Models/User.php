@@ -223,7 +223,7 @@ class User extends AbstractModel
             ];
 
             if ($isUpdate) {
-                $params[':updated_at'] = $this->getUpdatedAt()->format('Y-m-d H:i:s');
+                $params[':updated_at'] = $this->getUpdatedAt()?->format('Y-m-d H:i:s');
                 $params[':id'] = $this->getId();
             } else {
                 $params[':created_at'] = $this->getCreatedAt()->format('Y-m-d H:i:s');

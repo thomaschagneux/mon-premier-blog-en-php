@@ -14,8 +14,9 @@
                 {% for column in columns %}
                     <td>
                         {% if column.key == 'actions' %}
-                            {{ row[column.key] | raw}}
-
+                            {{ row[column.key] | raw }}
+                        {% elseif column.key == 'action' %}
+                            {{ row[column.key] | raw }}
                         {% else %}
                             {{ row[column.key]}}
                         {% endif %}

@@ -36,7 +36,7 @@ class UserController extends AbstractController
         if ($this->isAdmin()) {
             $this->user = new User();
             $users = $this->user->getAllUsers();
-            $table = $this->userTableService->getUserTable();
+            $table = $this->userTableService->getTableContent();
 
             $validateMessage = $this->cookieManager->getCookie('validate_message');
             $this->cookieManager->deleteCookie('validate_message');

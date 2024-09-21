@@ -4,6 +4,7 @@ namespace App\Services\CustomTables;
 
 use App\Components\TableComponent;
 use App\core\Router;
+use App\Models\AbstractModel;
 use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
@@ -73,4 +74,48 @@ abstract class AbstractTableService
 
         return $table->render($this->twig);
     }
+
+    /**
+     * @param string $route
+     * @param string $label
+     * @param string|null $cssClass
+     * @param array<int|string, string|array<string, string>> $params
+     * @return string
+     */
+    protected function getLink(string $route, string $label, string $cssClass = null, array $params = []): string
+    {
+        $url = $this->router->getRouteUrl($route, $params);
+        return sprintf('<a href="%s" class="btn btn-sm rounded %s">%s</a>', $url, $cssClass, $label);
+    }
+
+    /**
+     * @param string $route
+     * @param array<int|string, string|array<string, string>> $params
+     * @return string
+     */
+    protected function getEditLink(string $route, array $params = []): string
+    {
+        return $this->getLink($route, 'Modifier', 'btn-warning', $params);
+    }
+
+    /**
+     * @param string $route
+     * @param array<int|string, string|array<string, string>> $params
+     * @return string
+     */
+    protected function getDeleteLink(string $route, array $params = []): string
+    {
+        return $this->getLink($route,'Supprimer' ,'btn-danger', $params);
+    }
+
+    /**
+     * @param string $route
+     * @param array<int|string, string|array<string, string>> $params
+     * @return string
+     */
+    protected function getShowLink(string $route, array $params = []): string
+    {
+        return $this->getLink($route, 'Voir', 'btn-primary', $params );
+    }
+
 }

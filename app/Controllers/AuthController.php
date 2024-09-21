@@ -99,7 +99,7 @@ class AuthController extends AbstractController
             'password' => $user->getPassword(),
             'picture_id' => $user->getpictureId(),
             'created_at' => $user->getCreatedAt()->format('d/m/y'),
-            'updated_at' => $user->getUpdatedAt()->format('d/m/y'),
+            'updated_at' => $user->getUpdatedAt()?->format('d/m/y'),
         ]);
         if (null == $userData) {
             throw new Exception("Erreur lors de l'enregistrement de l'utilisateur");
