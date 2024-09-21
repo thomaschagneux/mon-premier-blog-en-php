@@ -1,6 +1,7 @@
 <?php
 
 use App\Controllers\Admincontroller;
+use App\Controllers\PostController;
 use App\Controllers\UserController;
 use App\core\Router;
 use App\Controllers\HomeController;
@@ -46,4 +47,5 @@ function defineRoutes(Router $router): void
 
     $router->addRoute('POST', '/admin/user/{id}/edit', [Usercontroller::class, 'editUser'], 'edit_user_action');
 
+    $router->addRoute('GET', '/admin/post/list', [PostController::class, 'postList'], 'list_post');
 }

@@ -4,6 +4,7 @@ namespace App\Services\CustomTables;
 
 use App\core\Router;
 use App\Models\User;
+use Exception;
 use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
@@ -30,9 +31,10 @@ class UserTableService extends AbstractTableService
      * @throws LoaderError
      * @throws RuntimeError
      * @throws SyntaxError
+     * @throws Exception
      * @return string
      */
-    public function getUserTable(): string
+    public function getTableContent(): string
     {
         $users = $this->userModel->getAllUsers();
 
