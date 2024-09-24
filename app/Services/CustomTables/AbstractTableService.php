@@ -39,9 +39,15 @@ abstract class AbstractTableService
             $this->columns[] = [
                 'title' => $title,
                 'key' => $key,
-                'formatter' => $this->getColumnFormatter($key)
+                'formatter' => $this->getColumnFormatter($key),
+                'cssClass' => $this->getColumnClass($key),
             ];
         }
+    }
+
+    protected function getColumnClass(string $key): string
+    {
+        return 'column-' . $key;
     }
 
     protected function getColumnFormatter(string $key): ?callable

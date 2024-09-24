@@ -15,8 +15,6 @@ return array(
     'Respect\\Stringifier\\' => array($vendorDir . '/respect/stringifier/src'),
     'PhpOption\\' => array($vendorDir . '/phpoption/phpoption/src/PhpOption'),
     'PHPMailer\\PHPMailer\\' => array($vendorDir . '/phpmailer/phpmailer/src'),
-    'Intervention\\Image\\' => array($vendorDir . '/intervention/image/src'),
-    'Intervention\\Gif\\' => array($vendorDir . '/intervention/gif/src'),
     'GrahamCampbell\\ResultType\\' => array($vendorDir . '/graham-campbell/result-type/src'),
     'Dotenv\\' => array($vendorDir . '/vlucas/phpdotenv/src'),
     'App\\' => array($baseDir . '/app'),

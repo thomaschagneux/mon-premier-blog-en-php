@@ -42,11 +42,6 @@ class ComposerStaticInit98c39a327de827273cc1e274d73360f2
             'PhpOption\\' => 10,
             'PHPMailer\\PHPMailer\\' => 20,
         ),
-        'I' => 
-        array (
-            'Intervention\\Image\\' => 19,
-            'Intervention\\Gif\\' => 17,
-        ),
         'G' => 
         array (
             'GrahamCampbell\\ResultType\\' => 26,
@@ -97,14 +92,6 @@ class ComposerStaticInit98c39a327de827273cc1e274d73360f2
         'PHPMailer\\PHPMailer\\' => 
         array (
             0 => __DIR__ . '/..' . '/phpmailer/phpmailer/src',
-        ),
-        'Intervention\\Image\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/intervention/image/src',
-        ),
-        'Intervention\\Gif\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/intervention/gif/src',
         ),
         'GrahamCampbell\\ResultType\\' => 
         array (

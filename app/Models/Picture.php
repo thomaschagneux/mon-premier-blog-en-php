@@ -22,6 +22,7 @@ class Picture extends AbstractModel
     /**
      * @param array<string, mixed> $data
      * @return self
+     * @throws Exception
      */
     public function fromArray(array $data): self
     {
@@ -85,7 +86,7 @@ class Picture extends AbstractModel
 
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            if ($result) {
+            if (is_array($result)) {
                 return $this->fromArray($result);
             }
 

@@ -52,6 +52,19 @@ class UserTableService extends AbstractTableService
         return $this->renderTable($rows);
     }
 
+    protected function getColumnClass(string $key): string
+    {
+        $customClasses = [
+            'name' => 'column-name',
+            'email' => 'column-email',
+            'role' => 'column-role',
+            'created_at' => 'column-created',
+            'actions' => 'column-actions',
+        ];
+
+        // Retourne la classe personnalisée si elle existe, sinon la classe par défaut
+        return $customClasses[$key] ?? parent::getColumnClass($key);
+    }
 
     /**
      * @param User $user
