@@ -30,7 +30,7 @@ function loadUsers($pdo) {
 function loadPictures($pdo) {
     $csvFile = dirname(__DIR__) . '/data/Picture_Data.csv';
     insertDataFromCsv($pdo, $csvFile, 'picture', [
-        'id', 'file_name', 'path_name', 'mimeType', 'created_at', 'updated_at'
+        'id', 'file_name', 'path_name', 'mime_type', 'created_at', 'updated_at'
     ]);
 }
 

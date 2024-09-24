@@ -238,9 +238,9 @@ class UserController extends AbstractController
      */
     public function editUserForm(int $id): string|RedirectResponse
     {
-        $message = $this->cookieManager->getCookie('error_message') ?? null;
+        $errorMessage = $this->cookieManager->getCookie('error_message') ?? null;
 
-        if ($message !== null) {
+        if ($errorMessage !== null) {
             $this->cookieManager->deleteCookie('error_message');
         }
 
@@ -251,7 +251,7 @@ class UserController extends AbstractController
             }
             return $this->render('user/edit.html.twig', [
                 'user' => $user,
-                'message' => $message]);
+                'error_message' => $errorMessage]);
         } else {
             return $this->redirectToReferer();
         }
@@ -289,8 +289,22 @@ class UserController extends AbstractController
             $user->setRole($role);
 
             $picture = new Picture();
-            $fileData = $this->fileManager->getFile('avatar');
 
+            $file = $this->fileManager->sanitizedFiles('avatar');
+
+            if($file['error'] === UPLOAD_ERR_INI_SIZE || $file['error'] === UPLOAD_ERR_FORM_SIZE) {
+                $this->cookieManager->setCookie('error_message', 'Le fichier dépasse la taille maximale autorisée', 60);
+                return $this->redirectToRoute('user_edit_form', ['id' => (string) $id]);
+            } elseif ($file['error'] === UPLOAD_ERR_NO_FILE) {
+                $this->cookieManager->setCookie('error_message', 'Fichier inexistant', 60);
+                return $this->redirectToRoute('user_edit_form', ['id' => (string) $id]);
+            } elseif ($file['error'] !== UPLOAD_ERR_OK) {
+                $this->cookieManager->setCookie('error_message', 'Erreur inconnue dans le chargement du fichier', 60);
+                return $this->redirectToRoute('user_edit_form', ['id' => (string) $id]);
+            }
+
+
+            $fileData = $this->fileManager->getFile('avatar');
 
             if (null !== $fileData) {
                 $extension = pathinfo($fileData['name'], PATHINFO_EXTENSION);
@@ -323,11 +337,15 @@ class UserController extends AbstractController
      * @throws RuntimeError
      * @throws SyntaxError
      * @throws LoaderError
+     * @throws Exception
      */
     public function adminUserShow(int $id): string|RedirectResponse
     {
         if ($this->isAdmin()) {
             $user = $this->user->findById($id);
+            if (null === $user) {
+                return $this->redirectToRoute('error_500');
+            }
             $picture = null;
             if (null !== $user->getPictureId()) {
                 $pictureModel = new Picture();

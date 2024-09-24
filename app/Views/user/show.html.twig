@@ -8,11 +8,22 @@
         <ul class="list-group list-group-flush">
             <li class="list-group-item">Prénom: {{ user.firstName }}</li>
             <li class="list-group-item">Nom: {{ user.lastName }}</li>
+            <li class="list-group-item">Email: {{ user.email }}</li>
+            <li class="list-group-item">Rôle:
+                {% if user.role == 'ROLE_ADMIN' %}
+                    Administrateur
+                {% elseif user.role == 'ROLE_USER' %}
+                    Utilisateur
+                {% endif %}
+            </li>
             {% if picture is defined and not null %}
-                <li class="list-group-item"><img src="/../../{{ picture.pathName }}{{ picture.fileName }}" alt="" ></li>
-                <li class="list-group-item">{{ dump(picture) }}</li>
+                <li class="list-group-item">
+                    <img src="/../../{{ picture.pathName }}{{ picture.fileName }}" alt="" class="img-fluid">
+                </li>
             {% endif %}
-            <li class="list-group-item">{{ user.createdAt.format('d/m/Y H:i:s') }}</li>
+            <li>{{ dump(user) }}</li>
+            <li class="list-group-item">Créé le: {{ user.createdAt.format('d/m/Y H:i:s') }}</li>
+            <li class="list-group-item">Modifié le: {{ user.updatedAt.format('d/m/Y H:i:s') }}</li>
         </ul>
     </div>
 </div>

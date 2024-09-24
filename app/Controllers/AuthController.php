@@ -117,21 +117,6 @@ class AuthController extends AbstractController
     }
 
     /**
-     * @throws RuntimeError
-     * @throws SyntaxError
-     * @throws LoaderError
-     */
-    private function renderError(): string
-    {
-        $errorMessage = $this->cookieManager->getCookie('error_message');
-        if (null !== $errorMessage) {
-            $this->cookieManager->deleteCookie('error_message');
-        }
-        return $this->twig->render('login/login.html.twig', ['error_message' => $errorMessage]);
-    }
-
-
-    /**
      * @throws Exception
      */
     public function logout(): RedirectResponse

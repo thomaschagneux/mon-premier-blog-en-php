@@ -21,14 +21,12 @@ class FileManager
      */
     public function getFile(string $key, array $allowedTypes = ['image/jpeg', 'image/png'], int $maxSize = 2000000): ?array
     {
-        $file = Sanitizer::sanitizeArray($_FILES[$key]);
-
-        // Validate the file has been uploaded without errors
-        if ($file['error'] !== UPLOAD_ERR_OK) {
-            return null;
-        }
+        $file = $this->sanitizedFiles($key);
 
         // Sanitize the file name (removes harmful characters)
+        if (!is_string($file['name'])) {
+            return null;
+        }
         $filteredName = Sanitizer::sanitizeString($file['name']);
 
         // Validate file size
@@ -105,5 +103,17 @@ class FileManager
         $this->destination = rtrim($destination, '/') . '/';
 
         return $this;
+    }
+
+    /**
+     * @param string|null $key
+     * @return array<mixed>
+     */
+    public function sanitizedFiles(string $key = null): array
+    {
+        if (null === $key) {
+            return Sanitizer::sanitizeArray($_FILES);
+        }
+        return Sanitizer::sanitizeArray($_FILES[$key]);
     }
 }

@@ -1,6 +1,7 @@
 <?php
 
 use App\Controllers\Admincontroller;
+use App\Controllers\ErrorController;
 use App\Controllers\PostController;
 use App\Controllers\UserController;
 use App\core\Router;
@@ -22,6 +23,12 @@ function defineRoutes(Router $router): void
     $router->addRoute('GET', '/about/{id}', [HomeController::class, 'about'], 'about');
 
     $router->addRoute('GET', '/contact', [HomeController::class, 'contact'], 'contact');
+
+    $router->addRoute('GET', '/error/500', [ErrorController::class, 'error500'], 'error_500');
+
+    $router->addRoute('GET', '/error/404', [ErrorController::class, 'error404'], 'error_404');
+
+    $router->addRoute('GET', '/error/403', [ErrorController::class, 'error403'], 'error_403');
 
     $router->addRoute('GET', '/login', [AuthController::class, 'loginForm'], 'login_form');
 

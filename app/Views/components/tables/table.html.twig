@@ -4,7 +4,7 @@
         <thead class="custom-table-head table-dark">
         <tr>
             {% for column in columns %}
-                <th>{{ column.title }}</th>
+                <th class="{{ column.cssClass }}">{{ column.title }}</th>
             {% endfor %}
         </tr>
         </thead>
