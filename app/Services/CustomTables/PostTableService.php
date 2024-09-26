@@ -27,7 +27,7 @@ class PostTableService extends AbstractTableService
             'author' => 'Auteur',
             'created_at' => 'Date de création',
             'updated_at' => 'Date de modification',
-            'action' => 'Action',
+            'actions' => 'Action',
         ];
         parent::__construct($twig, $router);
     }
@@ -50,7 +50,7 @@ class PostTableService extends AbstractTableService
                 'author' => $this->getAuthor($post),
                 'created_at' => $post->getCreatedAt()->format('d/m/Y'),
                 'updated_at' => $post->getUpdatedAt() ? $post->getUpdatedAt()->format('d/m/Y') : '',
-                'action' => $this->getAction($post),
+                'actions' => $this->getAction($post),
             ];
         }
 

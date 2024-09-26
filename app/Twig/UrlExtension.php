@@ -49,7 +49,7 @@ class UrlExtension extends AbstractExtension
         return [
             new TwigFunction('path', [$this, 'generatePath']),
             new TwigFunction('referer', [$this, 'getReferer']),
-            new TwigFunction('dump', [$this, 'dump']),
+            new TwigFunction('dumper', [$this, 'dumper']),
         ];
     }
 
@@ -70,7 +70,7 @@ class UrlExtension extends AbstractExtension
         return $this->serverManager->getServerParams('HTTP_REFERER') ?? null;
     }
 
-    public function dump(mixed $var): void
+    public function dumper(mixed $var): void
     {
         $this->helperServices->dump($var);
     }

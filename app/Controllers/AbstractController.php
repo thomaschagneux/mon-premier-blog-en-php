@@ -80,6 +80,10 @@ abstract class AbstractController
         $this->serverManager = new ServerManager();
 
         $this->fileManager = new FileManager();
+
+        $this->addGlobalVariables();
+
+        $this->isConnected();
     }
 
     /**
@@ -156,6 +160,16 @@ abstract class AbstractController
         return new RedirectResponse($url, $this->headers, $this->response);
     }
 
+    /**
+     * @param string $routeName
+     * @param array<int|string, array<mixed>|string> $params
+     * @return string
+     */
+    public function generateUrl(string $routeName, array $params = []): string
+    {
+        return $this->router->getRouteUrl($routeName, $params);
+    }
+
     public function getReferer(): string
     {
         return  $this->serverManager->getServerParams('HTTP_REFERER') ?? $this->router->getRouteUrl('index');
@@ -210,5 +224,14 @@ abstract class AbstractController
     protected function isPostRequest(): bool
     {
         return $this->serverManager->getServerParams('REQUEST_METHOD') === 'POST';
+    }
+
+    protected function addGlobalVariables(): void
+    {
+        $userArray = [
+            'connected' => $this->isConnected(),
+            'admin' => $this->isAdmin(),
+        ];
+        $this->twig->addGlobal('app_user', $userArray); // Add user to Twig globals
     }
 }
