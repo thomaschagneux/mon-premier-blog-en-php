@@ -8,31 +8,19 @@ use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 
 class FormComponent
-{ /**
- * @var array<array<string, mixed>>
- */
+{
     private array $fields = [];
-
-    /**
-     * @var string
-     */
     private string $action;
+    private string $method;
+    private string $enctype;
 
-    /**
-     * @param string $action
-     */
-    public function __construct(string $action)
+    public function __construct(string $action, string $method = 'POST', string $enctype = 'multipart/form-data')
     {
         $this->action = $action;
+        $this->method = $method;
+        $this->enctype = $enctype;
     }
 
-    /**
-     * @param string $type
-     * @param string $name
-     * @param mixed $value
-     * @param array<string, mixed> $options
-     * @return void
-     */
     public function addField(string $type, string $name, mixed $value = null, array $options = []): void
     {
         $this->fields[] = [
@@ -43,34 +31,33 @@ class FormComponent
         ];
     }
 
-    /**
-     * @return array<array<string, mixed>>
-     */
     public function getFields(): array
     {
         return $this->fields;
     }
 
-    /**
-     * @return string
-     */
     public function getAction(): string
     {
         return $this->action;
     }
 
-    /**
-     * @param Environment $twig
-     * @throws LoaderError
-     * @throws RuntimeError
-     * @throws SyntaxError
-     * @return string
-     */
+    public function getMethod(): string
+    {
+        return $this->method;
+    }
+
+    public function getEnctype(): string
+    {
+        return $this->enctype;
+    }
+
     public function render(Environment $twig): string
     {
         return $twig->render('components/form/form.html.twig', [
             'fields' => $this->getFields(),
             'action' => $this->getAction(),
+            'method' => $this->getMethod(),
+            'enctype' => $this->getEnctype(),
         ]);
     }
 }

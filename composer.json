@@ -13,7 +13,6 @@
       "ext-pdo": "*",
       "ext-fileinfo": "*",
         "symfony/var-dumper": "^7.1",
-        "tinymce/tinymce": "^7.3",
       "ext-dom": "*",
       "ext-libxml": "*"
     },

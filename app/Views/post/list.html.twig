@@ -19,6 +19,14 @@
         </div>
 
         <div class="card-body">
+            <div class="row justify-content-end">
+                <div class="col col-md-4 text-end">
+                    <a class="btn btn-primary" href={{ path('add_post_form')}}>
+                        <span><i class="fa-solid fa-plus"></i></span>
+                        <span>Ajouter un utilisateur</span>
+                    </a>
+                </div>
+            </div>
             {% if posts is defined and posts is not null %}
                 {{ table | raw }}
             {% endif %}

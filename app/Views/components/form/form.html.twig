@@ -1,0 +1,35 @@
+<form action="{{ action }}" method="{{ method }}" enctype="{{ enctype }}">
+    {% for field in fields %}
+        {% if field.type == 'text' %}
+            <div>
+                <label for="{{ field.name }}">{{ field.name }}</label>
+                <input type="text" id="{{ field.name }}" name="{{ field.name }}" value="{{ field.value ?? '' }}">
+            </div>
+        {% elseif field.type == 'textarea' %}
+            <div>
+                <label for="{{ field.name }}">{{ field.name }}</label>
+                <textarea id="{{ field.name }}" name="{{ field.name }}">{{ field.value ?? '' }}</textarea>
+            </div>
+        {% elseif field.type == 'file' %}
+            <div>
+                <label for="{{ field.name }}">{{ field.name }}</label>
+                <input type="file" id="{{ field.name }}" name="{{ field.name }}">
+            </div>
+        {% elseif field.type == 'select' %}
+            <div>
+                <label for="{{ field.name }}">{{ field.name }}</label>
+                <select id="{{ field.name }}" name="{{ field.name }}">
+                    {% for option in field.options %}
+                        <option value="{{ option.value }}">{{ option.label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        {% elseif field.type == 'checkbox' %}
+            <div>
+                <input type="checkbox" id="{{ field.name }}" name="{{ field.name }}" {% if field.value %}checked{% endif %}>
+                <label for="{{ field.name }}">{{ field.name }}</label>
+            </div>
+        {% endif %}
+    {% endfor %}
+    <button type="submit">Submit</button>
+</form>
