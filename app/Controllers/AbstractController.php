@@ -12,6 +12,7 @@ use App\Manager\FileManager;
 use App\Manager\PostManager;
 use App\Manager\ServerManager;
 use App\Services\Sanitizer;
+use App\Twig\AppExtension;
 use App\Twig\UrlExtension;
 use Respect\Validation\Validatable;
 use Respect\Validation\Validator as v;
@@ -72,6 +73,8 @@ abstract class AbstractController
         $this->twig->addExtension(new DebugExtension()); // Add DebugExtension
 
         $this->twig->addExtension(new UrlExtension($router)); // Add UrlExtension
+
+        $this->twig->addExtension(new AppExtension());
 
         $this->cookieManager = new CookieManager();
 

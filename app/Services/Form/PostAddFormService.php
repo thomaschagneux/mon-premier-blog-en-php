@@ -5,41 +5,44 @@ namespace App\Services\Form;
 use App\Components\FormComponent;
 use Twig\Environment;
 
-class PostAddFormService
+class PostAddFormService extends AbstractFormService
 {
-    private FormComponent $formComponent;
 
-    /**
-     * @param string $route
-     * @param string $action
-     * @param string $enctype
-     */
-    public function __construct(string $route, string $action = 'POST', string $enctype = 'multipart/form-data')
+    protected function buildForm(): void
     {
-        $this->formComponent = new FormComponent($route, $action, $enctype);
-        $this->initializeFields();
-    }
+        $this->formComponent->addField(
+            'text',
+            'title',
+            'plop',
+            ['class' => 'form-control'],
+        );
 
-    /**
-     * Initialize form fields.
-     */
-    private function initializeFields(): void
-    {
-        // Define the fields for the form
-        $this->formComponent->addField('text', 'title', '', ['label' => 'Title']);
-        $this->formComponent->addField('textarea', 'content', '', ['label' => 'Content']);
-        $this->formComponent->addField('file', 'image', '', ['label' => 'Image']);
-        // Add more fields as necessary
-    }
+        $this->formComponent->addField(
+            'textarea',
+            'content',
+            '',
+            ['class' => 'form-control', 'disabled' => true],
+        );
 
-    /**
-     * Render the form with the Twig environment.
-     *
-     * @param Environment $twig
-     * @return string
-     */
-    public function render(Environment $twig): string
-    {
-        return $this->formComponent->render($twig);
+        $this->formComponent->addField(
+            'file',
+            'image',
+            '',
+        );
+
+        // Exemple de champ select avec une option sélectionnée par défaut et des attributs supplémentaires
+        $options = [
+            ['value' => '1', 'label' => 'Option 1'],
+            ['value' => '2', 'label' => 'Option 2'],
+            ['value' => '3', 'label' => 'Option 3'],
+        ];
+        $this->formComponent->addField(
+            'select',
+            'category',
+            null,
+            ['class' => 'form-select', 'data-label' => 'category-select'],
+            $options,
+            '2',
+        );
     }
 }

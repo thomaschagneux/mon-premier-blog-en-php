@@ -21,14 +21,47 @@ class FormComponent
         $this->enctype = $enctype;
     }
 
-    public function addField(string $type, string $name, mixed $value = null, array $options = []): void
+    public function addField(
+        string $type,
+        string $name,
+        mixed $value = null,
+        array $attributes = [],
+        array $options = [],
+        mixed $selectedOption = null
+    ): void
     {
-        $this->fields[] = [
+        $field = [
             'type' => $type,
             'name' => $name,
             'value' => $value,
-            'options' => $options,
+            'attributes' => $attributes,
         ];
+        if ('select' == $type) {
+            $field['options'] = $this->formatOptions($options, $selectedOption);
+        }
+
+        $this->fields[] = $field;
+    }
+
+    private function formatOptions(array $options, mixed $selectedOption): array
+    {
+        $formattedOptions = [];
+        foreach ($options as $key => $option) {
+            if (is_array($option) && isset($option['value']) && isset($option['label'])) {
+                $formattedOptions[] = [
+                    'value' => $option['value'],
+                    'label' => $option['label'],
+                    'selected' => ($option['value'] === $selectedOption)
+                ];
+            } else {
+                $formattedOptions[] = [
+                    'value' => $key,
+                    'label' => $option,
+                    'selected' => ($key === $selectedOption)
+                ];
+            }
+        }
+        return $formattedOptions;
     }
 
     public function getFields(): array
