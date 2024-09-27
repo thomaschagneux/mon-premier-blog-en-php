@@ -26,7 +26,7 @@ class PostAddFormService extends AbstractFormService
             'textarea',
             'content',
             '',
-            ['class' => 'form-control', 'rows' => 5],
+            ['class' => 'form-control tiny-mce', 'rows' => 5],
             [],
 
         ));
