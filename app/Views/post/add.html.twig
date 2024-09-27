@@ -7,7 +7,17 @@
         </div>
 
         <div class="card-body">
-{{ form | raw }}
+            <form method="POST" action="{{path('add_user_action')}}" enctype="multipart/form-data">
+                <div class="row">
+                    <div class="col col-md-6">
+                        {{ form_rows.title | raw }}
+                    </div>
+                    <div class="col col-md-6">
+                        {{ form_rows.category | raw }}
+                    </div>
+                </div>
+
+            </form>
         </div>
     </div>
 {% endblock %}

@@ -2,24 +2,54 @@
 
 namespace App\Services\Form;
 
-use App\Components\FormComponent;
+use App\Components\FormRowComponent;
 use Twig\Environment;
 
 abstract class AbstractFormService
 {
-    protected FormComponent $formComponent;
-
-    public function __construct(string $route, string $action = 'POST', string $enctype = 'multipart/form-data')
+    protected Environment $twig;
+    protected array $formRows = [];
+    public function __construct(Environment $twig)
     {
-        $this->formComponent = new FormComponent($route, $action, $enctype);
-
-        $this->buildForm();
+        $this->twig = $twig;
     }
 
+    /**
+     * Method to be implemented by child classes to build form fields.
+     */
     abstract protected function buildForm(): void;
 
-    public function render(Environment $twig): string
+    /**
+     * Render a form row and store it in the associative array.
+     *
+     * @param string $name
+     * @param \App\Components\FormRowComponent $formRowComponent
+     */
+    protected function addFormRow(string $name, \App\Components\FormRowComponent $formRowComponent): void
     {
-        return $this->formComponent->render($twig);
+        $this->formRows[$name] = $formRowComponent->render($this->twig);
     }
+
+    /**
+     * Get the form rows by name.
+     *
+     * @param string $name
+     * @return string|null
+     */
+    public function getFormRow(string $name): ?string
+    {
+        return $this->formRows[$name] ?? null;
+    }
+
+    /**
+     * Get all form rows.
+     *
+     * @return array
+     */
+    public function getFormRows(): array
+    {
+        return $this->formRows;
+    }
+
+
 }

@@ -2,47 +2,54 @@
 
 namespace App\Services\Form;
 
-use App\Components\FormComponent;
+use App\Components\FormRowComponent;
 use Twig\Environment;
 
 class PostAddFormService extends AbstractFormService
 {
 
-    protected function buildForm(): void
+    /**
+     * Build the form components and store them in an associative array.
+     */
+    public function buildForm(): void
     {
-        $this->formComponent->addField(
+        $this->addFormRow('title', new FormRowComponent(
             'text',
             'title',
-            'plop',
-            ['class' => 'form-control'],
-        );
+            '',
+            ['class' => 'form-control', 'placeholder' => 'Enter title'],
+            [],
 
-        $this->formComponent->addField(
+        ));
+
+        $this->addFormRow('content', new FormRowComponent(
             'textarea',
             'content',
             '',
-            ['class' => 'form-control', 'disabled' => true],
-        );
+            ['class' => 'form-control', 'rows' => 5],
+            [],
 
-        $this->formComponent->addField(
+        ));
+
+        $this->addFormRow('image', new FormRowComponent(
             'file',
             'image',
             '',
-        );
+            ['class' => 'form-control-file'],
+            [],
+        ));
 
-        // Exemple de champ select avec une option sélectionnée par défaut et des attributs supplémentaires
-        $options = [
+        $selectOptions = [
             ['value' => '1', 'label' => 'Option 1'],
             ['value' => '2', 'label' => 'Option 2'],
-            ['value' => '3', 'label' => 'Option 3'],
+            ['value' => '3', 'label' => 'Option 3', 'selected' => true],
         ];
-        $this->formComponent->addField(
+        $this->addFormRow('category', new FormRowComponent(
             'select',
             'category',
             null,
-            ['class' => 'form-select', 'data-label' => 'category-select'],
-            $options,
-            '2',
-        );
+            ['class' => 'form-select'],
+            $selectOptions,
+        ));
     }
 }

@@ -51,9 +51,12 @@ class PostController extends AbstractController
         }
 
         if ($this->isConnected()) {
-            $form = new PostAddFormService($this->generateUrl('add_post_form'));
-            $formView = $form->render($this->twig);
-            return $this->render('post/add.html.twig', ['form' => $formView]);
+            $postAddFormService = new PostAddFormService($this->twig);
+
+            $postAddFormService->buildForm();
+            // Get the form rows from the service
+            $formRows = $postAddFormService->getFormRows();
+            return $this->render('post/add.html.twig', ['form_rows' => $formRows,]);
         } else {
             return $this->redirectToReferer();
         }
