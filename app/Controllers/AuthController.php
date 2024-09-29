@@ -85,7 +85,6 @@ class AuthController extends AbstractController
     {
         $userModel = new User();
         $user = $userModel->findByUsermail($email);
-
         if ($user && password_verify($password, $user->getPassword())) {
             $this->initializeUserSession($user);
             return true;

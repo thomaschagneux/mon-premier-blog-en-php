@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\core\RedirectResponse;
 use App\core\Router;
 use App\Models\Post;
+use App\Models\User;
 use App\Services\CustomTables\PostTableService;
 use App\Services\Form\PostAddFormService;
 use App\Services\HelperServices;
@@ -60,5 +61,21 @@ class PostController extends AbstractController
         } else {
             return $this->redirectToReferer();
         }
+    }
+
+    public function addPostAction(): string|RedirectResponse
+    {
+        $title =  $this->postManager->getPostParam('title');
+        $lede =  $this->postManager->getPostParam('lede');
+        $content = $this->postManager->getPostParam('content');
+
+        $postModel = new Post();
+        $postModel->setContent($content);
+        $postModel->setTitle($title);
+        $postModel->setLede($lede);
+        $postModel->setUserId(1);
+        $postModel->setCreatedAt(new \DateTime());
+        $postModel->save();
+        return $this->redirectToRoute('list_post');
     }
 }

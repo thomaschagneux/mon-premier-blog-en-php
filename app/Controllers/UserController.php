@@ -250,13 +250,11 @@ class UserController extends AbstractController
             if (null === $user) {
                 return $this->redirectToRoute('admin_list_user');
             }
-            $editForm = new UserEditForm($user, $this->generateUrl('edit_user_action', ['id' => (string) $user->getId()]));
 
-            dd($editForm);
             return $this->render('user/edit.html.twig', [
                 'user' => $user,
                 'error_message' => $errorMessage,
-                'edit_form' => $editForm]);
+                ]);
         } else {
             return $this->redirectToReferer();
         }
@@ -278,7 +276,6 @@ class UserController extends AbstractController
             $email = $this->postManager->getPostParam('email');
             $password = $this->postManager->getPostParam('password');
             $role = $this->postManager->getPostParam('role') ?? 'ROLE_USER';
-            dd($this->postManager->getPostParam('contenu'));
             if (empty($password)) {
                 $password = $user->getPassword();
             }

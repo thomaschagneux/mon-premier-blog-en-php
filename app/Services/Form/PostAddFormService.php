@@ -13,7 +13,8 @@ class PostAddFormService extends AbstractFormService
      */
     public function buildForm(): void
     {
-        $this->addFormRow('title', new FormRowComponent(
+        $this
+            ->addFormRow('title', new FormRowComponent(
             'text',
             'title',
             '',
@@ -22,16 +23,23 @@ class PostAddFormService extends AbstractFormService
 
         ));
 
+        $this->addFormRow('lede', new FormRowComponent(
+            'text',
+            'lede',
+            '',
+            ['class' => 'form-control', 'placeholder' => 'Enter lede'],
+        ));
+
         $this->addFormRow('content', new FormRowComponent(
             'textarea',
             'content',
             '',
-            ['class' => 'form-control tiny-mce', 'rows' => 5],
+            ['class' => 'tiny-mce', 'rows' => 5],
             [],
-
         ));
 
-        $this->addFormRow('image', new FormRowComponent(
+
+       /* $this->addFormRow('image', new FormRowComponent(
             'file',
             'image',
             '',
@@ -50,6 +58,6 @@ class PostAddFormService extends AbstractFormService
             null,
             ['class' => 'form-select'],
             $selectOptions,
-        ));
+        ));*/
     }
 }

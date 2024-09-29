@@ -60,5 +60,5 @@ function defineRoutes(Router $router): void
 
     $router->addRoute('GET', '/admin/post/add', [PostController::class, 'addPostForm'], 'add_post_form');
 
-    $router->addRoute('POST', '/admin/post/add', [PostController::class, 'addPost'], 'add_post_action');
+    $router->addRoute('POST', '/admin/post/add', [PostController::class, 'addPostAction'], 'add_post_action');
 }

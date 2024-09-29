@@ -21,7 +21,6 @@
                     <img src="/../../{{ picture.pathName }}{{ picture.fileName }}" alt="" class="img-fluid">
                 </li>
             {% endif %}
-            <li>{{ dump(user) }}</li>
             <li class="list-group-item">Créé le: {{ user.createdAt.format('d/m/Y H:i:s') }}</li>
             <li class="list-group-item">Modifié le: {{ user.updatedAt.format('d/m/Y H:i:s') }}</li>
         </ul>
