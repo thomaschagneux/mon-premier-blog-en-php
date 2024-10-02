@@ -75,7 +75,15 @@ class PostController extends AbstractController
         $postModel->setLede($lede);
         $postModel->setUserId(1);
         $postModel->setCreatedAt(new \DateTime());
+
         $postModel->save();
         return $this->redirectToRoute('list_post');
+    }
+
+    public function postShow(int $id): string|RedirectResponse
+    {
+        $post = $this->post->findById($id);
+
+        return $this->render('post/show.html.twig', ['post' => $post]);
     }
 }

@@ -78,7 +78,7 @@ class PostTableService extends AbstractTableService
 
     private function show(Post $post): string
     {
-        return $this->getShowLink('index');
+        return $this->getShowLink('post_show', ['id' => $post->getId()]);
     }
 
     /**

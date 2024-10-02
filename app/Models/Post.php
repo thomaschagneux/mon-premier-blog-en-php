@@ -66,6 +66,21 @@ class Post extends AbstractModel
         return [];
     }
 
+    public function findById(int $id): ?self
+    {
+        if ($this->conn instanceof PDO) {
+            $query = "SELECT * FROM post WHERE id = ?";
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute([$id]);
+
+            $data = $stmt->fetch(PDO::FETCH_ASSOC);
+            if (is_array($data)) {
+                return self::fromArray($data);
+            }
+        }
+        return null;
+    }
+
     public function save(): int
     {
         // Vérification de la connexion à la base de données

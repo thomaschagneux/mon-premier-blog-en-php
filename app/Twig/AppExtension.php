@@ -2,11 +2,20 @@
 
 namespace App\Twig;
 
+use App\Services\HelperServices;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
+use Twig\TwigFunction;
 
 class AppExtension extends AbstractExtension
 {
+    private HelperServices $helperServices;
+
+    public function __construct()
+    {
+        $this->helperServices = new HelperServices();
+    }
+
     /**
      * Returns a list of custom filters.
      *
@@ -16,6 +25,13 @@ class AppExtension extends AbstractExtension
     {
         return [
             new TwigFilter('attributes', [$this, 'attributesFilter']),
+        ];
+    }
+
+    public function getFunctions()
+    {
+        return [
+            new TwigFunction('dumper', [$this, 'dumper']),
         ];
     }
 
@@ -32,5 +48,10 @@ class AppExtension extends AbstractExtension
             $html .= sprintf('%s=%s ', htmlspecialchars($key), htmlspecialchars($value));
         }
         return trim($html);
+    }
+
+    public function dumper(mixed $var): void
+    {
+        $this->helperServices->dump($var);
     }
 }
