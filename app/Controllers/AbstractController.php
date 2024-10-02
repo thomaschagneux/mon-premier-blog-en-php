@@ -190,7 +190,7 @@ abstract class AbstractController
      * @throws \Exception
      * @return mixed
      */
-    private function getUserData(): mixed
+    public function getUserData(): mixed
     {
         $cookieData = $this->cookieManager->getCookie('user_data');
 

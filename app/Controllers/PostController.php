@@ -69,11 +69,29 @@ class PostController extends AbstractController
         $lede =  $this->postManager->getPostParam('lede');
         $content = $this->postManager->getPostParam('content');
 
+        if (null === $title || null === $content || null === $lede) {
+            $this->cookieManager->setCookie('error_message', 'Veuillez remplir les champs requis', 60);
+            return $this->redirectToRoute('add_post_form');
+        }
+
+        $userModel = new User();
+        $userData = $this->getUserData();
+        $user = $userModel->findByUsermail($userData['email']);
+
+        if (!$user instanceof User) {
+            $this->cookieManager->setCookie('error_message', 'Il y a eu une erreur, veuillez recommencer');
+            return $this->redirectToRoute('add_post_form');
+        }
+
+        dump($title);
+        dump($lede);
+        dd($content);
+
         $postModel = new Post();
         $postModel->setContent($content);
         $postModel->setTitle($title);
         $postModel->setLede($lede);
-        $postModel->setUserId(1);
+        $postModel->setUserId($user->getId());
         $postModel->setCreatedAt(new \DateTime());
 
         $postModel->save();
