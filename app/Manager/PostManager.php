@@ -2,8 +2,6 @@
 
 namespace App\Manager;
 
-use DOMDocument;
-
 class PostManager
 {
     /**
@@ -39,6 +37,11 @@ class PostManager
             'href',
             'open',
             'title',
+            'target',
+            'rel',
+            'alt',
+            'width',
+            'height',
         ];
 
         $allowedTags = array_fill_keys(
@@ -61,14 +64,28 @@ class PostManager
                 's',
                 'img',
                 'blockquote',
-                'sub'
+                'sub',
+                'sup',
+                'table',
+                'thead',
+                'tbody',
+                'colgroup',
+                'col',
+                'tr',
+                'th',
+                'td',
+                'a',
+                'iframe', // Autorisation des iframes
             ],
             $allowedAttributes
         );
 
+        // Restriction des attributs autorisés pour l'iframe (par exemple, seulement src, width, height)
+        $allowedIframeAttributes = ['src', 'width', 'height'];
+
         $pattern = '#<(/?)([a-zA-Z0-9]+)([^>]*)>#';
 
-        $sanitizedInput = preg_replace_callback($pattern, function ($matches) use ($allowedTags) {
+        $sanitizedInput = preg_replace_callback($pattern, function ($matches) use ($allowedTags, $allowedIframeAttributes) {
             $closingSlash = $matches[1];
             $tag = strtolower($matches[2]);
             $attributes = $matches[3];
@@ -84,6 +101,19 @@ class PostManager
                 $attrName = strtolower($attr[1]);
                 $attrValue = $attr[2];
 
+                // Vérifier les iframes spécifiquement
+                if ($tag === 'iframe' && !in_array($attrName, $allowedIframeAttributes)) {
+                    continue; // Ignorer les attributs non autorisés pour les iframes
+                }
+
+                // Si on est dans un iframe, valider l'URL source
+                if ($tag === 'iframe' && $attrName === 'src') {
+                    $srcUrl = trim($attrValue, '"\''); // Enlever les guillemets
+                    if (!$this->isTrustedIframeSource($srcUrl)) {
+                        return ''; // Si l'URL n'est pas de confiance, on ne permet pas l'iframe
+                    }
+                }
+
                 if (in_array($attrName, $allowedTags[$tag])) {
                     // Si l'attribut est autorisé, on le conserve
                     $filteredAttributes .= " $attrName=$attrValue";
@@ -98,4 +128,31 @@ class PostManager
 
         return $sanitizedInput;
     }
+
+    /**
+     * Vérifie si l'URL src d'un iframe est dans la liste des sources autorisées.
+     *
+     * @param string $url L'URL src de l'iframe.
+     * @return bool True si l'URL est de confiance, sinon false.
+     */
+    private function isTrustedIframeSource(string $url): bool
+    {
+        // Liste des domaines autorisés pour les iframes
+        $trustedDomains = [
+            'youtube.com',
+            'www.youtube.com',
+            'vimeo.com',
+            'player.vimeo.com'
+        ];
+
+        $parsedUrl = parse_url($url);
+
+        // Vérifier si le domaine de l'URL est dans la liste des domaines de confiance
+        if (isset($parsedUrl['host']) && in_array($parsedUrl['host'], $trustedDomains, true)) {
+            return true;
+        }
+
+        return false;
+    }
+
 }

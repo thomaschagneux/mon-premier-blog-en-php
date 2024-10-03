@@ -83,16 +83,13 @@ class PostController extends AbstractController
             return $this->redirectToRoute('add_post_form');
         }
 
-        dump($title);
-        dump($lede);
-        dd($content);
-
         $postModel = new Post();
         $postModel->setContent($content);
         $postModel->setTitle($title);
         $postModel->setLede($lede);
         $postModel->setUserId($user->getId());
         $postModel->setCreatedAt(new \DateTime());
+
 
         $postModel->save();
         return $this->redirectToRoute('list_post');
