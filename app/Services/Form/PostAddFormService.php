@@ -18,7 +18,7 @@ class PostAddFormService extends AbstractFormService
             'text',
             'title',
             '',
-            ['class' => 'form-control', 'placeholder' => 'Enter title'],
+            ['class' => 'form-control', 'placeholder' => 'Enter title', 'required' => true],
             [],
 
         ));
@@ -27,7 +27,7 @@ class PostAddFormService extends AbstractFormService
             'text',
             'lede',
             '',
-            ['class' => 'form-control', 'placeholder' => 'Enter lede'],
+            ['class' => 'form-control', 'placeholder' => 'Enter lede', 'required' => true],
         ));
 
         $this->addFormRow('content', new FormRowComponent(
