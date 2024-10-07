@@ -24,8 +24,6 @@ class UrlExtension extends AbstractExtension
 
     private ServerManager $serverManager;
 
-    private HelperServices $helperServices;
-
     /**
      * UrlExtension constructor.
      *
@@ -36,7 +34,6 @@ class UrlExtension extends AbstractExtension
     {
         $this->router = $router;
         $this->serverManager = new ServerManager();
-        $this->helperServices = new HelperServices();
     }
 
     /**
@@ -49,7 +46,6 @@ class UrlExtension extends AbstractExtension
         return [
             new TwigFunction('path', [$this, 'generatePath']),
             new TwigFunction('referer', [$this, 'getReferer']),
-            new TwigFunction('dump', [$this, 'dump']),
         ];
     }
 
@@ -68,10 +64,5 @@ class UrlExtension extends AbstractExtension
     public function getReferer(): ?string
     {
         return $this->serverManager->getServerParams('HTTP_REFERER') ?? null;
-    }
-
-    public function dump(mixed $var): void
-    {
-        $this->helperServices->dump($var);
     }
 }

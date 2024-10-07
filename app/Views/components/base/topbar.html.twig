@@ -25,13 +25,18 @@
 									<i class="fa-solid fa-user-tie"></i>
 								</a>
 								<ul class="dropdown-menu dropdown rounded">
-									<li><a class="dropdown-item " href="{{ path('admin_home') }}">Mon espace</a></li>
-									<li class="dropdown-item">
-										<a class="" href={{ path('login')}}>Login</a>
-									</li>
-									<li class="dropdown-item">
-										<a class="" href={{ path('logout')}}>Logout</a>
-									</li>
+									{% if app_user.connected %}
+										<li>
+											<a class="dropdown-item" href="{{ path('admin_home') }}">Mon espace</a>
+										</li>
+										<li class="dropdown-item">
+											<a class="" href="{{ path('logout') }}">Logout</a>
+										</li>
+									{% else %}
+										<li class="dropdown-item">
+											<a class="" href="{{ path('login') }}">Login</a>
+										</li>
+									{% endif %}
 								</ul>
 							</div>
 						</li>

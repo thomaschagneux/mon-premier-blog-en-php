@@ -57,4 +57,10 @@ function defineRoutes(Router $router): void
     $router->addRoute('GET', '/admin/user/{id}/show', [Usercontroller::class, 'adminUserShow'], 'user_show');
 
     $router->addRoute('GET', '/admin/post/list', [PostController::class, 'postList'], 'list_post');
+
+    $router->addRoute('GET', '/admin/post/add', [PostController::class, 'addPostForm'], 'add_post_form');
+
+    $router->addRoute('POST', '/admin/post/add', [PostController::class, 'addPostAction'], 'add_post_action');
+
+    $router->addRoute('GET', '/admin/post/{id}/show', [PostController::class, 'postShow'], 'post_show');
 }

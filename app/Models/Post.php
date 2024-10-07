@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use DateTime;
+use Exception;
 use PDO;
 
 class Post extends AbstractModel
@@ -63,6 +64,74 @@ class Post extends AbstractModel
             return $posts;
         }
         return [];
+    }
+
+    public function findById(int $id): ?self
+    {
+        if ($this->conn instanceof PDO) {
+            $query = "SELECT * FROM post WHERE id = ?";
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute([$id]);
+
+            $data = $stmt->fetch(PDO::FETCH_ASSOC);
+            if (is_array($data)) {
+                return self::fromArray($data);
+            }
+        }
+        return null;
+    }
+
+    public function save(): int
+    {
+        // Vérification de la connexion à la base de données
+        if (!$this->conn instanceof PDO) {
+            throw new Exception("La connexion à la base de données n'est pas disponible.");
+        }
+
+        $isUpdate = isset($this->id) && $this->id > 0;
+
+        if ($isUpdate) {
+            $query = "UPDATE post SET 
+                        title = :title,
+                        lede = :lede,
+                        content = :content,
+                        user_id = :user_id,
+                        updated_at = :updated_at
+                      WHERE id = :id";
+        } else {
+            $query = "INSERT INTO post (title, lede, content, user_id, created_at) 
+                      VALUES (:title, :lede, :content, :user_id, :created_at)";
+        }
+
+        try {
+            $stmt = $this->conn->prepare($query);
+            if ($isUpdate) {
+                $this->updatedAt = new DateTime();
+            } else {
+                $this->createdAt = new DateTime();
+            }
+
+            $params = [
+                ':title' => $this->getTitle(),
+                ':lede' => $this->getLede(),
+                ':content' => $this->getContent(),
+                ':user_id' => $this->getUserId(),
+            ];
+            if ($isUpdate) {
+                $params[':updated_at'] = $this->getUpdatedAt()?->format('Y-m-d H:i:s');
+                $params[':id'] = $this->getId();
+            } else {
+                $params[':created_at'] = $this->getCreatedAt()->format('Y-m-d H:i:s');
+            }
+            $stmt->execute($params);
+
+            if (!$isUpdate) {
+                $this->id = (int) $this->conn->lastInsertId();
+            }
+            return $this->id;
+        } catch (Exception) {
+            throw new Exception('Erreur lors de la sauvegarde de l\'utilisateur');
+        }
     }
 
     /**

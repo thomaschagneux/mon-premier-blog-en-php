@@ -1,24 +1,20 @@
 {% extends "components/base/base_admin.html.twig" %}
 
 {% block body %}
-    {% if validate_message is defined and validate_message is not null %}
-        <div class="alert alert-danger" role="alert">
-            <span><i class="fa fa-warning"></i> </span>
-            <span>{{ validate_message }}</span>
-        </div>
-    {% endif %}
-    {% if error_message is defined and error_message is not null %}
-        <div class="alert alert-danger" role="alert">
-            <span><i class="fa fa-warning"></i> </span>
-            <span>{{ error_message }}</span>
-        </div>
-    {% endif %}
     <div class="card mb-5">
         <div class="card-header">
             <h1>Liste des posts</h1>
         </div>
 
         <div class="card-body">
+            <div class="row justify-content-end">
+                <div class="col col-md-4 text-end">
+                    <a class="btn btn-primary" href={{ path('add_post_form')}}>
+                        <span><i class="fa-solid fa-plus"></i></span>
+                        <span>Ajouter un post</span>
+                    </a>
+                </div>
+            </div>
             {% if posts is defined and posts is not null %}
                 {{ table | raw }}
             {% endif %}

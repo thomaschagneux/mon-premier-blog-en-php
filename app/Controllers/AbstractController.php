@@ -12,6 +12,7 @@ use App\Manager\FileManager;
 use App\Manager\PostManager;
 use App\Manager\ServerManager;
 use App\Services\Sanitizer;
+use App\Twig\AppExtension;
 use App\Twig\UrlExtension;
 use Respect\Validation\Validatable;
 use Respect\Validation\Validator as v;
@@ -73,6 +74,8 @@ abstract class AbstractController
 
         $this->twig->addExtension(new UrlExtension($router)); // Add UrlExtension
 
+        $this->twig->addExtension(new AppExtension());
+
         $this->cookieManager = new CookieManager();
 
         $this->postManager = new PostManager();
@@ -80,6 +83,10 @@ abstract class AbstractController
         $this->serverManager = new ServerManager();
 
         $this->fileManager = new FileManager();
+
+        $this->addGlobalVariables();
+
+        $this->isConnected();
     }
 
     /**
@@ -156,6 +163,16 @@ abstract class AbstractController
         return new RedirectResponse($url, $this->headers, $this->response);
     }
 
+    /**
+     * @param string $routeName
+     * @param array<int|string, array<mixed>|string> $params
+     * @return string
+     */
+    public function generateUrl(string $routeName, array $params = []): string
+    {
+        return $this->router->getRouteUrl($routeName, $params);
+    }
+
     public function getReferer(): string
     {
         return  $this->serverManager->getServerParams('HTTP_REFERER') ?? $this->router->getRouteUrl('index');
@@ -173,7 +190,7 @@ abstract class AbstractController
      * @throws \Exception
      * @return mixed
      */
-    private function getUserData(): mixed
+    public function getUserData(): mixed
     {
         $cookieData = $this->cookieManager->getCookie('user_data');
 
@@ -210,5 +227,14 @@ abstract class AbstractController
     protected function isPostRequest(): bool
     {
         return $this->serverManager->getServerParams('REQUEST_METHOD') === 'POST';
+    }
+
+    protected function addGlobalVariables(): void
+    {
+        $userArray = [
+            'connected' => $this->isConnected(),
+            'admin' => $this->isAdmin(),
+        ];
+        $this->twig->addGlobal('app_user', $userArray); // Add user to Twig globals
     }
 }

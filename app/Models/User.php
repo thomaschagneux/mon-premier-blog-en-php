@@ -59,24 +59,6 @@ class User extends AbstractModel
     }
 
     /**
-     * Retrieves all users from the user table.
-     *
-     * @return array<int, array<string, mixed>> An associative array of all users
-     */
-    public function findAllUsers(): array
-    {
-        if ($this->conn instanceof PDO) {
-            $query = "SELECT * FROM user";
-            $stmt = $this->conn->prepare($query);
-            $stmt->execute();
-
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        }
-
-        return [];
-    }
-
-    /**
      * Retrieves all User objects from the user table.
      *
      * @throws Exception
