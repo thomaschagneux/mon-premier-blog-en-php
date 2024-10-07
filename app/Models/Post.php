@@ -135,6 +135,30 @@ class Post extends AbstractModel
     }
 
     /**
+     * @throws Exception
+     * @return bool
+     */
+    public function remove(): bool
+    {
+        if (!$this->conn instanceof PDO) {
+            throw new Exception("La connexion à la base de données n'est pas disponible.");
+        }
+
+        if (!isset($this->id) || $this->id <= 0) {
+            throw new Exception("ID du post non valide.");
+        }
+
+        try {
+            $query = "DELETE FROM post WHERE id = :id";
+            $stmt = $this->conn->prepare($query);
+            return $stmt->execute([':id' => $this->id]);
+        } catch (Exception $e) {
+            throw new Exception('Erreur lors de la suppression de l\'utilisateur : ' . $e->getMessage());
+        }
+
+    }
+
+    /**
      *  GETTERS AND SETTERS
      */
 
