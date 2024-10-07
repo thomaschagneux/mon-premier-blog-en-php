@@ -3,9 +3,19 @@
 namespace App\Services\Form;
 
 use App\Components\FormRowComponent;
+use App\Models\Post;
+use Twig\Environment;
 
-class PostAddFormService extends AbstractFormService
+class PostEditFormService extends AbstractFormService
 {
+
+    public function __construct(
+        Environment $twig,
+        private readonly Post $post,
+    )
+    {
+        parent::__construct($twig);
+    }
 
     /**
      * Build the form components and store them in an associative array.
@@ -16,7 +26,7 @@ class PostAddFormService extends AbstractFormService
             ->addFormRow('title', new FormRowComponent(
             'text',
             'title',
-            '',
+            $this->post->getTitle(),
             ['class' => 'form-control', 'placeholder' => 'Enter title', 'required' => true],
             [],
 
@@ -25,14 +35,14 @@ class PostAddFormService extends AbstractFormService
         $this->addFormRow('lede', new FormRowComponent(
             'text',
             'lede',
-            '',
+            $this->post->getLede(),
             ['class' => 'form-control', 'placeholder' => 'Enter lede', 'required' => true],
         ));
 
         $this->addFormRow('content', new FormRowComponent(
             'textarea',
             'content',
-            '',
+            $this->post->getContent(),
             ['class' => 'tiny-mce', 'rows' => 5],
             [],
         ));

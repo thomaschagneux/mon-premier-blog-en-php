@@ -78,4 +78,37 @@ tables
     font-weight: bold;
 }
 
+#loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.8); /* Fond semi-transparent */
+    z-index: 9999; /* Assurez-vous que l'overlay est au-dessus de tout */
+    display: flex;
+    flex-direction: column; /* Pour disposer les éléments verticalement */
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
 
+#loading-overlay h2 {
+    font-size: 24px;
+    color: #333; /* Assurez-vous que la couleur du texte contraste bien avec l'arrière-plan */
+    margin-bottom: 20px;
+}
+
+.spinner {
+    border: 8px solid #f3f3f3; /* Couleur du bord externe */
+    border-radius: 50%;
+    border-top: 8px solid #3498db; /* Couleur du bord supérieur */
+    width: 60px;
+    height: 60px;
+    animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

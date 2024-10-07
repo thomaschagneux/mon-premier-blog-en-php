@@ -68,7 +68,7 @@ class PostTableService extends AbstractTableService
 
     private function edit(Post $post): string
     {
-        return  $this->getEditLink('index');
+        return  $this->getEditLink('edit_post_form', ['id' => (string) $post->getId()]);
     }
 
     private function remove(Post $post): string

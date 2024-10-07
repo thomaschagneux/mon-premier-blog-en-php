@@ -2,6 +2,7 @@ const isSmallScreen = window.matchMedia('(max-width: 1023.5px)').matches;
 
 tinymce.init({
   selector: 'textarea.tiny-mce',
+  license_key: 'gpl',
   plugins: 'preview importcss searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen image link media codesample table charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help charmap quickbars emoticons accordion',
   editimage_cors_hosts: ['picsum.photos'],
   menubar: 'file edit view insert format tools table help',
@@ -47,5 +48,14 @@ tinymce.init({
   noneditable_class: 'mceNonEditable',
   toolbar_mode: 'sliding',
   contextmenu: 'link image table',
-  content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:16px }'
+  content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:16px }',
+
+});
+
+// Cacher l'overlay quand le chargement de la page est terminé
+document.addEventListener('DOMContentLoaded', function() {
+  const overlay = document.getElementById('loading-overlay');
+  if (overlay) {
+    overlay.style.display = 'none';
+  }
 });
