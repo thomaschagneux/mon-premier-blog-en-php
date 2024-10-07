@@ -1,18 +1,6 @@
 {% extends "components/base/base_admin.html.twig" %}
 
 {% block body %}
-    {% if validate_message is defined and validate_message is not null %}
-        <div class="alert alert-danger" role="alert">
-            <span><i class="fa fa-warning"></i> </span>
-            <span>{{ validate_message }}</span>
-        </div>
-    {% endif %}
-    {% if error_message is defined and error_message is not null %}
-        <div class="alert alert-danger" role="alert">
-            <span><i class="fa fa-warning"></i> </span>
-            <span>{{ error_message }}</span>
-        </div>
-    {% endif %}
     <div class="card mb-5">
         <div class="card-header">
             <h1>Liste des posts</h1>

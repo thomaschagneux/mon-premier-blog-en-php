@@ -91,13 +91,11 @@ class Post extends AbstractModel
         $isUpdate = isset($this->id) && $this->id > 0;
 
         if ($isUpdate) {
-            $query = "UPDATE user SET 
-                        first_name = :first_name,
-                        last_name = :last_name,
-                        email = :email,
-                        password = :password,
-                        role = :role,
-                        picture_id = :picture_id,
+            $query = "UPDATE post SET 
+                        title = :title,
+                        lede = :lede,
+                        content = :content,
+                        user_id = :user_id,
                         updated_at = :updated_at
                       WHERE id = :id";
         } else {
@@ -107,7 +105,6 @@ class Post extends AbstractModel
 
         try {
             $stmt = $this->conn->prepare($query);
-
             if ($isUpdate) {
                 $this->updatedAt = new DateTime();
             } else {
@@ -120,20 +117,17 @@ class Post extends AbstractModel
                 ':content' => $this->getContent(),
                 ':user_id' => $this->getUserId(),
             ];
-
             if ($isUpdate) {
                 $params[':updated_at'] = $this->getUpdatedAt()?->format('Y-m-d H:i:s');
                 $params[':id'] = $this->getId();
             } else {
                 $params[':created_at'] = $this->getCreatedAt()->format('Y-m-d H:i:s');
             }
-
             $stmt->execute($params);
 
             if (!$isUpdate) {
                 $this->id = (int) $this->conn->lastInsertId();
             }
-
             return $this->id;
         } catch (Exception) {
             throw new Exception('Erreur lors de la sauvegarde de l\'utilisateur');

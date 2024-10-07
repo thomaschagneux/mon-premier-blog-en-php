@@ -10,11 +10,28 @@ use Twig\Error\SyntaxError;
 class FormRowComponent
 {
     private string $type;
+
     private string $name;
+
     private mixed $value;
+
+    /**
+     * @var array<string, mixed>
+     */
     private array $options;
+
+    /**
+     * @var array<string, mixed>
+     */
     private array $attributes;
 
+    /**
+     * @param string $type
+     * @param string $name
+     * @param mixed|null $value
+     * @param array<string, mixed> $attributes
+     * @param array<string, mixed> $options
+     */
     public function __construct(
         string $type,
         string $name,

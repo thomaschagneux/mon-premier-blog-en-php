@@ -8,7 +8,12 @@ use Twig\Environment;
 abstract class AbstractFormService
 {
     protected Environment $twig;
+
+    /**
+     * @var array<string, string>
+     */
     protected array $formRows = [];
+
     public function __construct(Environment $twig)
     {
         $this->twig = $twig;
@@ -23,9 +28,9 @@ abstract class AbstractFormService
      * Render a form row and store it in the associative array.
      *
      * @param string $name
-     * @param \App\Components\FormRowComponent $formRowComponent
+     * @param FormRowComponent $formRowComponent
      */
-    protected function addFormRow(string $name, \App\Components\FormRowComponent $formRowComponent): void
+    protected function addFormRow(string $name, FormRowComponent $formRowComponent): void
     {
         $this->formRows[$name] = $formRowComponent->render($this->twig);
     }
@@ -44,7 +49,7 @@ abstract class AbstractFormService
     /**
      * Get all form rows.
      *
-     * @return array
+     * @return array<string, string>
      */
     public function getFormRows(): array
     {

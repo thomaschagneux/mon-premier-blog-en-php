@@ -19,7 +19,7 @@ class AppExtension extends AbstractExtension
     /**
      * Returns a list of custom filters.
      *
-     * @return array
+     * @return array<TwigFilter>
      */
     public function getFilters(): array
     {
@@ -28,6 +28,9 @@ class AppExtension extends AbstractExtension
         ];
     }
 
+    /**
+     * @return array<TwigFunction>
+     */
     public function getFunctions()
     {
         return [
@@ -38,7 +41,7 @@ class AppExtension extends AbstractExtension
     /**
      * Convert an associative array to HTML attributes string.
      *
-     * @param array $attributes
+     * @param array<string, string> $attributes
      * @return string
      */
     public function attributesFilter(array $attributes): string

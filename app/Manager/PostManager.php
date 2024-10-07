@@ -75,7 +75,7 @@ class PostManager
                 'th',
                 'td',
                 'a',
-                'iframe', // Autorisation des iframes
+                'iframe',
             ],
             $allowedAttributes
         );
@@ -126,7 +126,7 @@ class PostManager
             return "<$closingSlash$tag$filteredAttributes>";
         }, $input);
 
-        return $sanitizedInput;
+        return $sanitizedInput ?? '';
     }
 
     /**
