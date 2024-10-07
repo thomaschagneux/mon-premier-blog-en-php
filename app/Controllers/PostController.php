@@ -8,6 +8,7 @@ use App\Models\Post;
 use App\Models\User;
 use App\Services\CustomTables\PostTableService;
 use App\Services\Form\PostAddFormService;
+use App\Services\Form\PostEditFormService;
 use App\Services\HelperServices;
 use Twig\Environment;
 use Twig\Error\LoaderError;
@@ -46,7 +47,7 @@ class PostController extends AbstractController
             return $this->render('post/list.html.twig', [
                 'posts' => $posts,
                 'table' => $table,
-                'success_message' => $message
+                'success_message' => $message,
             ]);
         }
         return $this->redirectToReferer();
@@ -66,7 +67,10 @@ class PostController extends AbstractController
             $postAddFormService->buildForm();
             $formRows = $postAddFormService->getFormRows();
 
-            return $this->render('post/add.html.twig', ['form_rows' => $formRows,]);
+            return $this->render('post/add.html.twig', [
+                'form_rows' => $formRows,
+                'error_message' => $message,
+            ]);
         } else {
             return $this->redirectToReferer();
         }
@@ -107,6 +111,65 @@ class PostController extends AbstractController
 
 
         $postModel->save();
+        $this->cookieManager->setCookie('success_message', 'Le post a bien été enregistré', 60);
+        return $this->redirectToRoute('list_post');
+    }
+
+    public function editPostForm(int $id): string|RedirectResponse
+    {
+        $message = $this->cookieManager->getCookie('error_message') ?? null;
+
+        if ($message !== null) {
+            $this->cookieManager->deleteCookie('error_message');
+        }
+
+        if ($this->isConnected()) {
+            $PostModel = new Post();
+            $post = $PostModel->findById($id);
+
+            if (!$post instanceof Post) {
+                $this->cookieManager->setCookie('error_message', 'Il y a eu une erreur, veuillez recommencer', 60);
+                return $this->redirectToRoute('list_post');
+            }
+            $postEditFormService = new PostEditFormService($this->twig, $post);
+
+            $postEditFormService->buildForm();
+            $formRows = $postEditFormService->getFormRows();
+
+            return  $this->render('post/edit.html.twig', [
+                'form_rows' => $formRows,
+                'post' => $post,
+                'error_message' => $message,
+                ]);
+        } else {
+            return $this->redirectToReferer();
+        }
+    }
+
+    public function editPostAction(int $id): string|RedirectResponse
+    {
+        $title =  $this->postManager->getPostParam('title');
+        $lede =  $this->postManager->getPostParam('lede');
+        $content = $this->postManager->getPostParam('content');
+
+        if (null === $title || null === $content || null === $lede) {
+            $this->cookieManager->setCookie('error_message', 'Veuillez remplir les champs requis', 60);
+            return $this->redirectToRoute('add_post_form');
+        }
+
+        $postModel = new Post();
+        $post = $postModel->findById($id);
+
+        if (!$post instanceof Post) {
+            $this->cookieManager->setCookie('error_message', 'Il y a eu une erreur, veuillez recommencer', 60);
+            return $this->redirectToRoute('add_post_form');
+        }
+        $post->setContent($content);
+        $post->setTitle($title);
+        $post->setLede($lede);
+        $post->setUpdatedAt(new \DateTime());
+
+        $post->save();
         $this->cookieManager->setCookie('success_message', 'Le post a bien été enregistré', 60);
         return $this->redirectToRoute('list_post');
     }
