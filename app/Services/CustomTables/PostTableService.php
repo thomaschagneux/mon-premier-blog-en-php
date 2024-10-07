@@ -73,7 +73,7 @@ class PostTableService extends AbstractTableService
 
     private function remove(Post $post): string
     {
-        return $this->getDeleteLink('index');
+        return $this->getDeleteLink('post_remove', ['id' => (string) $post->getId()]);
     }
 
     private function show(Post $post): string

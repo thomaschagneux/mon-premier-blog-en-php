@@ -67,4 +67,6 @@ function defineRoutes(Router $router): void
     $router->addRoute('POST', '/admin/post/{id}/edit', [PostController::class, 'editPostAction'], 'edit_post_action');
 
     $router->addRoute('GET', '/admin/post/{id}/show', [PostController::class, 'postShow'], 'post_show');
+
+    $router->addRoute('GET', '/admin/post/{id}/remove', [PostController::class, 'postRemove'], 'post_remove');
 }
