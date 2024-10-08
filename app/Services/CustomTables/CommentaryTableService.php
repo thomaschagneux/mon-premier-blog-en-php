@@ -79,7 +79,7 @@ class CommentaryTableService extends AbstractTableService
 
     private function show(Comment $comment): string
     {
-        return $this->getShowLink('post_show', ['id' => (string) $comment->getId()]);
+        return $this->getShowLink('comment_show', ['id' => (string) $comment->getId()]);
     }
 
     /**
