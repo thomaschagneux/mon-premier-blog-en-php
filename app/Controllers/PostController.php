@@ -4,8 +4,10 @@ namespace App\Controllers;
 
 use App\core\RedirectResponse;
 use App\core\Router;
+use App\Models\Comment;
 use App\Models\Post;
 use App\Models\User;
+use App\Services\CustomTables\CommentaryTableService;
 use App\Services\CustomTables\PostTableService;
 use App\Services\Form\PostAddFormService;
 use App\Services\Form\PostEditFormService;
@@ -19,12 +21,19 @@ class PostController extends AbstractController
 {
     private  Post $post;
 
+    private Comment $comment;
+
     private  PostTableService $postTableService;
+
+    private CommentaryTableService $commentaryTableService;
+
     public function __construct(Router $router)
     {
         parent::__construct($router);
         $this->post = new Post();
+        $this->comment = new Comment();
         $this->postTableService = new PostTableService($this->post, $this->twig, $this->router);
+        $this->commentaryTableService = new CommentaryTableService($this->twig, $this->router);
     }
 
     /**
@@ -177,8 +186,18 @@ class PostController extends AbstractController
     public function postShow(int $id): string|RedirectResponse
     {
         $post = $this->post->findById($id);
+        $comments = $this->comment->getCommentsByPostId($id);
 
-        return $this->render('post/show.html.twig', ['post' => $post]);
+        $commentsTable = '';
+        if ($post instanceof Post) {
+            $commentsTable = $this->commentaryTableService->getTableContent($post);
+        }
+
+        return $this->render('post/show.html.twig', [
+            'post' => $post,
+            'comments' => $comments,
+            'comments_table' => $commentsTable,
+        ]);
     }
 
     public function postRemove(int $id): string|RedirectResponse

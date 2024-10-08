@@ -1,6 +1,7 @@
 <?php
 
 use App\Controllers\Admincontroller;
+use App\Controllers\CommentController;
 use App\Controllers\ErrorController;
 use App\Controllers\PostController;
 use App\Controllers\UserController;
@@ -69,4 +70,18 @@ function defineRoutes(Router $router): void
     $router->addRoute('GET', '/admin/post/{id}/show', [PostController::class, 'postShow'], 'post_show');
 
     $router->addRoute('GET', '/admin/post/{id}/remove', [PostController::class, 'postRemove'], 'post_remove');
+
+    $router->addRoute('GET', '/admin/comment/{id}/list', [CommentController::class, 'commentList'], 'comment_list');
+
+    $router->addRoute('GET', '/admin/comment/{id}/add', [CommentController::class, 'commentAddForm'], 'comment_add_form');
+
+    $router->addRoute('POST', '/admin/comment/{id}/add', [CommentController::class, 'commentAddAction'], 'comment_add_action');
+
+    $router->addRoute('GET', '/admin/comment/{id}/edit', [CommentController::class, 'commentEditForm'], 'comment_edit_form');
+
+    $router->addRoute('POST', '/admin/comment/{id}/edit', [CommentController::class, 'commentEditAction'], 'comment_edit_action');
+
+    $router->addRoute('GET', '/admin/comment/{id}/show', [CommentController::class, 'commentShow'], 'comment_show');
+
+    $router->addRoute('GET', '/admin/comment/{id}/remove', [CommentController::class, 'commentRemove'], 'comment_remove');
 }
