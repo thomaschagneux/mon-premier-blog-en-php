@@ -1,5 +1,6 @@
 {% extends "components/base/base_admin.html.twig" %}
-
+{% block scripts %}
+{% endblock %}
 {% block body %}
 
     <div class="card mb-5">
@@ -28,24 +29,7 @@
                 </div>
 
                 <!-- Second Tab: Post Commentary -->
-                <div class="tab-pane fade" id="post-commentary" role="tabpanel" aria-labelledby="post-commentary-tab">
-                    <div class="card-header">
-                        <h2>Commentaires</h2>
-                    </div>
-                    <div class="card-body">
-                        {% if comments is defined and comments|length > 0 %}
-                            <ul class="list-group">
-                                {% for comment in comments %}
-                                    <li class="list-group-item">
-                                        <strong>{{ comment.author }}:</strong> {{ comment.content }}
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        {% else %}
-                            <p>Aucun commentaire pour ce post.</p>
-                        {% endif %}
-                    </div>
-                </div>
+                {% include 'post/comment/list.html.twig' %}
             </div>
         {% endif %}
     </div>
