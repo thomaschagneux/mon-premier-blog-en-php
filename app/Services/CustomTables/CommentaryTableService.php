@@ -74,7 +74,7 @@ class CommentaryTableService extends AbstractTableService
 
     private function remove(Comment $comment): string
     {
-        return $this->getDeleteLink('post_remove', ['id' => (string) $comment->getId()]);
+        return $this->getDeleteLink('comment_remove', ['id' => (string) $comment->getId()]);
     }
 
     private function show(Comment $comment): string

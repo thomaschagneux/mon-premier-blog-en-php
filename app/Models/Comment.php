@@ -165,15 +165,15 @@ class Comment extends AbstractModel
         }
 
         if (!isset($this->id) || $this->id <= 0) {
-            throw new Exception("ID du post non valide.");
+            throw new Exception("ID du commentaire non valide.");
         }
 
         try {
             $query = "DELETE FROM commentary WHERE id = :id";
             $stmt = $this->conn->prepare($query);
             return $stmt->execute([':id' => $this->id]);
-        } catch (Exception $e) {
-            throw new Exception('Erreur lors de la suppression de l\'utilisateur : ' . $e->getMessage());
+        } catch (Exception) {
+            throw new Exception('Erreur lors de la suppression du commentaire');
         }
 
     }
