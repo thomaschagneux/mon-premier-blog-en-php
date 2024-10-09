@@ -1,26 +1,28 @@
 <div class="form-row">
-    {% if type == 'text' %}
-        <label for="{{ name }}">{{ name }}</label>
-        <input type="text" id="{{ name }}" name="{{ name }}" value="{{ value }}" {{ attributes|attributes }}>
-    {% elseif type == 'textarea' %}
-        <label for="{{ name }}">{{ name }}</label>
-        <textarea id="tiny-mce" name="{{ name }}" {{ attributes|attributes }}>{{ value }}</textarea>
-    {% elseif type == 'file' %}
-        <label for="{{ name }}">{{ name }}</label>
-        <input type="file" id="{{ name }}" name="{{ name }}" {{ attributes|attributes }}>
-    {% elseif type == 'select' %}
-        <label for="{{ name }}">{{ name }}</label>
-        <select id="{{ name }}" name="{{ name }}" {{ attributes|attributes }}>
-            {% for option in options %}
-                <option value="{{ option.value }}" {% if option.selected %}selected{% endif %}>{{ option.label }}</option>
-            {% endfor %}
-        </select>
-    {% elseif type == 'checkbox' %}
-        <input type="checkbox" id="{{ name }}" name="{{ name }}" {% if value %}checked{% endif %} {{ attributes|attributes }}>
-        <label for="{{ name }}">{{ name }}</label>
-    {% else %}
-        <!-- Default case for other input types -->
-        <label for="{{ name }}">{{ name }}</label>
-        <input type="{{ type }}" id="{{ name }}" name="{{ name }}" value="{{ value }}" {{ attributes|attributes }}>
-    {% endif %}
+        {% if type == 'hidden' %}
+                <input type="hidden" id="{{ name }}" name="{{ name }}" value="{{ value }}" {{ attributes|attributes }}>
+        {% elseif type == 'text' %}
+                <label for="{{ name }}">{{ name }}</label>
+                <input type="text" id="{{ name }}" name="{{ name }}" value="{{ value }}" {{ attributes|attributes }}>
+        {% elseif type == 'textarea' %}
+                <label for="{{ name }}">{{ name }}</label>
+                <textarea id="tiny-mce" name="{{ name }}" {{ attributes|attributes }}>{{ value }}</textarea>
+        {% elseif type == 'file' %}
+                <label for="{{ name }}">{{ name }}</label>
+                <input type="file" id="{{ name }}" name="{{ name }}" {{ attributes|attributes }}>
+        {% elseif type == 'select' %}
+                <label for="{{ name }}">{{ name }}</label>
+                <select id="{{ name }}" name="{{ name }}" {{ attributes|attributes }}>
+                        {% for option in options %}
+                                <option value="{{ option.value }}" {% if option.selected %}selected{% endif %}>{{ option.label }}</option>
+                        {% endfor %}
+                </select>
+        {% elseif type == 'checkbox' %}
+                <input type="checkbox" id="{{ name }}" name="{{ name }}" {% if value %}checked{% endif %} {{ attributes|attributes }}>
+                <label for="{{ name }}">{{ name }}</label>
+        {% else %}
+                <!-- Default case for other input types -->
+                <label for="{{ name }}">{{ name }}</label>
+                <input type="{{ type }}" id="{{ name }}" name="{{ name }}" value="{{ value }}" {{ attributes|attributes }}>
+        {% endif %}
 </div>

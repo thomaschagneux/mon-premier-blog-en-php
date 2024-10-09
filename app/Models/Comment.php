@@ -120,7 +120,7 @@ class Comment extends AbstractModel
                         updated_at = :updated_at
                       WHERE id = :id";
         } else {
-            $query = "INSERT INTO post (content, user_id, post_id, created_at) 
+            $query = "INSERT INTO commentary (content, user_id, post_id, created_at) 
                       VALUES (:content, :user_id, :post_id, :created_at)";
         }
 
@@ -134,7 +134,7 @@ class Comment extends AbstractModel
 
             $params = [
                 ':content' => $this->getContent(),
-                'post_id' => $this->getPostId(),
+                ':post_id' => $this->getPostId(),
                 ':user_id' => $this->getUserId(),
             ];
             if ($isUpdate) {

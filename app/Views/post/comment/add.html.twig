@@ -1,0 +1,20 @@
+{% extends "components/base/base_admin.html.twig" %}
+
+{% block body %}
+    <div class="card">
+        <div class="card-header">
+            <h1>Ajout d'un commentaire</h1>
+        </div>
+{{ dumper(post) }}
+        <div class="card-body">
+            <form method="POST" action="{{path('comment_add_action', { 'id': post.id })}}" enctype="multipart/form-data">
+                <div class="row">
+                    {{ comment_add_form.content | raw }}
+                </div>
+                <div class="d-flex justify-content-center justify-content-md-end">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

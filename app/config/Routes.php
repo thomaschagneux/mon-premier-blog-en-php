@@ -73,9 +73,9 @@ function defineRoutes(Router $router): void
 
     $router->addRoute('GET', '/admin/comment/{id}/list', [CommentController::class, 'commentList'], 'comment_list');
 
-    $router->addRoute('GET', '/admin/comment/{id}/add', [CommentController::class, 'commentAddForm'], 'comment_add_form');
+    $router->addRoute('GET', '/admin/post/{id}/comment/add', [CommentController::class, 'commentAddForm'], 'comment_add_form');
 
-    $router->addRoute('POST', '/admin/comment/{id}/add', [CommentController::class, 'commentAddAction'], 'comment_add_action');
+    $router->addRoute('POST', '/admin/post/{id}/comment/add', [CommentController::class, 'commentAddAction'], 'comment_add_action');
 
     $router->addRoute('GET', '/admin/comment/{id}/edit', [CommentController::class, 'commentEditForm'], 'comment_edit_form');
 
