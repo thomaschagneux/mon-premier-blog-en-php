@@ -46,7 +46,7 @@ class CommentaryTableService extends AbstractTableService
         $rows = [];
         foreach ($comments as $comment) {
             $rows[] = [
-                'content' => $comment->getContent(),
+                'content' => $this->getContent($comment, 200),
                 'author' => $this->getAuthor($comment),
                 'post' => $this->getPost($comment) ? $this->getPost($comment)->getTitle() :  '',
                 'created_at' => $comment->getCreatedAt()->format('d/m/Y'),
@@ -107,5 +107,16 @@ class CommentaryTableService extends AbstractTableService
         } else {
             return null;
         }
+    }
+
+    private function getContent(Comment $comment, int $strlength): string
+    {
+        $content = strip_tags($comment->getContent());
+
+
+        if (mb_strlen($content) > $strlength) {
+            $content = mb_substr($content, 0, $strlength) . ' [...]';
+        }
+        return $content;
     }
 }

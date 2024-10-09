@@ -52,6 +52,18 @@ tinymce.init({
 
 });
 
+tinymce.init({
+  selector: 'textarea.tiny-light',
+  license_key: 'gpl',
+  plugins: 'autolink lists link image charmap preview anchor',
+  menubar: false,
+  toolbar: 'undo redo | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link | preview',
+  height: 300,
+  image_caption: true,
+  toolbar_mode: 'sliding',
+  content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:16px }',
+});
+
 // Cacher l'overlay quand le chargement de la page est terminé
 document.addEventListener('DOMContentLoaded', function() {
   const overlay = document.getElementById('loading-overlay');

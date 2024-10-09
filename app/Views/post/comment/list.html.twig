@@ -3,11 +3,18 @@
         <h2>Commentaires</h2>
     </div>
     <div class="card-body">
+        <div class="row justify-content-end">
+            <div class="col col-md-4 text-end">
+                <a class="btn btn-primary" href={{ path('comment_add_form', {'id': post.id})}}>
+                    <span><i class="fa-solid fa-plus"></i></span>
+                    <span>Ajouter un commentaire</span>
+                </a>
+            </div>
+        </div>
         {% if comments is defined and comments|length > 0 %}
             {{ comments_table | raw }}
         {% else %}
             <p>Aucun commentaire pour ce post.</p>
         {% endif %}
-        {{ dumper(comments) }}
     </div>
 </div>
