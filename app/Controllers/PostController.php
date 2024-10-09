@@ -185,6 +185,11 @@ class PostController extends AbstractController
 
     public function postShow(int $id): string|RedirectResponse
     {
+        $message = $this->cookieManager->getCookie('success_message');
+        if (null !== $message) {
+            $this->cookieManager->deleteCookie('success_message');
+        }
+
         $post = $this->post->findById($id);
         $comments = $this->comment->getCommentsByPostId($id);
 
@@ -197,6 +202,7 @@ class PostController extends AbstractController
             'post' => $post,
             'comments' => $comments,
             'comments_table' => $commentsTable,
+            'success_message' => $message,
         ]);
     }
 

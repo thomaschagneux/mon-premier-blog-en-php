@@ -93,9 +93,23 @@ class CommentController extends AbstractController
         return $this->redirectToRoute('post_show', ['id' => (string) $postId]);
     }
 
-    public function commentRemove(int $commentId): void
+    public function commentRemove(int $commentId): RedirectResponse
     {
 
+        $commentModel = new Comment();
+        $comment = $commentModel->findById($commentId);
+
+        if ($comment instanceof Comment) {
+            $postId = $comment->getPostId();
+
+            if ($comment->remove()) {
+                $this->cookieManager->setCookie('success_message', 'Cet commentaire a bien été supprimé', 60);
+                return $this->redirectToRoute('post_show', ['id' => (string) $postId]);
+            }
+        }
+        $this->cookieManager->setCookie('error_message', 'Il y a eu un problème dans la suppression de ce message', 60);
+
+        return $this->redirectToReferer();
     }
 
     public function commentEditForm(int $commentId):void
