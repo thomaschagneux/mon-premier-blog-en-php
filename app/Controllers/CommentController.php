@@ -8,6 +8,7 @@ use App\Models\Comment;
 use App\Models\Post;
 use App\Models\User;
 use App\Services\Form\CommentAddFormService;
+use App\Services\Form\CommentEditFormService;
 
 class CommentController extends AbstractController
 {
@@ -112,13 +113,67 @@ class CommentController extends AbstractController
         return $this->redirectToReferer();
     }
 
-    public function commentEditForm(int $commentId):void
+    public function commentEditForm(int $commentId):string|RedirectResponse
     {
+        $message = $this->cookieManager->getCookie('error_message') ?? null;
 
+        if ($message !== null) {
+            $this->cookieManager->deleteCookie('error_message');
+        }
+
+        if ($this->isConnected()) {
+            $commentModel = new Comment();
+            $comment = $commentModel->findById($commentId);
+
+            $commentEditForm = null;
+            $post = null;
+
+            if ($comment instanceof Comment) {
+                $commentEditForm = new CommentEditFormService($this->twig, $comment);
+                $commentEditForm->buildForm();
+
+                $postModel = new Post();
+                $post = $comment->getPostId() ? $postModel->findById($comment->getPostId()) : null;
+
+            }
+
+
+            return $this->render('post/comment/edit.html.twig', [
+                'post' => $post instanceof Post ? $post : null,
+                'comment_edit_form' => $commentEditForm?->getFormRows(),
+                'error_message' => $message,
+            ]);
+        }
+
+        return $this->redirectToReferer();
     }
 
-    public function commentEditAction(int $commentId):void
+    public function commentEditAction(int $commentId): RedirectResponse
     {
+        $commentModel = new Comment();
+        $comment = $commentModel->findById($commentId);
+        if ($comment instanceof Comment) {
+            $content = $this->postManager->getPostParam('content');
 
+            if (empty($content)) {
+                $this->cookieManager->setCookie('error_message', 'Le commentaire ne peux pas être vide',60);
+                return $this->redirectToReferer();
+            }
+
+            $comment->setContent($content);
+            $comment->setUpdatedAt(new \DateTime());
+            $comment->save();
+
+            $postModel = new Post();
+            $post = $comment->getPostId() ? $postModel->findById($comment->getPostId()) : null;
+
+            if ($post instanceof Post) {
+                $this->cookieManager->setCookie('success_message', 'Le commentaire a bien été enregistré', 60);
+                return $this->redirectToRoute('post_show', ['id' => (string) $post->getId()]);
+            }
+
+        }
+        $this->cookieManager->setCookie('error_message', 'Il y a eu une erreur, veuillez recommencer',60);
+        return $this->redirectToReferer();
     }
 }

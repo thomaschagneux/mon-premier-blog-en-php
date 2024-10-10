@@ -143,11 +143,13 @@ class Comment extends AbstractModel
             } else {
                 $params[':created_at'] = $this->getCreatedAt()->format('Y-m-d H:i:s');
             }
+
             $stmt->execute($params);
 
             if (!$isUpdate) {
                 $this->id = (int) $this->conn->lastInsertId();
             }
+
             return $this->id;
         } catch (Exception) {
             throw new Exception('Erreur lors de la sauvegarde de l\'utilisateur');

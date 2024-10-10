@@ -69,7 +69,7 @@ class CommentaryTableService extends AbstractTableService
 
     private function edit(Comment $comment): string
     {
-        return  $this->getEditLink('edit_post_form', ['id' => (string) $comment->getId()]);
+        return  $this->getEditLink('comment_edit_form', ['id' => (string) $comment->getId()]);
     }
 
     private function remove(Comment $comment): string
