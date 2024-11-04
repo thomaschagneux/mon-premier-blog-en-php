@@ -21,20 +21,21 @@
                         <div id="last_nameHelp" class="form-text"></div>
                     </div>
                 </div>
-
                 <div class="row mb-3">
                     <div class="col col-md-6">
                         <label for="avatar" class="form-label">Avatar</label>
                         <input type="file" class="form-control" id="avatar" name="avatar" accept="image/png, image/jpeg, image/jpg" />
                     </div>
-                    <div class="col col-md-6">
-                        <label for="role" class="form-label">Rôle</label>
-                        <select id="role" name="role" class="form-select" aria-label="role" required>
-                            <option disabled>Choisissez un rôle pour l'utilisateur</option>
-                            <option {% if user.role == 'ROLE_USER' %}selected{% endif%}  value="ROLE_USER">Utilisateur</option>
-                            <option {% if user.role == 'ROLE_ADMIN' %}selected{% endif%} value="ROLE_ADMIN">Administrateur</option>
-                        </select>
-                    </div>
+                    {% if app_user['admin'] %}
+                        <div class="col col-md-6">
+                            <label for="role" class="form-label">Rôle</label>
+                            <select id="role" name="role" class="form-select" aria-label="role" required>
+                                <option disabled>Choisissez un rôle pour l'utilisateur</option>
+                                <option {% if user.role == 'ROLE_USER' %}selected{% endif%}  value="ROLE_USER">Utilisateur</option>
+                                <option {% if user.role == 'ROLE_ADMIN' %}selected{% endif%} value="ROLE_ADMIN">Administrateur</option>
+                            </select>
+                        </div>
+                    {% endif %}
                 </div>
 
 

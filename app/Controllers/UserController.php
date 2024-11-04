@@ -255,9 +255,19 @@ class UserController extends AbstractController
                 'user' => $user,
                 'error_message' => $errorMessage,
                 ]);
-        } else {
-            return $this->redirectToReferer();
+        } elseif ($this->isConnected()) {
+            $userData = $this->getUserData();
+            if (is_array($userData) && isset($userData['email'])) {
+                $user = $this->user->findByUsermail($userData['email']);
+                if ($user instanceof User) {
+                    return $this->render('user/edit.html.twig', [
+                        'user' => $user,
+                        'error_message' => $errorMessage,
+                    ]);
+                }
+            }
         }
+        return $this->redirectToReferer();
     }
 
     /**
@@ -265,17 +275,88 @@ class UserController extends AbstractController
      */
     public function editUser(int $id): RedirectResponse
     {
+        if ($this->isAdmin()) {
+            $user = $this->user->findById($id);
+            if (null === $user) {
+                return $this->redirectToRoute('admin_list_user');
+            }
 
+            if ($this->isPostRequest()) {
+                $firstName = $this->postManager->getPostParam('first_name');
+                $lastName = $this->postManager->getPostParam('last_name');
+                $email = $this->postManager->getPostParam('email');
+                $password = $this->postManager->getPostParam('password');
+                $role = $this->postManager->getPostParam('role') ?? 'ROLE_USER';
+
+                if (empty($password)) {
+                    $password = $user->getPassword();
+                }
+
+                if (empty($firstName) || empty($lastName) || empty($email)) {
+                    $this->cookieManager->setCookie('error_message', 'Veuillez remplir les champs requis', 60);
+                    return $this->redirectToRoute('user_edit_form', ['id' => (string) $id]);
+                }
+
+                $user->setFirstName($firstName);
+                $user->setLastName($lastName);
+                $user->setEmail($email);
+                $user->setPassword(password_hash($password, PASSWORD_DEFAULT));
+                $user->setRole($role);
+
+                // Traitement du fichier avatar
+                $file = $this->fileManager->sanitizedFiles('avatar');
+
+                if ($file !== null && $file['error'] === UPLOAD_ERR_OK) {
+                    $fileData = $this->fileManager->getFile('avatar');
+
+                    if (null !== $fileData) {
+                        $extension = pathinfo($fileData['name'], PATHINFO_EXTENSION);
+                        $uniqueFileName = 'avatar_' . $user->getFirstName() . '_' . $user->getLastName() . '_' . uniqid() . '.' . $extension;
+                        $uniqueFileName = Sanitizer::sanitizeString($uniqueFileName);
+
+                        $picture = new Picture();
+                        $picture->setFileName($uniqueFileName);
+                        $picture->setPathName('assets/img/avatars/');
+                        $picture->setMimeType($fileData['type']);
+
+                        $this->fileManager->setDestination($picture->getPathName());
+                        $this->fileManager->moveFile($fileData['tmp_name'], $picture->getFileName());
+                        $picture->save();
+
+                        $user->setPictureId($picture->getId());
+                    }
+                } elseif ($file === null || $file['error'] === UPLOAD_ERR_NO_FILE) {
+                    // Aucun fichier n'a été téléchargé, on conserve l'image actuelle si elle existe
+                    if ($user->getPictureId() !== null) {
+                        $user->setPictureId($user->getPictureId());
+                    }
+                } else {
+                    // Gestion des autres erreurs de fichier
+                    if ($file['error'] === UPLOAD_ERR_INI_SIZE || $file['error'] === UPLOAD_ERR_FORM_SIZE) {
+                        $this->cookieManager->setCookie('error_message', 'Le fichier dépasse la taille maximale autorisée', 60);
+                        return $this->redirectToRoute('user_edit_form', ['id' => (string) $id]);
+                    } else {
+                        $this->cookieManager->setCookie('error_message', 'Erreur inconnue dans le chargement du fichier', 60);
+                        return $this->redirectToRoute('user_edit_form', ['id' => (string) $id]);
+                    }
+                }
+
+                $user->save();
+                $this->cookieManager->setCookie('success_message', 'Cet utilisateur a bien été modifié', 60);
+                return $this->redirectToRoute('admin_list_user');
+            }
+        }
         $user = $this->user->findById($id);
         if (null === $user) {
             return $this->redirectToRoute('admin_list_user');
         }
+
         if ($this->isPostRequest()) {
             $firstName = $this->postManager->getPostParam('first_name');
             $lastName = $this->postManager->getPostParam('last_name');
             $email = $this->postManager->getPostParam('email');
             $password = $this->postManager->getPostParam('password');
-            $role = $this->postManager->getPostParam('role') ?? 'ROLE_USER';
+
             if (empty($password)) {
                 $password = $user->getPassword();
             }
@@ -284,56 +365,58 @@ class UserController extends AbstractController
                 $this->cookieManager->setCookie('error_message', 'Veuillez remplir les champs requis', 60);
                 return $this->redirectToRoute('user_edit_form', ['id' => (string) $id]);
             }
+
             $user->setFirstName($firstName);
             $user->setLastName($lastName);
             $user->setEmail($email);
             $user->setPassword(password_hash($password, PASSWORD_DEFAULT));
-            $user->setRole($role);
 
-            $picture = new Picture();
-
+            // Traitement du fichier avatar
             $file = $this->fileManager->sanitizedFiles('avatar');
 
-            if($file['error'] === UPLOAD_ERR_INI_SIZE || $file['error'] === UPLOAD_ERR_FORM_SIZE) {
-                $this->cookieManager->setCookie('error_message', 'Le fichier dépasse la taille maximale autorisée', 60);
-                return $this->redirectToRoute('user_edit_form', ['id' => (string) $id]);
+            if ($file !== null && $file['error'] === UPLOAD_ERR_OK) {
+                $fileData = $this->fileManager->getFile('avatar');
+
+                if (null !== $fileData) {
+                    $extension = pathinfo($fileData['name'], PATHINFO_EXTENSION);
+                    $uniqueFileName = 'avatar_' . $user->getFirstName() . '_' . $user->getLastName() . '_' . uniqid() . '.' . $extension;
+                    $uniqueFileName = Sanitizer::sanitizeString($uniqueFileName);
+
+                    $picture = new Picture();
+                    $picture->setFileName($uniqueFileName);
+                    $picture->setPathName('assets/img/avatars/');
+                    $picture->setMimeType($fileData['type']);
+
+                    $this->fileManager->setDestination($picture->getPathName());
+                    $this->fileManager->moveFile($fileData['tmp_name'], $picture->getFileName());
+                    $picture->save();
+
+                    $user->setPictureId($picture->getId());
+                }
             } elseif ($file['error'] === UPLOAD_ERR_NO_FILE) {
-                $this->cookieManager->setCookie('error_message', 'Fichier inexistant', 60);
-                return $this->redirectToRoute('user_edit_form', ['id' => (string) $id]);
-            } elseif ($file['error'] !== UPLOAD_ERR_OK) {
-                $this->cookieManager->setCookie('error_message', 'Erreur inconnue dans le chargement du fichier', 60);
-                return $this->redirectToRoute('user_edit_form', ['id' => (string) $id]);
+                // Aucun fichier n'a été téléchargé, on conserve l'image actuelle si elle existe
+                if ($user->getPictureId() !== null) {
+                    $user->setPictureId($user->getPictureId());
+                }
+            } else {
+                // Gestion des autres erreurs de fichier
+                if ($file['error'] === UPLOAD_ERR_INI_SIZE || $file['error'] === UPLOAD_ERR_FORM_SIZE) {
+                    $this->cookieManager->setCookie('error_message', 'Le fichier dépasse la taille maximale autorisée', 60);
+                    return $this->redirectToRoute('user_edit_form', ['id' => (string) $id]);
+                } else {
+                    $this->cookieManager->setCookie('error_message', 'Erreur inconnue dans le chargement du fichier', 60);
+                    return $this->redirectToRoute('user_edit_form', ['id' => (string) $id]);
+                }
             }
 
-
-            $fileData = $this->fileManager->getFile('avatar');
-
-            if (null !== $fileData) {
-                $extension = pathinfo($fileData['name'], PATHINFO_EXTENSION);
-                $uniqueFileName = 'avatar_' . $user->getFirstName() . '_' . $user->getLastName() . '_' . uniqid() . '.' . $extension;
-                $uniqueFileName = Sanitizer::sanitizeString($uniqueFileName);
-
-                $picture->setFileName($uniqueFileName);
-                $picture->setPathName('assets/img/avatars/');
-                $picture->setMimeType($fileData['type']);
-
-                $this->fileManager->setDestination($picture->getPathName());
-                $this->fileManager->moveFile($fileData['tmp_name'], $picture->getFileName());
-                $picture->save();
-
-                $user->setPictureId($picture->getId());
-            } elseif(null !== $user->getPictureId()) {
-                $user->setPictureId($user->getPictureId());
-            }else {
-                $this->cookieManager->setCookie('error_message', 'Erreur dans le chargement de cette image', 60);
-                return $this->redirectToRoute('user_edit_form', ['id' => (string) $id]);
-            }
             $user->save();
             $this->cookieManager->setCookie('success_message', 'Cet utilisateur a bien été modifié', 60);
             return $this->redirectToRoute('admin_list_user');
         }
+
         return $this->redirectToRoute('user_edit_form', ['id' => (string) $id]);
     }
+
 
     /**
      * @throws RuntimeError

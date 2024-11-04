@@ -160,7 +160,6 @@ class PostController extends AbstractController
         $title =  $this->postManager->getPostParam('title');
         $lede =  $this->postManager->getPostParam('lede');
         $content = $this->postManager->getPostParam('content');
-
         if (null === $title || null === $content || null === $lede) {
             $this->cookieManager->setCookie('error_message', 'Veuillez remplir les champs requis', 60);
             return $this->redirectToRoute('add_post_form');
