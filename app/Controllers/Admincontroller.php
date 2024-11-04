@@ -69,5 +69,4 @@ class Admincontroller extends AbstractController
         return $this->redirectToRoute('login');
     }
 
-
 }
