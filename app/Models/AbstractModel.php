@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\core\Database;
+use App\Manager\CookieManager;
 use DateTime;
 use Exception;
 use PDO;
@@ -14,6 +15,8 @@ class AbstractModel
     protected DateTime $createdAt;
 
     protected ?DateTime $updatedAt = null;
+
+    protected CookieManager $cookieManager;
 
     /**
      * @throws Exception
@@ -30,6 +33,8 @@ class AbstractModel
         if ($this->conn === null) {
             throw new Exception('Failed to connect to the database.');
         }
+
+        $this->cookieManager = new CookieManager();
 
     }
 

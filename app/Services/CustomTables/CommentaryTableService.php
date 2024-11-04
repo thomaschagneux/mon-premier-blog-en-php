@@ -48,7 +48,8 @@ class CommentaryTableService extends AbstractTableService
             $rows[] = [
                 'content' => $this->getContent($comment, 200),
                 'author' => $this->getAuthor($comment),
-                'post' => $this->getPost($comment) ? $this->getPost($comment)->getTitle() :  '',
+                // Utilise le post passé en paramètre plutôt que de le rechercher à nouveau
+                'post' => $this->getPost($comment, $post)->getTitle(),
                 'created_at' => $comment->getCreatedAt()->format('d/m/Y'),
                 'updated_at' => $comment->getUpdatedAt() ? $comment->getUpdatedAt()->format('d/m/Y') : '',
                 'actions' => $this->getAction($comment),
@@ -57,6 +58,7 @@ class CommentaryTableService extends AbstractTableService
 
         return $this->renderTable($rows);
     }
+
 
     public  function getAction(Comment $comment): string
     {
@@ -97,17 +99,20 @@ class CommentaryTableService extends AbstractTableService
         }
     }
 
-    private function getPost(Comment $comment): ?Post
+    private function getPost(Comment $comment, Post $post): ?Post
     {
-        $postModel = new Post();
-        $post = $comment->getPostId() ? $postModel->findById($comment->getPostId()) : null;
-        if ($post instanceof Post) {
+        // Si l'ID du post dans le commentaire est le même que celui du post passé en paramètre
+        if ($comment->getPostId() === $post->getId()) {
             return $post;
-
-        } else {
-            return null;
         }
+
+        // Si le commentaire fait référence à un autre post, charger ce post
+        $postModel = new Post();
+        $foundPost = $comment->getPostId() ? $postModel->findById($comment->getPostId()) : null;
+
+        return $foundPost instanceof Post ? $foundPost : null;
     }
+
 
     private function getContent(Comment $comment, int $strlength): string
     {

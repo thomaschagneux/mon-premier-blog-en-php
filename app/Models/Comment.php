@@ -87,6 +87,23 @@ class Comment extends AbstractModel
         return [];
     }
 
+    public function findcommentsByUserId(int $userId): array
+    {
+        if ($this->conn instanceof PDO) {
+            $query = "SELECT * FROM commentary WHERE user_id = :user_id";
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute([':user_id' => $userId]);
+
+            $posts = [];
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                if (is_array($row)) {
+                    $posts[] = self::fromArray($row);
+                }
+            }
+            return $posts;
+        }
+        return [];
+    }
 
     public function findById(int $id): ?self
     {

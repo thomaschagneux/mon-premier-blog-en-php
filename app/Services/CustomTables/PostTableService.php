@@ -46,7 +46,7 @@ class PostTableService extends AbstractTableService
         foreach ($posts as $post) {
             $rows[] = [
                 'title' => $post->getTitle(),
-                'lede' => $post->getLede(),
+                'lede' => $this->getLede($post, 100),
                 'author' => $this->getAuthor($post),
                 'created_at' => $post->getCreatedAt()->format('d/m/Y'),
                 'updated_at' => $post->getUpdatedAt() ? $post->getUpdatedAt()->format('d/m/Y') : '',
@@ -95,4 +95,21 @@ class PostTableService extends AbstractTableService
             return '';
         }
     }
+
+    private function getLede(Post $post, int $strlength): string
+    {
+
+        $lede = strip_tags($post->getContent());
+
+
+        $lede = html_entity_decode($lede, ENT_QUOTES, 'UTF-8');
+
+        // Vérification de la longueur et tronquage si nécessaire
+        if (mb_strlen($lede) > $strlength) {
+            $lede = mb_substr($lede, 0, $strlength) . ' [...]';
+        }
+
+        return $lede;
+    }
+
 }

@@ -5,7 +5,7 @@
         <div class="card-header">
             <h1>Modification d'un commentaire</h1>
         </div>
-{{ dumper(post) }}
+
         <div class="card-body">
             <form method="POST" action="{{path('comment_edit_action', { 'id': post.id })}}" enctype="multipart/form-data">
                 <div class="row">
