@@ -3,8 +3,10 @@
 namespace App\Controllers;
 
 use App\Manager\ServerManager;
+use App\Models\Post;
 use App\Models\User;
 use App\core\RedirectResponse;
+use App\Services\Form\ContactFormService;
 use App\Services\Sanitizer;
 use Exception;
 use Twig\Error\LoaderError;
@@ -22,16 +24,28 @@ class HomeController extends AbstractController
      */
     public function index(): string
     {
-        $content = 'index';
 
         $successMessage = $this->cookieManager->getCookie('success_message');
         if ($successMessage) {
             $this->cookieManager->deleteCookie('success_message');
         }
+
+        $contactForm = new ContactFormService($this->twig);
+
+        $contactForm->buildForm();
+        $contactFormRows = $contactForm->getFormRows();
+
+        $postModel = new Post();
+        $posts = array_reverse($postModel->getAllPosts());
+
+        $lastPost = $posts[0] ?? null;
+
         return $this->twig->render('index.html.twig', [
             'title' => 'Home Page',
-            'content' => $content,
+            'contact_form' => $contactFormRows,
             'success_message' => $successMessage,
+            'posts' => $posts,
+            'last_post' => $lastPost
         ]);
     }
 
