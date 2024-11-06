@@ -2,20 +2,25 @@
 
 namespace App\Controllers;
 
-use App\Manager\ServerManager;
+use App\core\Router;
 use App\Models\Post;
-use App\Models\User;
 use App\core\RedirectResponse;
 use App\Services\Form\ContactFormService;
-use App\Services\Sanitizer;
+use Dotenv\Dotenv;
 use Exception;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 
-
 class HomeController extends AbstractController
 {
+    public function __construct(Router $router)
+    {
+        parent::__construct($router);
+        $dotenv = Dotenv::createImmutable(__DIR__ . '/../../');
+        $dotenv->load();
+    }
+
     /**
      * @throws RuntimeError
      * @throws SyntaxError
@@ -28,6 +33,10 @@ class HomeController extends AbstractController
         $successMessage = $this->cookieManager->getCookie('success_message');
         if ($successMessage) {
             $this->cookieManager->deleteCookie('success_message');
+        }
+        $errorMessage = $this->cookieManager->getCookie('error_message');
+        if ($errorMessage) {
+            $this->cookieManager->deleteCookie('error_message');
         }
 
         $contactForm = new ContactFormService($this->twig);
@@ -44,9 +53,31 @@ class HomeController extends AbstractController
             'title' => 'Home Page',
             'contact_form' => $contactFormRows,
             'success_message' => $successMessage,
+            'error_message' => $errorMessage,
             'posts' => $posts,
-            'last_post' => $lastPost
+            'last_post' => $lastPost,
+            'recaptcha_site_key' => $_ENV['RECAPTCHA_SITE_KEY'],
         ]);
+    }
+
+    public function contactSubmit()
+    {
+        $recaptchaResponse = $this->postManager->getPostParam('g-recaptcha-response') ?? '';
+
+        $secretKey = $_ENV['RECAPTCHA_SECRET_KEY'];
+
+        $response = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=$secretKey&response=$recaptchaResponse");
+        $responseKeys = json_decode($response, true);
+
+        if ($responseKeys['success'] ?? false) {
+
+            $this->cookieManager->setCookie('success_message', 'Formulaire envoyé avec succès', 60);
+            return $this->redirectToRoute('index');
+        } else {
+
+            $this->cookieManager->setCookie('error_message', 'Le reCAPTCHA a échoué, veuillez réessayer', 60);
+            return $this->redirectToRoute('index');
+        }
     }
 
     public function about(int $id): string

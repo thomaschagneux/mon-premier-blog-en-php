@@ -13,7 +13,7 @@ class Post extends AbstractModel
 
     private string $title;
 
-    private  string $lede;
+    private string $lede;
 
     private string $content;
 
@@ -27,7 +27,7 @@ class Post extends AbstractModel
     }
 
     /**
-     * @param array<string, mixed> $data
+     * @param array<string, int|string|null> $data
      * @return self
      * @throws \DateMalformedStringException
      */

@@ -21,9 +21,9 @@ function defineRoutes(Router $router): void
 {
     $router->addRoute('GET', '/', [HomeController::class, 'index'], 'index');
 
-    $router->addRoute('GET', '/about/{id}', [HomeController::class, 'about'], 'about');
+    $router->addRoute('POST', '/contact', [HomeController::class, 'contactSubmit'], 'contact');
 
-    $router->addRoute('GET', '/contact', [HomeController::class, 'contact'], 'contact');
+    $router->addRoute('GET', '/contact', [HomeController::class, 'contactSubmit'], 'contact');
 
     $router->addRoute('GET', '/error/500', [ErrorController::class, 'error500'], 'error_500');
 
