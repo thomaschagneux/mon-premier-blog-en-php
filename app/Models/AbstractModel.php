@@ -5,8 +5,8 @@ namespace App\Models;
 use App\core\Database;
 use App\Manager\CookieManager;
 use DateTime;
-use Exception;
 use PDO;
+use RuntimeException;
 
 class AbstractModel
 {
@@ -19,19 +19,19 @@ class AbstractModel
     protected CookieManager $cookieManager;
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function __construct()
     {
         $database = new Database();
         $dbInstance = $database::getInstance();
         if ($dbInstance === null) {
-            throw new Exception('Failed to get a valid Database instance.');
+            throw new RuntimeException('Failed to get a valid Database instance.');
         }
 
         $this->conn = $dbInstance->getConnection();
         if ($this->conn === null) {
-            throw new Exception('Failed to connect to the database.');
+            throw new RuntimeException('Failed to connect to the database.');
         }
 
         $this->cookieManager = new CookieManager();

@@ -2,3 +2,53 @@
 CSS stylesheet for general app.
 For Administration part check app_admin.css
  */
+
+/* Ajout d'une légère animation au survol pour les cartes */
+.featured-article, .latest-posts .card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.featured-article:hover, .latest-posts .card:hover {
+    transform: scale(1.03); /* Agrandissement léger */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Ombre plus intense */
+}
+
+/* Effet slide-in depuis le bas */
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.slide-in {
+    opacity: 0; /* Début invisible */
+    animation: slideInUp 0.6s forwards; /* Animation en 0.6s */
+}
+
+/* Dégradé et effet de brillance pour la carte en vedette */
+.featured-article {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    position: relative;
+    overflow: hidden;
+}
+
+.featured-article::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -75%;
+    width: 50%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.5);
+    transform: skewX(-20deg);
+    transition: all 0.5s ease-in-out;
+}
+
+.featured-article:hover::after {
+    left: 125%; /* Glisse vers la droite au survol */
+}

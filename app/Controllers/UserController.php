@@ -325,7 +325,7 @@ class UserController extends AbstractController
 
                         $user->setPictureId($picture->getId());
                     }
-                } elseif ($file === null || $file['error'] === UPLOAD_ERR_NO_FILE) {
+                } elseif ($file['error'] === UPLOAD_ERR_NO_FILE) {
                     // Aucun fichier n'a été téléchargé, on conserve l'image actuelle si elle existe
                     if ($user->getPictureId() !== null) {
                         $user->setPictureId($user->getPictureId());

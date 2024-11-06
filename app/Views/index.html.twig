@@ -1,13 +1,102 @@
 {% extends "components/base/base.html.twig" %}
 
-{% block body %}
-    <h1>Accueil</h1>
-    <ul class="list-unstyled">
-        {% for element in content %}
-            <li>{{ element }}</li>
-        {% endfor %}
-    </ul>
+{% block scripts %}
+    <script src="https://www.google.com/recaptcha/api.js?render={{ recaptcha_site_key }}"></script>
+    <script>
+        grecaptcha.ready(function() {
+            grecaptcha.execute('{{ recaptcha_site_key }}', {action: 'submit'}).then(function(token) {
+                document.getElementById('g-recaptcha-response').value = token;
+            });
+        });
+    </script>
+{% endblock %}
 
-<pre>{{ content }}</pre>
+{% block body %}
+
+    <div class="container">
+
+        <div class="intro mb-3 p-4 bg-light border rounded-3">
+            <h2>A propos de moi</h2>
+            <p>
+                Je m'appelle Thomas Chagneux et je suis un développeur PHP junior passionné,
+            avec un fort intérêt pour le développement web et
+            une curiosité constante pour les nouvelles technologies.
+            Après des études en développement informatique et plusieurs projets académiques,
+            je me spécialise aujourd’hui en PHP et explore ses frameworks populaires, notamment Symfony.
+
+            Grâce à mes projets personnels et à mes exercices académiques, j'ai acquis de solides compétences en PHP,
+            ainsi qu'une bonne maîtrise des bases du HTML, CSS et JavaScript.
+            Mon objectif est de concevoir des applications web modernes, fonctionnelles et accessibles.
+            En tant que développeur junior, je suis motivé par l'apprentissage continu et le désir d'améliorer mes compétences à chaque nouveau projet.
+            Que ce soit par la lecture de documentation, des cours en ligne ou la collaboration avec d'autres développeurs,
+            j'aime me lancer des défis pour progresser.
+            Vous cherchez un développeur motivé et en pleine évolution ?
+            Je serais ravi d’échanger avec vous et de contribuer à vos projets avec enthousiasme et détermination !
+            </p>
+
+            <div class="skills mt-3">
+                <h3>Compétences</h3>
+                <span class="badge bg-primary m-1">PHP</span>
+                <span class="badge bg-secondary m-1">Symfony</span>
+                <span class="badge bg-info m-1">HTML</span>
+                <span class="badge bg-warning m-1">CSS</span>
+                <span class="badge bg-success m-1">JavaScript</span>
+            </div>
+        </div>
+
+        <div class="contact-form mb-3">
+            <h2>Me contacter</h2>
+            <form action="{{ path('contact') }}" enctype="multipart/form-data" method="post">
+                <div class="row mb-2">
+                    <div class="col col-md-6">{{ contact_form.firstName | raw }}</div>
+                    <div class="col col-md-6">{{ contact_form.lastName | raw }}</div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col col-md-6">{{ contact_form.email | raw }}</div>
+                </div>
+                <div class="row mb-2">
+                    <div class="">{{ contact_form.message | raw }}</div>
+                </div>
+                <div class="row">
+                    <input type="hidden" name="g-recaptcha-response" id="g-recaptcha-response">
+                </div>
+                <div class="d-flex justify-content-center justify-content-md-end">
+                    <button type="submit" class="btn btn-primary rounded-2">Valider</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="latest-posts mt-5">
+            <h2>Derniers articles</h2>
+            <div class="row mb-4">
+                {% if last_post %}
+                    <div class="col-12 mb-4 slide-in">
+                        <div class="card h-100 shadow-lg featured-article">
+                            <div class="card-body">
+                                <h3 class="card-title">{{ last_post.title }}</h3>
+                                <p class="card-text">{{ last_post.chapo | slice(0, 200) ~ '...' }}</p>
+                                <a href="#" class="btn btn-primary btn-lg">Lire la suite</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="row">
+                {% for post in posts | slice(1, 3) %}
+                    <div class="col-md-4 mb-4 slide-in">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ post.title }}</h5>
+                                <p class="card-text">{{ post.chapo | slice(0, 100) ~ '...' }}</p>
+                                <a href="#" class="btn btn-outline-primary btn-sm">Lire la suite</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
 
 {% endblock %}

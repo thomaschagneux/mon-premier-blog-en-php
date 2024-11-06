@@ -13,6 +13,8 @@ class FormRowComponent
 
     private string $name;
 
+    private ?string $label;
+
     private mixed $value;
 
     /**
@@ -38,10 +40,12 @@ class FormRowComponent
         mixed $value = null,
         array $attributes = [],
         array $options = [],
+        string $label = null,
     )
     {
         $this->type = $type;
         $this->name = $name;
+        $this->label = $label;
         $this->value = $value;
         $this->options = $options;
         $this->attributes = $attributes;
@@ -52,6 +56,7 @@ class FormRowComponent
         return $twig->render('components/form/form_fields.html.twig', [
             'type' => $this->type,
             'name' => $this->name,
+            'label' => $this->label,
             'value' => $this->value,
             'options' => $this->options,
             'attributes' => $this->attributes,
