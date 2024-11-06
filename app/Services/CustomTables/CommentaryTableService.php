@@ -49,7 +49,7 @@ class CommentaryTableService extends AbstractTableService
                 'content' => $this->getContent($comment, 200),
                 'author' => $this->getAuthor($comment),
                 // Utilise le post passé en paramètre plutôt que de le rechercher à nouveau
-                'post' => $this->getPost($comment, $post)->getTitle(),
+                'post' => $this->getPost($comment, $post) ? $this->getPost($comment, $post)->getTitle() : '',
                 'created_at' => $comment->getCreatedAt()->format('d/m/Y'),
                 'updated_at' => $comment->getUpdatedAt() ? $comment->getUpdatedAt()->format('d/m/Y') : '',
                 'actions' => $this->getAction($comment),

@@ -14,11 +14,17 @@ use Twig\Error\SyntaxError;
 
 class HomeController extends AbstractController
 {
+    /**
+     * @var array<string, string>
+     */
+    private array $env;
+
     public function __construct(Router $router)
     {
         parent::__construct($router);
         $dotenv = Dotenv::createImmutable(__DIR__ . '/../../');
         $dotenv->load();
+        $this->env = $_ENV;
     }
 
     /**
@@ -56,20 +62,21 @@ class HomeController extends AbstractController
             'error_message' => $errorMessage,
             'posts' => $posts,
             'last_post' => $lastPost,
-            'recaptcha_site_key' => $_ENV['RECAPTCHA_SITE_KEY'],
+            'recaptcha_site_key' => $this->env['RECAPTCHA_SITE_KEY'],
         ]);
     }
 
-    public function contactSubmit()
+    public function contactSubmit(): RedirectResponse
     {
         $recaptchaResponse = $this->postManager->getPostParam('g-recaptcha-response') ?? '';
 
-        $secretKey = $_ENV['RECAPTCHA_SECRET_KEY'];
+        $secretKey = $this->env['RECAPTCHA_SECRET_KEY'];
 
         $response = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=$secretKey&response=$recaptchaResponse");
-        $responseKeys = json_decode($response, true);
 
-        if ($responseKeys['success'] ?? false) {
+        $responseKeys = $response ? json_decode($response, true) : ['success' => false];
+
+        if (is_array($responseKeys) && $responseKeys['success'] ) {
 
             $this->cookieManager->setCookie('success_message', 'Formulaire envoyé avec succès', 60);
             return $this->redirectToRoute('index');

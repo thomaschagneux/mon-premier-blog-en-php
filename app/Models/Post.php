@@ -70,6 +70,10 @@ class Post extends AbstractModel
         return [];
     }
 
+    /**
+     * @param int $userId
+     * @return array<int, Post>
+     */
     public function findPostsByUserId(int $userId): array
     {
         if ($this->conn instanceof PDO) {
@@ -105,7 +109,7 @@ class Post extends AbstractModel
                     $post->incrementViews();
 
                     // Définir un cookie pour éviter de recompter les vues immédiatement
-                    $this->cookieManager->setCookie('viewed_post_' . $id, true, time() + (3600 * 24)); // Cookie valide pour 24 heures
+                    $this->cookieManager->setCookie('viewed_post_' . $id, "true", time() + (3600 * 24));
                 }
 
                 return $post;
@@ -118,11 +122,14 @@ class Post extends AbstractModel
     {
         // Incrémenter les vues dans la base de données
         $query = "UPDATE post SET views = views + 1 WHERE id = :id";
-        $stmt = $this->conn->prepare($query);
-        $stmt->execute([':id' => $this->getId()]);
 
-        // Mettre à jour l'attribut views de l'objet
-        $this->views++;
+        if ($this->conn instanceof PDO) {
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute([':id' => $this->getId()]);
+
+            // Mettre à jour l'attribut views de l'objet
+            $this->views++;
+        }
     }
 
     public function save(): int
@@ -264,6 +271,5 @@ class Post extends AbstractModel
     {
         $this->views = $views;
     }
-
 
 }
