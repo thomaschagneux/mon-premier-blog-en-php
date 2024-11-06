@@ -1,4 +1,7 @@
 id,file_name,path_name,mimeType,created_at,updated_at
-1,photo1.jpg,/images/photo1.jpg,image/jpeg,2023-06-28 10:00:00,
-2,photo2.jpg,/images/photo2.jpg,image/jpeg,2023-06-28 10:00:00,
-3,photo3.png,/images/photo3.png,image/png,2023-06-28 10:00:00,
+1,photo1.jpg,/assets/img/,image/jpeg,2023-06-28 10:00:00,
+2,photo2.jpg,/assets/img/,image/jpeg,2023-06-28 10:00:00,
+3,photo3.png,/assets/img/,image/png,2023-06-28 10:00:00,
+4,featured_post1.jpg,/assets/img/featured_image/,image/png,06/11/24,
+5,featured_post1.jpg,/assets/img/featured_image/,image/png,07/11/24,
+6,featured_post1.jpg,/assets/img/featured_image/,image/png,08/11/24,
