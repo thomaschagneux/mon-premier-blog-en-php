@@ -15,6 +15,10 @@ class Post extends AbstractModel
 
     private string $lede;
 
+    private int $featured_image_id;
+
+    private ?Picture $featuredImage = null;
+
     private string $content;
 
     private ?int $user_id = null;
@@ -30,6 +34,7 @@ class Post extends AbstractModel
      * @param array<string, int|string|null> $data
      * @return self
      * @throws \DateMalformedStringException
+     * @throws Exception
      */
     public function fromArray(array $data): self
     {
@@ -38,6 +43,12 @@ class Post extends AbstractModel
         $post->setId(isset($data['id']) && is_int($data['id'])? $data['id'] : 0);
         $post->setTitle(isset($data['title']) && is_string($data['title'])? $data['title'] : "");
         $post->setLede(isset($data['lede']) && is_string($data['lede'])? $data['lede'] : "");
+        if (isset($data['featured_image_id']) && is_int($data['featured_image_id'])) {
+            $picture = (new Picture())->findById($data['featured_image_id']);
+            if ($picture) {
+                $post->setFeaturedImage($picture);
+            }
+        }
         $post->setContent(isset($data['content']) && is_string($data['content'])? $data['content'] : "");
         $post->setUserId(isset($data['user_id']) && is_int($data['user_id'])? $data['user_id'] : null);
         $post->setViews((isset($data['views']) && is_int($data['views'])? $data['views'] : 0));
@@ -240,6 +251,26 @@ class Post extends AbstractModel
     public function setLede(string $lede): void
     {
         $this->lede = $lede;
+    }
+
+    public function getFeaturedImageId(): int
+    {
+        return $this->featured_image_id;
+    }
+
+    public function setFeaturedImageId(int $featured_image_id): void
+    {
+        $this->featured_image_id = $featured_image_id;
+    }
+
+    public function getFeaturedImage(): ?Picture
+    {
+        return $this->featuredImage;
+    }
+
+    public function setFeaturedImage(?Picture $featuredImage): void
+    {
+        $this->featuredImage = $featuredImage;
     }
 
     public function getContent(): string

@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\core\Router;
+use App\Models\Picture;
 use App\Models\Post;
 use App\core\RedirectResponse;
 use App\Services\Form\ContactFormService;
