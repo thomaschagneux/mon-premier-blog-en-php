@@ -52,3 +52,75 @@ For Administration part check app_admin.css
 .featured-article:hover::after {
     left: 125%; /* Glisse vers la droite au survol */
 }
+
+/**
+CSS pour la page de détail d'un post
+ */
+/* Container principal pour la page du post */
+.post-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* Styles pour le post */
+.post-title {
+    font-weight: 700;
+    color: #333;
+}
+
+.post-body {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: #555;
+}
+
+/* Meta information for post */
+.post-meta {
+    font-size: 0.9rem;
+    color: #888;
+}
+
+.post-lede {
+    font-size: 1.2rem;
+    color: #666;
+    margin-top: 10px;
+}
+
+
+/* Styles pour les commentaires */
+.comments-section {
+    margin-top: 50px;
+}
+
+.card {
+    border: none;
+    border-radius: 8px;
+}
+
+.card-header {
+    background-color: #007bff;
+    color: #fff;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    padding: 15px;
+}
+
+.comment {
+    padding: 10px;
+}
+
+.comment-author {
+    font-size: 1.1rem;
+    color: #007bff;
+}
+
+.comment-content {
+    font-size: 1rem;
+    color: #444;
+}
+
+.comment-date {
+    font-size: 0.85rem;
+    color: #888;
+    text-align: right;
+}
