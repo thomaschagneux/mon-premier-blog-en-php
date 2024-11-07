@@ -78,7 +78,7 @@
                                     <img src="{{ last_post.getFeaturedImage.pathName }}{{ last_post.getFeaturedImage.fileName }}" class="card-img-top" alt="{{ last_post.title }}">
                                 {% endif %}
                                 <p class="card-text">{{ last_post.lede | slice(0, 200) ~ '...' }}</p>
-                                <a href="#" class="btn btn-primary btn-lg">Lire la suite</a>
+                                <a href="{{ path('front_post_show', { id: last_post.id }) }}" class="btn btn-primary btn-lg">Lire la suite</a>
                             </div>
                         </div>
                     </div>

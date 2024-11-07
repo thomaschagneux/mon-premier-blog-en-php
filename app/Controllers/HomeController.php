@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\core\Router;
+use App\Models\Comment;
 use App\Models\Picture;
 use App\Models\Post;
 use App\core\RedirectResponse;
@@ -88,9 +89,27 @@ class HomeController extends AbstractController
         }
     }
 
-    public function about(int $id): string
+    /**
+     * @throws SyntaxError
+     * @throws RuntimeError
+     * @throws LoaderError
+     * @throws Exception
+     */
+    public function frontPostShow(int $id): RedirectResponse|string
     {
-        return 'This is the about page of ' . $id;
+        $postModel = new Post();
+        $post = $postModel->findById($id);
+        if (null === $post) {
+            $this->cookieManager->setCookie('error_message', 'Le post demandé est introuvable ou inexistant.', 60);
+            return $this->redirectToRoute('index');
+        }
+        $commentModel = new Comment();
+        $comments = $commentModel->getCommentsByPostId($id);
+
+        return $this->twig->render('post_show.html.twig', [
+            'post' => $post,
+            'comments' => $comments ? $comments : null,
+        ]);
     }
 
     /**

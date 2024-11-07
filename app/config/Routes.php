@@ -25,6 +25,8 @@ function defineRoutes(Router $router): void
 
     $router->addRoute('GET', '/contact', [HomeController::class, 'contactSubmit'], 'contact');
 
+    $router->addRoute('GET', '/post/{id}', [HomeController::class, 'frontPostShow'], 'front_post_show');
+
     $router->addRoute('GET', '/error/500', [ErrorController::class, 'error500'], 'error_500');
 
     $router->addRoute('GET', '/error/404', [ErrorController::class, 'error404'], 'error_404');

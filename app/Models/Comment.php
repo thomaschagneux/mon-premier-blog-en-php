@@ -16,6 +16,8 @@ class Comment extends AbstractModel
 
     private ?int $user_id = null;
 
+    private ?User $user = null;
+
     public function __construct()
     {
         parent::__construct();
@@ -33,6 +35,12 @@ class Comment extends AbstractModel
         $comment->setId(isset($data['id']) && is_int($data['id']) ? $data['id'] : 0);
         $comment->setContent(isset($data['content']) && is_string($data['content']) ? $data['content'] : '');
         $comment->setUserId(isset($data['user_id']) && is_int($data['user_id'])? $data['user_id'] : null);
+        if (isset($data['user_id']) && is_int($data['user_id'])) {
+            $user = (new User())->findById($data['user_id']);
+            if ($user) {
+                $comment->setUser($user);
+            }
+        }
         $comment->setPostId(isset($data['post_id']) && is_int($data['post_id'])? $data['post_id'] : null);
         $comment->setCreatedAt(isset($data['created_at']) && is_string($data['created_at'])? new DateTime($data['created_at']) : new DateTime());
         $comment->setUpdatedAt(isset($data['updated_at']) && is_string($data['updated_at'])? new DateTime($data['updated_at']) : null);
@@ -244,5 +252,15 @@ class Comment extends AbstractModel
     public function setUserId(?int $user_id): void
     {
         $this->user_id = $user_id;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): void
+    {
+        $this->user = $user;
     }
 }

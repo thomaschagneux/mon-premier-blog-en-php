@@ -23,6 +23,8 @@ class Post extends AbstractModel
 
     private ?int $user_id = null;
 
+    private ?User $user = null;
+
     private int $views = 0;
 
     public function __construct()
@@ -51,6 +53,12 @@ class Post extends AbstractModel
         }
         $post->setContent(isset($data['content']) && is_string($data['content'])? $data['content'] : "");
         $post->setUserId(isset($data['user_id']) && is_int($data['user_id'])? $data['user_id'] : null);
+        if (isset($data['user_id']) && is_int($data['user_id'])) {
+            $user = (new User())->findById($data['user_id']);
+            if ($user) {
+                $post->setUser($user);
+            }
+        }
         $post->setViews((isset($data['views']) && is_int($data['views'])? $data['views'] : 0));
         $post->setCreatedAt(isset($data['created_at']) && is_string($data['created_at'])? new DateTime($data['created_at']) : new DateTime());
         $post->setUpdatedAt(isset($data['updated_at']) && is_string($data['updated_at'])? new DateTime($data['updated_at']) : null);
@@ -291,6 +299,16 @@ class Post extends AbstractModel
     public function setUserId(?int $user_id): void
     {
         $this->user_id = $user_id;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): void
+    {
+        $this->user = $user;
     }
 
     public function getViews(): int
