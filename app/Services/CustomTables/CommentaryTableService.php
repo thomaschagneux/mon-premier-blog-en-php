@@ -26,6 +26,7 @@ class CommentaryTableService extends AbstractTableService
             'content' => 'Contenu',
             'post' => 'Post',
             'author' => 'Auteur',
+            'validated' => 'Validé',
             'created_at' => 'Date de création',
             'updated_at' => 'Date de modification',
             'actions' => 'Action',
@@ -50,6 +51,7 @@ class CommentaryTableService extends AbstractTableService
                 'author' => $this->getAuthor($comment),
                 // Utilise le post passé en paramètre plutôt que de le rechercher à nouveau
                 'post' => $this->getPost($comment, $post) ? $this->getPost($comment, $post)->getTitle() : '',
+                'validated' => $this->isValidated($comment),
                 'created_at' => $comment->getCreatedAt()->format('d/m/Y'),
                 'updated_at' => $comment->getUpdatedAt() ? $comment->getUpdatedAt()->format('d/m/Y') : '',
                 'actions' => $this->getAction($comment),
@@ -123,5 +125,14 @@ class CommentaryTableService extends AbstractTableService
             $content = mb_substr($content, 0, $strlength) . ' [...]';
         }
         return $content;
+    }
+
+    private function isValidated(Comment $comment): string
+    {
+        if ($comment->isValidated()) {
+            return '<span class="badge text-bg-success">Validé</span>';
+        } else {
+            return '<span class="badge text-bg-warning">Non validé</span>';
+        }
     }
 }

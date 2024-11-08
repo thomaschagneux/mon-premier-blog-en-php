@@ -5,9 +5,28 @@
 
     <div class="card mb-5">
         {% if comment is defined and comment is not null %}
-            <div class="card-body">
-                {{ comment.content | raw }}
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3>Détail du Commentaire</h3>
+                {% if not comment.isValidated %}
+                    <span class="badge bg-warning text-dark">Non validé</span>
+                {% else %}
+                    <span class="badge bg-success">Validé</span>
+                {% endif %}
             </div>
+            <div class="card-body">
+                <p>{{ comment.content | raw }}</p>
+            </div>
+            <div class="card-footer text-end">
+                {% if not comment.isValidated %}
+                    <form action="{{ path('comment_validate', {'id': comment.id}) }}" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-primary">Valider le commentaire</button>
+                    </form>
+                {% else %}
+                    <p class="text-muted">Ce commentaire est déjà validé.</p>
+                {% endif %}
+            </div>
+        {% else %}
+            <p class="text-center text-muted">Commentaire introuvable.</p>
         {% endif %}
     </div>
 

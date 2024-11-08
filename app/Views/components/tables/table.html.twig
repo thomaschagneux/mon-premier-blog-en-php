@@ -17,6 +17,8 @@
                             {{ row[column.key] | raw }}
                         {% elseif column.key == 'action' %}
                             {{ row[column.key] | raw }}
+                        {% elseif column.key == 'validated' %}
+                            {{ row[column.key] | raw }}
                         {% else %}
                             {{ row[column.key]}}
                         {% endif %}
