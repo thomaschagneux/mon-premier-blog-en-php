@@ -86,4 +86,7 @@ function defineRoutes(Router $router): void
     $router->addRoute('GET', '/admin/comment/{id}/show', [CommentController::class, 'commentShow'], 'comment_show');
 
     $router->addRoute('GET', '/admin/comment/{id}/remove', [CommentController::class, 'commentRemove'], 'comment_remove');
+
+    $router->addRoute('POST', '/admin/comment/{id}/validate', [CommentController::class, 'commentValidate'], 'comment_validate');
+
 }

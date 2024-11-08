@@ -44,7 +44,7 @@ function loadPosts($pdo) {
 function loadCommentaries($pdo) {
     $csvFile = dirname(__DIR__) . '/data/Commentary_Data.csv';
     insertDataFromCsv($pdo, $csvFile, 'commentary', [
-        'id', 'content', 'post_id', 'user_id', 'created_at', 'updated_at'
+        'id', 'content', 'validated', 'post_id', 'user_id', 'created_at', 'updated_at'
     ]);
 }
 

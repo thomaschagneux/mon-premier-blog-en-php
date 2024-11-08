@@ -12,6 +12,8 @@ class Comment extends AbstractModel
 
     private string $content;
 
+    private bool $validated = false;
+
     private ?int $post_id = null;
 
     private ?int $user_id = null;
@@ -34,6 +36,7 @@ class Comment extends AbstractModel
 
         $comment->setId(isset($data['id']) && is_int($data['id']) ? $data['id'] : 0);
         $comment->setContent(isset($data['content']) && is_string($data['content']) ? $data['content'] : '');
+        $comment->setValidated(isset($data['validated']) ? (bool) $data['validated'] : false);
         $comment->setUserId(isset($data['user_id']) && is_int($data['user_id'])? $data['user_id'] : null);
         if (isset($data['user_id']) && is_int($data['user_id'])) {
             $user = (new User())->findById($data['user_id']);
@@ -210,6 +213,31 @@ class Comment extends AbstractModel
 
     }
 
+    public function validate(): bool
+    {
+        // Vérifiez que la connexion PDO est bien initialisée
+        if (!$this->conn instanceof PDO) {
+            throw new Exception("La connexion à la base de données n'est pas disponible.");
+        }
+
+        // Vérifiez que l'ID du commentaire est défini
+        if (!isset($this->id) || $this->id <= 0) {
+            throw new Exception("ID du commentaire non valide.");
+        }
+
+        try {
+            $query = "UPDATE commentary SET validated = 1 WHERE id = :id";
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute([':id' => $this->id]);
+
+            $this->validated = true;
+
+            return true;
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+
     /**
      *  GETTERS AND SETTERS
      */
@@ -232,6 +260,16 @@ class Comment extends AbstractModel
     public function setContent(string $content): void
     {
         $this->content = $content;
+    }
+
+    public function isValidated(): bool
+    {
+        return $this->validated;
+    }
+
+    public function setValidated(bool $validated): void
+    {
+        $this->validated = $validated;
     }
 
     public function getPostId(): ?int

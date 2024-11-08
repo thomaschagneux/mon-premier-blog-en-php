@@ -24,7 +24,7 @@ class CommentController extends AbstractController
 
     public function commentShow(int $commentId): string|RedirectResponse
     {
-        if ($this->isAdmin()) {
+        if ($this->isConnected()) {
            $comment = $this->commentModel->findById($commentId);
            return $this->render('post/comment/show.html.twig', [
                'comment' => $comment
@@ -175,5 +175,24 @@ class CommentController extends AbstractController
         }
         $this->cookieManager->setCookie('error_message', 'Il y a eu une erreur, veuillez recommencer',60);
         return $this->redirectToReferer();
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function commentValidate(int $id): RedirectResponse
+    {
+        if (!$this->isConnected()) {
+            return $this->redirectToReferer();
+        }
+        $comment = (new Comment())->findById($id);
+
+        if ($comment && !$comment->isValidated()) {
+            $comment->validate();
+            $this->cookieManager->setCookie('validate_message', 'Le commentaire a bien été validé.', 60);
+            return $this->redirectToRoute('comment_show', ['id' => (string) $id]);
+        } else {
+            return $this->redirectToReferer();
+        }
     }
 }

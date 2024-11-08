@@ -36,11 +36,13 @@
 				<div class="card-body">
 					{% if comments|length > 0 %}
 						{% for comment in comments %}
+							{% if comment.validated %}
 							<div class="comment mb-4 p-3 border-bottom">
 								<div class="comment-author fw-bold mb-2">{{ comment.user.firstName }} {{ comment.user.lastName }}</div>
 								<div class="comment-content text-muted">{{ comment.content | striptags }}</div>
 								<div class="comment-date small text-end text-muted">{{ comment.date | date("d M Y H:i") }}</div>
 							</div>
+							{% endif %}
 						{% endfor %}
 					{% else %}
 						<p class="text-center text-muted">Aucun commentaire pour le moment. Soyez le premier à commenter !</p>

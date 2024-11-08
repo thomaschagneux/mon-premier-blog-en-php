@@ -44,7 +44,7 @@ class PostController extends AbstractController
      */
     public function postList(): string|RedirectResponse
     {
-        if ($this->isAdmin()) {
+        if ($this->isConnected()) {
 
             $posts = $this->post->getAllPosts();
             $table = $this->postTableService->getTableContent();
