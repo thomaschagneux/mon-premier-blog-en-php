@@ -25,19 +25,19 @@ class User extends AbstractModel
     public function __construct()
     {
         parent::__construct();
-        $this->id = 0;
-        $this->first_name = "";
-        $this->last_name = "";
-        $this->email = "";
-        $this->password = "";
-        $this->role = 'ROLE_USER';
+        $this->id         = 0;
+        $this->first_name = '';
+        $this->last_name  = '';
+        $this->email      = '';
+        $this->password   = '';
+        $this->role       = 'ROLE_USER';
         $this->picture_id = 0;
     }
 
     /**
      * Creates a User instance from an associative array.
      *
-     * @param array<string, mixed> $data
+     * @param  array<string, mixed> $data
      * @throws Exception
      * @return self
      */
@@ -67,8 +67,8 @@ class User extends AbstractModel
     public function getAllUsers(): array
     {
         if ($this->conn instanceof PDO) {
-            $query = "SELECT * FROM user";
-            $stmt = $this->conn->prepare($query);
+            $query = 'SELECT * FROM user';
+            $stmt  = $this->conn->prepare($query);
             $stmt->execute();
 
             $users = [];
@@ -88,15 +88,15 @@ class User extends AbstractModel
     /**
      * Finds a user by email.
      *
-     * @param string $mail
+     * @param  string    $mail
      * @throws Exception
      * @return self|null
      */
     public function findByUsermail(string $mail): ?self
     {
         if ($this->conn instanceof PDO) {
-            $query = "SELECT * FROM user WHERE email = ?";
-            $stmt = $this->conn->prepare($query);
+            $query = 'SELECT * FROM user WHERE email = ?';
+            $stmt  = $this->conn->prepare($query);
 
             if (!$stmt) {
                 throw new Exception('Failed to prepare the SQL statement.');
@@ -115,19 +115,19 @@ class User extends AbstractModel
             return null;
         }
 
-        throw new Exception("Server Error: Not connected to the database.");
+        throw new Exception('Server Error: Not connected to the database.');
     }
 
     /**
-     * @param int $id
+     * @param  int       $id
      * @throws Exception
      * @return self|null
      */
     public function findById(int $id): ?self
     {
         if ($this->conn instanceof PDO) {
-            $query = "SELECT * FROM user WHERE id = ?";
-            $stmt = $this->conn->prepare($query);
+            $query = 'SELECT * FROM user WHERE id = ?';
+            $stmt  = $this->conn->prepare($query);
             $stmt->execute([$id]);
 
             $userData = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -148,8 +148,8 @@ class User extends AbstractModel
         }
 
         try {
-            $query = "SELECT id FROM user WHERE email = :email LIMIT 1";
-            $stmt = $this->conn->prepare($query);
+            $query = 'SELECT id FROM user WHERE email = :email LIMIT 1';
+            $stmt  = $this->conn->prepare($query);
             $stmt->execute([':email' => $email]);
 
             // Si une ligne est trouvée, l'email existe déjà
@@ -172,7 +172,7 @@ class User extends AbstractModel
         $isUpdate = isset($this->id) && $this->id > 0;
 
         if ($isUpdate) {
-            $query = "UPDATE user SET 
+            $query = 'UPDATE user SET 
                         first_name = :first_name,
                         last_name = :last_name,
                         email = :email,
@@ -180,10 +180,10 @@ class User extends AbstractModel
                         role = :role,
                         picture_id = :picture_id,
                         updated_at = :updated_at
-                      WHERE id = :id";
+                      WHERE id = :id';
         } else {
-            $query = "INSERT INTO user (first_name, last_name, email, password, role, picture_id, created_at) 
-                      VALUES (:first_name, :last_name, :email, :password, :role, :picture_id, :created_at)";
+            $query = 'INSERT INTO user (first_name, last_name, email, password, role, picture_id, created_at) 
+                      VALUES (:first_name, :last_name, :email, :password, :role, :picture_id, :created_at)';
         }
 
         try {
@@ -197,16 +197,16 @@ class User extends AbstractModel
 
             $params = [
                 ':first_name' => $this->getFirstName(),
-                ':last_name' => $this->getLastName(),
-                ':email' => $this->getEmail(),
-                ':password' => $this->getPassword(),
-                ':role' => $this->getRole(),
+                ':last_name'  => $this->getLastName(),
+                ':email'      => $this->getEmail(),
+                ':password'   => $this->getPassword(),
+                ':role'       => $this->getRole(),
                 ':picture_id' => $this->getPictureId(),
             ];
 
             if ($isUpdate) {
                 $params[':updated_at'] = $this->getUpdatedAt()?->format('Y-m-d H:i:s');
-                $params[':id'] = $this->getId();
+                $params[':id']         = $this->getId();
             } else {
                 $params[':created_at'] = $this->getCreatedAt()->format('Y-m-d H:i:s');
             }
@@ -238,9 +238,9 @@ class User extends AbstractModel
         }
 
         try {
-            $query = "DELETE FROM user WHERE id = :id";
-            $stmt = $this->conn->prepare($query);
-           return $stmt->execute([':id' => $this->id]);
+            $query = 'DELETE FROM user WHERE id = :id';
+            $stmt  = $this->conn->prepare($query);
+            return $stmt->execute([':id' => $this->id]);
         } catch (Exception $e) {
             throw new Exception('Erreur lors de la suppression de l\'utilisateur : ' . $e->getMessage());
         }

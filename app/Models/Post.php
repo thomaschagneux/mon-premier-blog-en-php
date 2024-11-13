@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Manager\CookieManager;
 use DateTime;
 use Exception;
 use PDO;
@@ -33,7 +32,7 @@ class Post extends AbstractModel
     }
 
     /**
-     * @param array<string, int|string|null> $data
+     * @param  array<string, int|string|null> $data
      * @return self
      * @throws \DateMalformedStringException
      * @throws Exception
@@ -42,26 +41,26 @@ class Post extends AbstractModel
     {
         $post = new self();
 
-        $post->setId(isset($data['id']) && is_int($data['id'])? $data['id'] : 0);
-        $post->setTitle(isset($data['title']) && is_string($data['title'])? $data['title'] : "");
-        $post->setLede(isset($data['lede']) && is_string($data['lede'])? $data['lede'] : "");
+        $post->setId(isset($data['id']) && is_int($data['id']) ? $data['id'] : 0);
+        $post->setTitle(isset($data['title']) && is_string($data['title']) ? $data['title'] : '');
+        $post->setLede(isset($data['lede']) && is_string($data['lede']) ? $data['lede'] : '');
         if (isset($data['featured_image_id']) && is_int($data['featured_image_id'])) {
             $picture = (new Picture())->findById($data['featured_image_id']);
             if ($picture) {
                 $post->setFeaturedImage($picture);
             }
         }
-        $post->setContent(isset($data['content']) && is_string($data['content'])? $data['content'] : "");
-        $post->setUserId(isset($data['user_id']) && is_int($data['user_id'])? $data['user_id'] : null);
+        $post->setContent(isset($data['content']) && is_string($data['content']) ? $data['content'] : '');
+        $post->setUserId(isset($data['user_id']) && is_int($data['user_id']) ? $data['user_id'] : null);
         if (isset($data['user_id']) && is_int($data['user_id'])) {
             $user = (new User())->findById($data['user_id']);
             if ($user) {
                 $post->setUser($user);
             }
         }
-        $post->setViews((isset($data['views']) && is_int($data['views'])? $data['views'] : 0));
-        $post->setCreatedAt(isset($data['created_at']) && is_string($data['created_at'])? new DateTime($data['created_at']) : new DateTime());
-        $post->setUpdatedAt(isset($data['updated_at']) && is_string($data['updated_at'])? new DateTime($data['updated_at']) : null);
+        $post->setViews((isset($data['views']) && is_int($data['views']) ? $data['views'] : 0));
+        $post->setCreatedAt(isset($data['created_at']) && is_string($data['created_at']) ? new DateTime($data['created_at']) : new DateTime());
+        $post->setUpdatedAt(isset($data['updated_at']) && is_string($data['updated_at']) ? new DateTime($data['updated_at']) : null);
 
         return $post;
     }
@@ -73,7 +72,7 @@ class Post extends AbstractModel
     public function getAllPosts(): array
     {
         if ($this->conn instanceof PDO) {
-            $query = "SELECT * FROM post";
+            $query = 'SELECT * FROM post';
 
             $stmt = $this->conn->prepare($query);
             $stmt->execute();
@@ -90,14 +89,14 @@ class Post extends AbstractModel
     }
 
     /**
-     * @param int $userId
+     * @param  int              $userId
      * @return array<int, Post>
      */
     public function findPostsByUserId(int $userId): array
     {
         if ($this->conn instanceof PDO) {
-            $query = "SELECT * FROM post WHERE user_id = :user_id ORDER BY created_at ASC";
-            $stmt = $this->conn->prepare($query);
+            $query = 'SELECT * FROM post WHERE user_id = :user_id ORDER BY created_at ASC';
+            $stmt  = $this->conn->prepare($query);
             $stmt->execute([':user_id' => $userId]);
 
             $posts = [];
@@ -114,8 +113,8 @@ class Post extends AbstractModel
     public function findById(int $id): ?self
     {
         if ($this->conn instanceof PDO) {
-            $query = "SELECT * FROM post WHERE id = ?";
-            $stmt = $this->conn->prepare($query);
+            $query = 'SELECT * FROM post WHERE id = ?';
+            $stmt  = $this->conn->prepare($query);
             $stmt->execute([$id]);
 
             $data = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -128,7 +127,7 @@ class Post extends AbstractModel
                     $post->incrementViews();
 
                     // Définir un cookie pour éviter de recompter les vues immédiatement
-                    $this->cookieManager->setCookie('viewed_post_' . $id, "true", time() + (3600 * 24));
+                    $this->cookieManager->setCookie('viewed_post_' . $id, 'true', time() + (3600 * 24));
                 }
 
                 return $post;
@@ -140,7 +139,7 @@ class Post extends AbstractModel
     public function incrementViews(): void
     {
         // Incrémenter les vues dans la base de données
-        $query = "UPDATE post SET views = views + 1 WHERE id = :id";
+        $query = 'UPDATE post SET views = views + 1 WHERE id = :id';
 
         if ($this->conn instanceof PDO) {
             $stmt = $this->conn->prepare($query);
@@ -161,16 +160,16 @@ class Post extends AbstractModel
         $isUpdate = isset($this->id) && $this->id > 0;
 
         if ($isUpdate) {
-            $query = "UPDATE post SET 
+            $query = 'UPDATE post SET 
                         title = :title,
                         lede = :lede,
                         content = :content,
                         user_id = :user_id,
                         updated_at = :updated_at
-                      WHERE id = :id";
+                      WHERE id = :id';
         } else {
-            $query = "INSERT INTO post (title, lede, content, user_id, created_at) 
-                      VALUES (:title, :lede, :content, :user_id, :created_at)";
+            $query = 'INSERT INTO post (title, lede, content, user_id, created_at) 
+                      VALUES (:title, :lede, :content, :user_id, :created_at)';
         }
 
         try {
@@ -182,14 +181,14 @@ class Post extends AbstractModel
             }
 
             $params = [
-                ':title' => $this->getTitle(),
-                ':lede' => $this->getLede(),
+                ':title'   => $this->getTitle(),
+                ':lede'    => $this->getLede(),
                 ':content' => $this->getContent(),
                 ':user_id' => $this->getUserId(),
             ];
             if ($isUpdate) {
                 $params[':updated_at'] = $this->getUpdatedAt()?->format('Y-m-d H:i:s');
-                $params[':id'] = $this->getId();
+                $params[':id']         = $this->getId();
             } else {
                 $params[':created_at'] = $this->getCreatedAt()->format('Y-m-d H:i:s');
             }
@@ -214,12 +213,12 @@ class Post extends AbstractModel
         }
 
         if (!isset($this->id) || $this->id <= 0) {
-            throw new Exception("ID du post non valide.");
+            throw new Exception('ID du post non valide.');
         }
 
         try {
-            $query = "DELETE FROM post WHERE id = :id";
-            $stmt = $this->conn->prepare($query);
+            $query = 'DELETE FROM post WHERE id = :id';
+            $stmt  = $this->conn->prepare($query);
             return $stmt->execute([':id' => $this->id]);
         } catch (Exception $e) {
             throw new Exception('Erreur lors de la suppression de l\'utilisateur : ' . $e->getMessage());

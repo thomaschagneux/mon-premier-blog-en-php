@@ -12,7 +12,7 @@ interface HttpHeadersInterface
     /**
      * Sends an HTTP header.
      *
-     * @param string $header The HTTP header to send.
+     * @param  string $header The HTTP header to send.
      * @return void
      */
     public function sendHeader(string $header): void;

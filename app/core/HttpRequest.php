@@ -12,9 +12,9 @@ use App\Manager\ServerManager;
  */
 class HttpRequest
 {
-     /**
+    /**
      * @var string The URL of the current request
-     */
+    */
     private $url;
 
     /**
@@ -38,16 +38,16 @@ class HttpRequest
     public function __construct()
     {
         $this->server = new ServerManager();
-        $this->url = $this->server->getRequiredServerParam('REQUEST_URI');
+        $this->url    = $this->server->getRequiredServerParam('REQUEST_URI');
         $this->method = $this->server->getRequiredServerParam('REQUEST_METHOD');
-        $this->param = $this->initializeParams();
+        $this->param  = $this->initializeParams();
     }
 
-     /**
-     * Initializes the parameters of the current request.
-     *
+    /**
+    * Initializes the parameters of the current request.
+    *
      * @return array<int|string, array<mixed>|string> The parameters of the current request
-     */
+    */
     private function initializeParams(): array
     {
         switch ($this->method) {

@@ -37,11 +37,11 @@ class Router
     /**
      * Adds a route to the routing table.
      *
-     * @param string $method HTTP method (e.g., 'GET', 'POST')
-     * @param string $path The route path, with optional dynamic segments (e.g., '/user/{id}')
-     * @param callable|array{class-string, string} $callback The callback to be executed when the route is matched. This can be
-     *                                 a function or an array with a class and method (e.g., [HomeController::class, 'index'])
-     * @param string $name
+     * @param  string                               $method   HTTP method (e.g., 'GET', 'POST')
+     * @param  string                               $path     The route path, with optional dynamic segments (e.g., '/user/{id}')
+     * @param  callable|array{class-string, string} $callback The callback to be executed when the route is matched. This can be
+     *                                                        a function or an array with a class and method (e.g., [HomeController::class, 'index'])
+     * @param  string                               $name
      * @return void
      */
     public function addRoute(string $method, string $path, callable|array $callback, string $name): void
@@ -50,9 +50,9 @@ class Router
         $path = preg_replace('/{[a-zA-Z0-9_]+}/', '([^/]+)', $path);
         // Add the route to the routing table
         $route = [
-            'method' => $method,
-            'path' => '#^' . $path . '$#',
-            'callback' => $callback
+            'method'   => $method,
+            'path'     => '#^' . $path . '$#',
+            'callback' => $callback,
         ];
 
         if ($name) {
@@ -101,7 +101,7 @@ class Router
                     $response = $route['callback'](...$matches);
                 }
 
-                 // Check if the response is an instance of RedirectResponse
+                // Check if the response is an instance of RedirectResponse
                 if ($response instanceof RedirectResponse) {
                     // Send the redirection response to the client
                     $response->send();
@@ -125,17 +125,17 @@ class Router
     /**
      * Generates a URL for a named route with the given parameters.
      *
-     * @param string $name The name of the route
-     * @param array<int|string, array<mixed>|string> $params
-     * @return string The generated URL
-     * @throws \RuntimeException If the named route does not exist or if there is an error in processing the route regex
+     * @param  string                                 $name   The name of the route
+     * @param  array<int|string, array<mixed>|string> $params
+     * @return string                                 The generated URL
+     * @throws \RuntimeException                      If the named route does not exist or if there is an error in processing the route regex
      */
     public function getRouteUrl(string $name, array $params = []): string
     {
         // Check if the named route exists
         if (!isset($this->namedRoutes[$name])) {
             echo $this->errorController->error404('Route does not exist');
-            throw new \RuntimeException("Route does not exist");
+            throw new \RuntimeException('Route does not exist');
         }
 
         // Retrieve the path for the named route
@@ -144,10 +144,10 @@ class Router
         // Replace dynamic segments in the path with the provided parameters
         foreach ($params as $value) {
             $route = preg_replace('/\(\[\^\/\]\+\)/', $value, $route, 1);
-             // Check if preg_replace returned null, indicating an error
+            // Check if preg_replace returned null, indicating an error
             if ($route === null) {
                 echo $this->errorController->error500('Internal server error');
-                throw new \RuntimeException("Error processing route");
+                throw new \RuntimeException('Error processing route');
             }
         }
         // Remove start (^) and end ($) anchors from the route pattern
@@ -155,7 +155,7 @@ class Router
         // Check if preg_replace returned null, indicating an error
         if ($finalRoute === null) {
             echo $this->errorController->error500('Internal server error');
-            throw new \RuntimeException("Error processing final route regex");
+            throw new \RuntimeException('Error processing final route regex');
         }
         // Return the generated URL
         return $finalRoute;

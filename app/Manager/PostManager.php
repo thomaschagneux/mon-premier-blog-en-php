@@ -7,7 +7,7 @@ class PostManager
     /**
      * Validate and sanitize a POST parameter.
      *
-     * @param string $key The key of the POST parameter.
+     * @param  string      $key The key of the POST parameter.
      * @return string|null The sanitized value or null if the key does not exist.
      */
     public function getPostParam(string $key): ?string
@@ -24,7 +24,7 @@ class PostManager
     /**
      * Sanitize a given input manually.
      *
-     * @param string $input The input to sanitize.
+     * @param  string $input The input to sanitize.
      * @return string The sanitized input.
      */
     private function sanitizeInput(string $input): string
@@ -87,8 +87,8 @@ class PostManager
 
         $sanitizedInput = preg_replace_callback($pattern, function ($matches) use ($allowedTags, $allowedIframeAttributes) {
             $closingSlash = $matches[1];
-            $tag = strtolower($matches[2]);
-            $attributes = $matches[3];
+            $tag          = strtolower($matches[2]);
+            $attributes   = $matches[3];
 
             if (!array_key_exists($tag, $allowedTags)) {
                 return ''; // Si la balise n'est pas autorisée, la supprimer
@@ -98,7 +98,7 @@ class PostManager
             preg_match_all('/([a-zA-Z]+)=("[^"]*"|\'[^\']*\')/', $attributes, $attrMatches, PREG_SET_ORDER);
 
             foreach ($attrMatches as $attr) {
-                $attrName = strtolower($attr[1]);
+                $attrName  = strtolower($attr[1]);
                 $attrValue = $attr[2];
 
                 // Vérifier les iframes spécifiquement
@@ -132,8 +132,8 @@ class PostManager
     /**
      * Vérifie si l'URL src d'un iframe est dans la liste des sources autorisées.
      *
-     * @param string $url L'URL src de l'iframe.
-     * @return bool True si l'URL est de confiance, sinon false.
+     * @param  string $url L'URL src de l'iframe.
+     * @return bool   True si l'URL est de confiance, sinon false.
      */
     private function isTrustedIframeSource(string $url): bool
     {
@@ -142,7 +142,7 @@ class PostManager
             'youtube.com',
             'www.youtube.com',
             'vimeo.com',
-            'player.vimeo.com'
+            'player.vimeo.com',
         ];
 
         $parsedUrl = parse_url($url);

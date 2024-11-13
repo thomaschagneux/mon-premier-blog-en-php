@@ -23,7 +23,7 @@ class AbstractModel
      */
     public function __construct()
     {
-        $database = new Database();
+        $database   = new Database();
         $dbInstance = $database::getInstance();
         if ($dbInstance === null) {
             throw new RuntimeException('Failed to get a valid Database instance.');

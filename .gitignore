@@ -1,6 +1,9 @@
 # Ignore environment file
 .env
 
+# Ignore php cs fixer cache
+.php-cs-fixer.cache
+
 # Ignore PhpStorm .idea folder
 /.idea
 /.idea/*

@@ -27,7 +27,7 @@ abstract class AbstractFormService
     /**
      * Render a form row and store it in the associative array.
      *
-     * @param string $name
+     * @param string           $name
      * @param FormRowComponent $formRowComponent
      */
     protected function addFormRow(string $name, FormRowComponent $formRowComponent): void
@@ -38,7 +38,7 @@ abstract class AbstractFormService
     /**
      * Get the form rows by name.
      *
-     * @param string $name
+     * @param  string      $name
      * @return string|null
      */
     public function getFormRow(string $name): ?string

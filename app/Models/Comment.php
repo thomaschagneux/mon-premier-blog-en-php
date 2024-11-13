@@ -26,7 +26,7 @@ class Comment extends AbstractModel
     }
 
     /**
-     * @param array<string, mixed> $data
+     * @param  array<string, mixed>          $data
      * @return self
      * @throws \DateMalformedStringException
      */
@@ -37,16 +37,16 @@ class Comment extends AbstractModel
         $comment->setId(isset($data['id']) && is_int($data['id']) ? $data['id'] : 0);
         $comment->setContent(isset($data['content']) && is_string($data['content']) ? $data['content'] : '');
         $comment->setValidated(isset($data['validated']) ? (bool) $data['validated'] : false);
-        $comment->setUserId(isset($data['user_id']) && is_int($data['user_id'])? $data['user_id'] : null);
+        $comment->setUserId(isset($data['user_id']) && is_int($data['user_id']) ? $data['user_id'] : null);
         if (isset($data['user_id']) && is_int($data['user_id'])) {
             $user = (new User())->findById($data['user_id']);
             if ($user) {
                 $comment->setUser($user);
             }
         }
-        $comment->setPostId(isset($data['post_id']) && is_int($data['post_id'])? $data['post_id'] : null);
-        $comment->setCreatedAt(isset($data['created_at']) && is_string($data['created_at'])? new DateTime($data['created_at']) : new DateTime());
-        $comment->setUpdatedAt(isset($data['updated_at']) && is_string($data['updated_at'])? new DateTime($data['updated_at']) : null);
+        $comment->setPostId(isset($data['post_id']) && is_int($data['post_id']) ? $data['post_id'] : null);
+        $comment->setCreatedAt(isset($data['created_at']) && is_string($data['created_at']) ? new DateTime($data['created_at']) : new DateTime());
+        $comment->setUpdatedAt(isset($data['updated_at']) && is_string($data['updated_at']) ? new DateTime($data['updated_at']) : null);
 
         return $comment;
     }
@@ -58,7 +58,7 @@ class Comment extends AbstractModel
     public function getAllComments(): array
     {
         if ($this->conn instanceof PDO) {
-            $query = "SELECT * FROM commentary";
+            $query = 'SELECT * FROM commentary';
 
             $stmt = $this->conn->prepare($query);
             $stmt->execute();
@@ -75,14 +75,14 @@ class Comment extends AbstractModel
     }
 
     /**
-     * @param int $id
+     * @param  int                           $id
      * @return array<int, Comment>
      * @throws \DateMalformedStringException
      */
     public function getCommentsByPostId(int $id): array
     {
         if ($this->conn instanceof PDO) {
-            $query = "SELECT * FROM commentary where post_id = ?";
+            $query = 'SELECT * FROM commentary where post_id = ?';
 
             $stmt = $this->conn->prepare($query);
             $stmt->execute([$id]);
@@ -99,15 +99,15 @@ class Comment extends AbstractModel
     }
 
     /**
-     * @param int $userId
+     * @param  int                           $userId
      * @return array<int, Comment>
      * @throws \DateMalformedStringException
      */
     public function findcommentsByUserId(int $userId): array
     {
         if ($this->conn instanceof PDO) {
-            $query = "SELECT * FROM commentary WHERE user_id = :user_id";
-            $stmt = $this->conn->prepare($query);
+            $query = 'SELECT * FROM commentary WHERE user_id = :user_id';
+            $stmt  = $this->conn->prepare($query);
             $stmt->execute([':user_id' => $userId]);
 
             $posts = [];
@@ -124,8 +124,8 @@ class Comment extends AbstractModel
     public function findById(int $id): ?self
     {
         if ($this->conn instanceof PDO) {
-            $query = "SELECT * FROM commentary WHERE id = ?";
-            $stmt = $this->conn->prepare($query);
+            $query = 'SELECT * FROM commentary WHERE id = ?';
+            $stmt  = $this->conn->prepare($query);
             $stmt->execute([$id]);
 
             $data = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -146,15 +146,15 @@ class Comment extends AbstractModel
         $isUpdate = isset($this->id) && $this->id > 0;
 
         if ($isUpdate) {
-            $query = "UPDATE commentary SET 
+            $query = 'UPDATE commentary SET 
                         content = :content,
                         user_id = :user_id,
                         post_id = :post_id,
                         updated_at = :updated_at
-                      WHERE id = :id";
+                      WHERE id = :id';
         } else {
-            $query = "INSERT INTO commentary (content, user_id, post_id, created_at) 
-                      VALUES (:content, :user_id, :post_id, :created_at)";
+            $query = 'INSERT INTO commentary (content, user_id, post_id, created_at) 
+                      VALUES (:content, :user_id, :post_id, :created_at)';
         }
 
         try {
@@ -172,7 +172,7 @@ class Comment extends AbstractModel
             ];
             if ($isUpdate) {
                 $params[':updated_at'] = $this->getUpdatedAt()?->format('Y-m-d H:i:s');
-                $params[':id'] = $this->getId();
+                $params[':id']         = $this->getId();
             } else {
                 $params[':created_at'] = $this->getCreatedAt()->format('Y-m-d H:i:s');
             }
@@ -200,12 +200,12 @@ class Comment extends AbstractModel
         }
 
         if (!isset($this->id) || $this->id <= 0) {
-            throw new Exception("ID du commentaire non valide.");
+            throw new Exception('ID du commentaire non valide.');
         }
 
         try {
-            $query = "DELETE FROM commentary WHERE id = :id";
-            $stmt = $this->conn->prepare($query);
+            $query = 'DELETE FROM commentary WHERE id = :id';
+            $stmt  = $this->conn->prepare($query);
             return $stmt->execute([':id' => $this->id]);
         } catch (Exception) {
             throw new Exception('Erreur lors de la suppression du commentaire');
@@ -222,12 +222,12 @@ class Comment extends AbstractModel
 
         // Vérifiez que l'ID du commentaire est défini
         if (!isset($this->id) || $this->id <= 0) {
-            throw new Exception("ID du commentaire non valide.");
+            throw new Exception('ID du commentaire non valide.');
         }
 
         try {
-            $query = "UPDATE commentary SET validated = 1 WHERE id = :id";
-            $stmt = $this->conn->prepare($query);
+            $query = 'UPDATE commentary SET validated = 1 WHERE id = :id';
+            $stmt  = $this->conn->prepare($query);
             $stmt->execute([':id' => $this->id]);
 
             $this->validated = true;

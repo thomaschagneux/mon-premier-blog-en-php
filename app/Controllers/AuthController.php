@@ -36,8 +36,8 @@ class AuthController extends AbstractController
         }
 
         return $this->render('login/login.html.twig', [
-            'csrf_token' => $csrfToken,
-            'error_message' => $errorMessage
+            'csrf_token'    => $csrfToken,
+            'error_message' => $errorMessage,
         ]);
     }
 
@@ -54,15 +54,15 @@ class AuthController extends AbstractController
             [$email, $password] = $this->getPostCredentials();
 
             if (null === $email || '' === $email || null === $password || '' === $password) {
-                $this->cookieManager->setCookie('error_message', "Email ou mot de passe non renseigné.", 60);
+                $this->cookieManager->setCookie('error_message', 'Email ou mot de passe non renseigné.', 60);
                 return $this->redirectToRoute('login_form');
             } elseif ($this->authenticateUser($email, $password)) {
                 $this->cookieManager->setCookie('success_message', 'Vous vous êtes bien connecté', 60);
                 return $this->redirectToRoute('index');
-            } else {
-                $this->cookieManager->setCookie('error_message', "Identifiants invalides", 60);
-                return $this->redirectToRoute('login_form'); // Redirection pour recharger les cookies
             }
+            $this->cookieManager->setCookie('error_message', 'Identifiants invalides', 60);
+            return $this->redirectToRoute('login_form'); // Redirection pour recharger les cookies
+
         }
 
         return $this->loginForm();
@@ -73,7 +73,7 @@ class AuthController extends AbstractController
      */
     private function getPostCredentials(): array
     {
-        $email = $this->postManager->getPostParam('loginEmail');
+        $email    = $this->postManager->getPostParam('loginEmail');
         $password = $this->postManager->getPostParam('loginPassword');
         return [$email, $password];
     }
@@ -84,7 +84,7 @@ class AuthController extends AbstractController
     private function authenticateUser(string $email, string $password): bool
     {
         $userModel = new User();
-        $user = $userModel->findByUsermail($email);
+        $user      = $userModel->findByUsermail($email);
         if ($user && password_verify($password, $user->getPassword())) {
             $this->initializeUserSession($user);
             return true;
@@ -100,10 +100,10 @@ class AuthController extends AbstractController
     {
         $userData = json_encode([
             'first_name' => $user->getFirstName(),
-            'last_name' => $user->getLastName(),
-            'email' => $user->getEmail(),
-            'role' => $user->getRole(),
-            'password' => $user->getPassword(),
+            'last_name'  => $user->getLastName(),
+            'email'      => $user->getEmail(),
+            'role'       => $user->getRole(),
+            'password'   => $user->getPassword(),
             'picture_id' => $user->getpictureId(),
             'created_at' => $user->getCreatedAt()->format('d/m/y'),
             'updated_at' => $user->getUpdatedAt()?->format('d/m/y'),
@@ -121,8 +121,7 @@ class AuthController extends AbstractController
     public function logout(): RedirectResponse
     {
         $this->cookieManager->deleteCookie('user_data');
-        $this->cookieManager->setCookie('success_message', "Vous vous êtes bien déconnecté", 60);
+        $this->cookieManager->setCookie('success_message', 'Vous vous êtes bien déconnecté', 60);
         return $this->redirectToRoute('index');
     }
 }
-

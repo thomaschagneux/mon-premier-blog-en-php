@@ -11,7 +11,7 @@ use App\Controllers\AuthController;
 
 /**
  * Define application routes
- * 
+ *
  * Each route maps a URL pattern and HTTP method to a specific controller action.
  * The controller action is specified as an array with the controller class and method.
  *

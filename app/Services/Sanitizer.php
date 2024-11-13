@@ -7,7 +7,7 @@ class Sanitizer
     /**
      * Sanitize a string by removing harmful characters.
      *
-     * @param string $data The string to sanitize.
+     * @param  string $data The string to sanitize.
      * @return string The sanitized string.
      */
     public static function sanitizeString(string $data): string
@@ -18,7 +18,7 @@ class Sanitizer
     /**
      * Sanitize an array recursively.
      *
-     * @param array<mixed> $data The array to sanitize.
+     * @param  array<mixed> $data The array to sanitize.
      * @return array<mixed> The sanitized array.
      */
     public static function sanitizeArray(array $data): array
@@ -37,7 +37,7 @@ class Sanitizer
     /**
      * Sanitize a variable based on its type.
      *
-     * @param mixed $data The data to sanitize (string, array, etc.).
+     * @param  mixed $data The data to sanitize (string, array, etc.).
      * @return mixed The sanitized data.
      */
     public static function sanitizeVariable(mixed $data): mixed

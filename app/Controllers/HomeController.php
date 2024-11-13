@@ -4,7 +4,6 @@ namespace App\Controllers;
 
 use App\core\Router;
 use App\Models\Comment;
-use App\Models\Picture;
 use App\Models\Post;
 use App\core\RedirectResponse;
 use App\Services\Form\ContactFormService;
@@ -53,17 +52,17 @@ class HomeController extends AbstractController
         $contactFormRows = $contactForm->getFormRows();
 
         $postModel = new Post();
-        $posts = array_reverse($postModel->getAllPosts());
+        $posts     = array_reverse($postModel->getAllPosts());
 
         $lastPost = $posts[0] ?? null;
 
         return $this->twig->render('index.html.twig', [
-            'title' => 'Home Page',
-            'contact_form' => $contactFormRows,
-            'success_message' => $successMessage,
-            'error_message' => $errorMessage,
-            'posts' => $posts,
-            'last_post' => $lastPost,
+            'title'              => 'Home Page',
+            'contact_form'       => $contactFormRows,
+            'success_message'    => $successMessage,
+            'error_message'      => $errorMessage,
+            'posts'              => $posts,
+            'last_post'          => $lastPost,
             'recaptcha_site_key' => $this->env['RECAPTCHA_SITE_KEY'],
         ]);
     }
@@ -78,15 +77,15 @@ class HomeController extends AbstractController
 
         $responseKeys = $response ? json_decode($response, true) : ['success' => false];
 
-        if (is_array($responseKeys) && $responseKeys['success'] ) {
+        if (is_array($responseKeys) && $responseKeys['success']) {
 
             $this->cookieManager->setCookie('success_message', 'Formulaire envoyé avec succès', 60);
             return $this->redirectToRoute('index');
-        } else {
-
-            $this->cookieManager->setCookie('error_message', 'Le reCAPTCHA a échoué, veuillez réessayer', 60);
-            return $this->redirectToRoute('index');
         }
+
+        $this->cookieManager->setCookie('error_message', 'Le reCAPTCHA a échoué, veuillez réessayer', 60);
+        return $this->redirectToRoute('index');
+
     }
 
     /**
@@ -98,16 +97,16 @@ class HomeController extends AbstractController
     public function frontPostShow(int $id): RedirectResponse|string
     {
         $postModel = new Post();
-        $post = $postModel->findById($id);
+        $post      = $postModel->findById($id);
         if (null === $post) {
             $this->cookieManager->setCookie('error_message', 'Le post demandé est introuvable ou inexistant.', 60);
             return $this->redirectToRoute('index');
         }
         $commentModel = new Comment();
-        $comments = $commentModel->getCommentsByPostId($id);
+        $comments     = $commentModel->getCommentsByPostId($id);
 
         return $this->twig->render('post_show.html.twig', [
-            'post' => $post,
+            'post'     => $post,
             'comments' => $comments ? $comments : null,
         ]);
     }

@@ -3,9 +3,6 @@
 namespace App\Components;
 
 use Twig\Environment;
-use Twig\Error\LoaderError;
-use Twig\Error\RuntimeError;
-use Twig\Error\SyntaxError;
 
 class FormRowComponent
 {
@@ -28,9 +25,9 @@ class FormRowComponent
     private array $attributes;
 
     /**
-     * @param string $type
-     * @param string $name
-     * @param mixed|null $value
+     * @param string               $type
+     * @param string               $name
+     * @param mixed|null           $value
      * @param array<string, mixed> $attributes
      * @param array<string, mixed> $options
      */
@@ -41,24 +38,23 @@ class FormRowComponent
         array $attributes = [],
         array $options = [],
         string $label = null,
-    )
-    {
-        $this->type = $type;
-        $this->name = $name;
-        $this->label = $label;
-        $this->value = $value;
-        $this->options = $options;
+    ) {
+        $this->type       = $type;
+        $this->name       = $name;
+        $this->label      = $label;
+        $this->value      = $value;
+        $this->options    = $options;
         $this->attributes = $attributes;
     }
 
     public function render(Environment $twig): string
     {
         return $twig->render('components/form/form_fields.html.twig', [
-            'type' => $this->type,
-            'name' => $this->name,
-            'label' => $this->label,
-            'value' => $this->value,
-            'options' => $this->options,
+            'type'       => $this->type,
+            'name'       => $this->name,
+            'label'      => $this->label,
+            'value'      => $this->value,
+            'options'    => $this->options,
             'attributes' => $this->attributes,
         ]);
     }

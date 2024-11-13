@@ -20,7 +20,7 @@ class Picture extends AbstractModel
     }
 
     /**
-     * @param array<string, mixed> $data
+     * @param  array<string, mixed> $data
      * @return self
      * @throws Exception
      */
@@ -48,8 +48,8 @@ class Picture extends AbstractModel
 
         try {
             // Préparer la requête d'insertion
-            $query = "INSERT INTO picture (file_name, path_name, mime_type, created_at)
-                      VALUES (:file_name, :path_name, :mime_type, :created_at)";
+            $query = 'INSERT INTO picture (file_name, path_name, mime_type, created_at)
+                      VALUES (:file_name, :path_name, :mime_type, :created_at)';
             $stmt = $this->conn->prepare($query);
 
             // Définir la date de création
@@ -57,9 +57,9 @@ class Picture extends AbstractModel
 
             // Exécution de la requête avec les valeurs du modèle
             $stmt->execute([
-                ':file_name' => $this->getFileName(),
-                ':path_name' => $this->getPathName(),
-                ':mime_type' => $this->getMimeType(),
+                ':file_name'  => $this->getFileName(),
+                ':path_name'  => $this->getPathName(),
+                ':mime_type'  => $this->getMimeType(),
                 ':created_at' => $this->getCreatedAt()->format('Y-m-d H:i:s'),
             ]);
 
@@ -80,8 +80,8 @@ class Picture extends AbstractModel
         }
 
         try {
-            $query = "SELECT * FROM picture WHERE id = :id";
-            $stmt = $this->conn->prepare($query);
+            $query = 'SELECT * FROM picture WHERE id = :id';
+            $stmt  = $this->conn->prepare($query);
             $stmt->execute([':id' => $id]);
 
             $result = $stmt->fetch(PDO::FETCH_ASSOC);

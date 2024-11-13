@@ -8,7 +8,6 @@ use Twig\Error\SyntaxError;
 
 class ErrorController extends AbstractController
 {
-
     /**
      * @throws SyntaxError
      * @throws RuntimeError
