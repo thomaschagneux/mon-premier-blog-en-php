@@ -16,8 +16,7 @@ class CommentController extends AbstractController
 
     public function __construct(
         Router $router,
-    )
-    {
+    ) {
         parent::__construct($router);
         $this->commentModel = new Comment();
     }
@@ -25,13 +24,13 @@ class CommentController extends AbstractController
     public function commentShow(int $commentId): string|RedirectResponse
     {
         if ($this->isConnected()) {
-           $comment = $this->commentModel->findById($commentId);
-           return $this->render('post/comment/show.html.twig', [
-               'comment' => $comment
-           ]);
-        } else {
-            return $this->redirectToReferer();
+            $comment = $this->commentModel->findById($commentId);
+            return $this->render('post/comment/show.html.twig', [
+                'comment' => $comment,
+            ]);
         }
+        return $this->redirectToReferer();
+
     }
 
     public function commentAddForm(int $postId): string|RedirectResponse
@@ -43,22 +42,22 @@ class CommentController extends AbstractController
         }
 
         if ($this->isConnected()) {
-            $postModel = new Post();
-            $post = $postModel->findById($postId);
+            $postModel      = new Post();
+            $post           = $postModel->findById($postId);
             $commentAddForm = new CommentAddFormService($this->twig);
             $commentAddForm->buildForm();
 
             return $this->render('post/comment/add.html.twig', [
-                'post' => $post,
+                'post'             => $post,
                 'comment_add_form' => $commentAddForm->getFormRows(),
-                'error_message' => $message,
+                'error_message'    => $message,
             ]);
         }
 
         return $this->redirectToReferer();
     }
 
-    public function CommentAddAction(int $postId):RedirectResponse
+    public function CommentAddAction(int $postId): RedirectResponse
     {
 
         $content = $this->postManager->getPostParam('content');
@@ -68,7 +67,7 @@ class CommentController extends AbstractController
         }
 
         $userModel = new User();
-        $userData = $this->getUserData();
+        $userData  = $this->getUserData();
 
         if (!is_array($userData) || !isset($userData['email']) || !is_string($userData['email'])) {
             $this->cookieManager->setCookie('error_message', 'Il y a eu une erreur, veuillez recommencer');
@@ -98,7 +97,7 @@ class CommentController extends AbstractController
     {
 
         $commentModel = new Comment();
-        $comment = $commentModel->findById($commentId);
+        $comment      = $commentModel->findById($commentId);
 
         if ($comment instanceof Comment) {
             $postId = $comment->getPostId();
@@ -113,7 +112,7 @@ class CommentController extends AbstractController
         return $this->redirectToReferer();
     }
 
-    public function commentEditForm(int $commentId):string|RedirectResponse
+    public function commentEditForm(int $commentId): string|RedirectResponse
     {
         $message = $this->cookieManager->getCookie('error_message') ?? null;
 
@@ -123,25 +122,25 @@ class CommentController extends AbstractController
 
         if ($this->isConnected()) {
             $commentModel = new Comment();
-            $comment = $commentModel->findById($commentId);
+            $comment      = $commentModel->findById($commentId);
 
             $commentEditForm = null;
-            $post = null;
+            $post            = null;
 
             if ($comment instanceof Comment) {
                 $commentEditForm = new CommentEditFormService($this->twig, $comment);
                 $commentEditForm->buildForm();
 
                 $postModel = new Post();
-                $post = $comment->getPostId() ? $postModel->findById($comment->getPostId()) : null;
+                $post      = $comment->getPostId() ? $postModel->findById($comment->getPostId()) : null;
 
             }
 
 
             return $this->render('post/comment/edit.html.twig', [
-                'post' => $post instanceof Post ? $post : null,
+                'post'              => $post instanceof Post ? $post : null,
                 'comment_edit_form' => $commentEditForm?->getFormRows(),
-                'error_message' => $message,
+                'error_message'     => $message,
             ]);
         }
 
@@ -151,12 +150,12 @@ class CommentController extends AbstractController
     public function commentEditAction(int $commentId): RedirectResponse
     {
         $commentModel = new Comment();
-        $comment = $commentModel->findById($commentId);
+        $comment      = $commentModel->findById($commentId);
         if ($comment instanceof Comment) {
             $content = $this->postManager->getPostParam('content');
 
             if (empty($content)) {
-                $this->cookieManager->setCookie('error_message', 'Le commentaire ne peux pas être vide',60);
+                $this->cookieManager->setCookie('error_message', 'Le commentaire ne peux pas être vide', 60);
                 return $this->redirectToReferer();
             }
 
@@ -165,7 +164,7 @@ class CommentController extends AbstractController
             $comment->save();
 
             $postModel = new Post();
-            $post = $comment->getPostId() ? $postModel->findById($comment->getPostId()) : null;
+            $post      = $comment->getPostId() ? $postModel->findById($comment->getPostId()) : null;
 
             if ($post instanceof Post) {
                 $this->cookieManager->setCookie('success_message', 'Le commentaire a bien été enregistré', 60);
@@ -173,7 +172,7 @@ class CommentController extends AbstractController
             }
 
         }
-        $this->cookieManager->setCookie('error_message', 'Il y a eu une erreur, veuillez recommencer',60);
+        $this->cookieManager->setCookie('error_message', 'Il y a eu une erreur, veuillez recommencer', 60);
         return $this->redirectToReferer();
     }
 
@@ -191,8 +190,8 @@ class CommentController extends AbstractController
             $comment->validate();
             $this->cookieManager->setCookie('validate_message', 'Le commentaire a bien été validé.', 60);
             return $this->redirectToRoute('comment_show', ['id' => (string) $id]);
-        } else {
-            return $this->redirectToReferer();
         }
+        return $this->redirectToReferer();
+
     }
 }

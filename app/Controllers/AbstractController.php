@@ -92,8 +92,8 @@ abstract class AbstractController
     /**
      * Render a twig template
      *
-     * @param string $template
-     * @param array<string, mixed> $data
+     * @param  string               $template
+     * @param  array<string, mixed> $data
      * @throws LoaderError
      * @throws RuntimeError
      * @throws SyntaxError
@@ -107,13 +107,14 @@ abstract class AbstractController
 
     /**
      * Validates a given value against an array of rules.
-     * 
-     * @param mixed $value The value to be validated.
+     *
+     * @param mixed         $value The value to be validated.
      * @param Validatable[] $rules An array of Respect\Validation\Validatable rules to apply.
-     * 
+     *
      * @return bool Returns true if the value passes all the rules, false otherwise.
      */
-    protected function validate(mixed $value, array $rules): bool {
+    protected function validate(mixed $value, array $rules): bool
+    {
         $validator = v::create();
         foreach ($rules as $rule) {
             $validator->addRule($rule);
@@ -121,14 +122,14 @@ abstract class AbstractController
         return $validator->validate($value);
     }
 
-     /**
-     * Gets validation messages for a given value against an array of rules.
-     * 
-     * @param mixed $value The value to be validated.
+    /**
+    * Gets validation messages for a given value against an array of rules.
+    *
+     * @param mixed         $value The value to be validated.
      * @param Validatable[] $rules An array of Respect\Validation\Validatable rules to apply.
-     * 
+    *
      * @return string Returns a validation message indicating if the validation passed or failed.
-     */
+    */
     protected function getValidationMessages(mixed $value, array $rules): string
     {
         $validator = v::create();
@@ -136,16 +137,16 @@ abstract class AbstractController
             $validator->addRule($rule);
         }
         if ($validator->validate($value)) {
-            return "Validation passed!";
-        } else {
-            return "Validation failed!";
+            return 'Validation passed!';
         }
+        return 'Validation failed!';
+
     }
 
     /**
      * Get a redirection to the named route with optional parameters
      *
-     * @param array<int|string, array<mixed>|string> $params
+     * @param  array<int|string, array<mixed>|string> $params
      * @throws \Exception
      */
     protected function redirectToRoute(string $routeName, array $params = []): RedirectResponse
@@ -164,8 +165,8 @@ abstract class AbstractController
     }
 
     /**
-     * @param string $routeName
-     * @param array<int|string, array<mixed>|string> $params
+     * @param  string                                 $routeName
+     * @param  array<int|string, array<mixed>|string> $params
      * @return string
      */
     public function generateUrl(string $routeName, array $params = []): string
@@ -194,7 +195,7 @@ abstract class AbstractController
     {
         $cookieData = $this->cookieManager->getCookie('user_data');
 
-        if (null === $cookieData){
+        if (null === $cookieData) {
             return null;
         }
 
@@ -233,7 +234,7 @@ abstract class AbstractController
     {
         $userArray = [
             'connected' => $this->isConnected(),
-            'admin' => $this->isAdmin(),
+            'admin'     => $this->isAdmin(),
         ];
         $this->twig->addGlobal('app_user', $userArray); // Add user to Twig globals
     }

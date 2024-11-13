@@ -2,9 +2,7 @@
 
 namespace App\Twig;
 
-use App\Controllers\AbstractController;
 use App\Manager\ServerManager;
-use App\Services\HelperServices;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 use App\core\Router;
@@ -32,7 +30,7 @@ class UrlExtension extends AbstractExtension
 
     public function __construct(Router $router)
     {
-        $this->router = $router;
+        $this->router        = $router;
         $this->serverManager = new ServerManager();
     }
 
@@ -49,13 +47,13 @@ class UrlExtension extends AbstractExtension
         ];
     }
 
-     /**
-     * Generates a URL for the given route name and parameters.
-     *
-     * @param string $routeName The name of the route.
-     * @param array<int|string, array<mixed>|string> $params Parameters to replace in the route path.
-     * @return string The generated URL.
-     */
+    /**
+    * Generates a URL for the given route name and parameters.
+    *
+     * @param  string                                 $routeName The name of the route.
+     * @param  array<int|string, array<mixed>|string> $params    Parameters to replace in the route path.
+     * @return string                                 The generated URL.
+    */
     public function generatePath(string $routeName, array $params = []): string
     {
         return $this->router->getRouteUrl($routeName, $params);

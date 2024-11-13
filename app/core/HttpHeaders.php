@@ -12,13 +12,13 @@ class HttpHeaders implements HttpHeadersInterface
     /**
      * Sends an HTTP header.
      *
-     * @param string $header The HTTP header to send.
+     * @param  string $header The HTTP header to send.
      * @return void
      */
     public function sendHeader(string $header): void
     {
         if (!$this->isValidHeader($header)) {
-            throw new \InvalidArgumentException("Invalid header value: ");
+            throw new \InvalidArgumentException('Invalid header value: ');
         }
 
         // Use header() function to send the HTTP header
@@ -26,21 +26,21 @@ class HttpHeaders implements HttpHeadersInterface
         // The header() function is used to send raw HTTP headers and it is essential for operations like redirection.
         // By encapsulating the header() function in this method, we ensure that it is used in a controlled and secure manner.
         // @codingStandardsIgnoreLine
-         header($header);
+        header($header);
     }
 
     /**
      * Validates the HTTP header.
      *
-     * @param string $header The HTTP header to validate.
-     * @return bool True if the header is valid, false otherwise.
+     * @param  string $header The HTTP header to validate.
+     * @return bool   True if the header is valid, false otherwise.
      */
     private function isValidHeader(string $header): bool
     {
         // Basic validation for the header value
         // patern: matches with a->z & A->Z & '/' & '-'
-        return preg_match('/^[a-zA-Z0-9\-\/\s:]+$/', $header) === 1 
-        && strpos($header, "\n") === false 
-        && strpos($header, "\r") === false;
+        return preg_match('/^[a-zA-Z0-9\-\/\s:]+$/', $header) === 1
+        && strpos($header, "\n")                              === false
+        && strpos($header, "\r")                              === false;
     }
 }

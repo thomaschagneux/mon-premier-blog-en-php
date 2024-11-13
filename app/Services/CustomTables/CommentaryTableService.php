@@ -19,17 +19,16 @@ class CommentaryTableService extends AbstractTableService
     public function __construct(
         Environment $twig,
         Router $router,
-    )
-    {
-        $this->comment = new Comment();
+    ) {
+        $this->comment        = new Comment();
         $this->columnMappings = [
-            'content' => 'Contenu',
-            'post' => 'Post',
-            'author' => 'Auteur',
-            'validated' => 'Validé',
+            'content'    => 'Contenu',
+            'post'       => 'Post',
+            'author'     => 'Auteur',
+            'validated'  => 'Validé',
             'created_at' => 'Date de création',
             'updated_at' => 'Date de modification',
-            'actions' => 'Action',
+            'actions'    => 'Action',
         ];
         parent::__construct($twig, $router);
     }
@@ -48,13 +47,13 @@ class CommentaryTableService extends AbstractTableService
         foreach ($comments as $comment) {
             $rows[] = [
                 'content' => $this->getContent($comment, 200),
-                'author' => $this->getAuthor($comment),
+                'author'  => $this->getAuthor($comment),
                 // Utilise le post passé en paramètre plutôt que de le rechercher à nouveau
-                'post' => $this->getPost($comment, $post) ? $this->getPost($comment, $post)->getTitle() : '',
-                'validated' => $this->isValidated($comment),
+                'post'       => $this->getPost($comment, $post) ? $this->getPost($comment, $post)->getTitle() : '',
+                'validated'  => $this->isValidated($comment),
                 'created_at' => $comment->getCreatedAt()->format('d/m/Y'),
                 'updated_at' => $comment->getUpdatedAt() ? $comment->getUpdatedAt()->format('d/m/Y') : '',
-                'actions' => $this->getAction($comment),
+                'actions'    => $this->getAction($comment),
             ];
         }
 
@@ -62,12 +61,12 @@ class CommentaryTableService extends AbstractTableService
     }
 
 
-    public  function getAction(Comment $comment): string
+    public function getAction(Comment $comment): string
     {
         return $this->twig->render('tables/_actions.html.twig', [
-            'edit' => $this->edit($comment),
+            'edit'   => $this->edit($comment),
             'remove' => $this->remove($comment),
-            'show' => $this->show($comment),
+            'show'   => $this->show($comment),
         ]);
     }
 
@@ -96,9 +95,9 @@ class CommentaryTableService extends AbstractTableService
         $user = $comment->getUserId() ? $userModel->findById($comment->getUserId()) : null;
         if ($user instanceof User) {
             return $user->getFirstName() . ' ' . $user->getLastName();
-        } else {
-            return '';
         }
+        return '';
+
     }
 
     private function getPost(Comment $comment, Post $post): ?Post
@@ -131,8 +130,8 @@ class CommentaryTableService extends AbstractTableService
     {
         if ($comment->isValidated()) {
             return '<span class="badge text-bg-success">Validé</span>';
-        } else {
-            return '<span class="badge text-bg-warning">Non validé</span>';
         }
+        return '<span class="badge text-bg-warning">Non validé</span>';
+
     }
 }

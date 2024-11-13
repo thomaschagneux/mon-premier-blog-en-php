@@ -17,17 +17,17 @@ class CookieManager
     /**
      * @throws Exception
      */
-    public function setCookie(string $name, string $value, int $expire = 0, string $path = "/", string $domain = "", bool $secure = false, bool $httpOnly = true, bool $encrypt = true): void
+    public function setCookie(string $name, string $value, int $expire = 0, string $path = '/', string $domain = '', bool $secure = false, bool $httpOnly = true, bool $encrypt = true): void
     {
         if ($encrypt) {
             $encryptedValue = $this->encrypt($value);
-            $value = Sanitizer::sanitizeString($encryptedValue);
+            $value          = Sanitizer::sanitizeString($encryptedValue);
         } else {
             $value = Sanitizer::sanitizeString($value);
         }
 
         if (!setcookie($name, $value, time() + $expire, $path, $domain, $secure, $httpOnly)) {
-            throw new Exception("Failed to set the cookie.");
+            throw new Exception('Failed to set the cookie.');
         }
     }
 
@@ -53,7 +53,7 @@ class CookieManager
     }
 
 
-    public function deleteCookie(string $name, string $path = "/", string $domain = ""): void
+    public function deleteCookie(string $name, string $path = '/', string $domain = ''): void
     {
         setcookie($name, '', time() - 3600, $path, $domain);
     }

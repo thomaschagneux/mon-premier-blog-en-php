@@ -41,7 +41,7 @@ class AppExtension extends AbstractExtension
     /**
      * Convert an associative array to HTML attributes string.
      *
-     * @param array<string, string> $attributes
+     * @param  array<string, string> $attributes
      * @return string
      */
     public function attributesFilter(array $attributes): string

@@ -16,13 +16,13 @@ class UserTableService extends AbstractTableService
 
     public function __construct(User $userModel, Environment $twig, Router $router)
     {
-        $this->userModel = $userModel;
+        $this->userModel      = $userModel;
         $this->columnMappings = [
-            'name' => 'Nom',
-            'email' => 'Email',
-            'role' => 'Role',
+            'name'       => 'Nom',
+            'email'      => 'Email',
+            'role'       => 'Role',
             'created_at' => 'Date de création',
-            'actions' => 'Actions'
+            'actions'    => 'Actions',
         ];
         parent::__construct($twig, $router);
     }
@@ -41,11 +41,11 @@ class UserTableService extends AbstractTableService
         $rows = [];
         foreach ($users as $user) {
             $rows[] = [
-                'name' => $user->getFirstName() . ' ' . $user->getLastName(),
-                'email' => $user->getEmail(),
-                'role' => $this->getRole($user),
+                'name'       => $user->getFirstName() . ' ' . $user->getLastName(),
+                'email'      => $user->getEmail(),
+                'role'       => $this->getRole($user),
                 'created_at' => $user->getCreatedAt()->format('d/m/Y'),
-                'actions' => $this->getActions($user)
+                'actions'    => $this->getActions($user),
             ];
         }
 
@@ -55,11 +55,11 @@ class UserTableService extends AbstractTableService
     protected function getColumnClass(string $key): string
     {
         $customClasses = [
-            'name' => 'column-name',
-            'email' => 'column-email',
-            'role' => 'column-role',
+            'name'       => 'column-name',
+            'email'      => 'column-email',
+            'role'       => 'column-role',
             'created_at' => 'column-created',
-            'actions' => 'column-actions',
+            'actions'    => 'column-actions',
         ];
 
         // Retourne la classe personnalisée si elle existe, sinon la classe par défaut
@@ -67,7 +67,7 @@ class UserTableService extends AbstractTableService
     }
 
     /**
-     * @param User $user
+     * @param  User         $user
      * @throws LoaderError
      * @throws RuntimeError
      * @throws SyntaxError
@@ -76,9 +76,9 @@ class UserTableService extends AbstractTableService
     private function getActions(User $user): string
     {
         return $this->twig->render('tables/_actions.html.twig', [
-            'edit' => $this->edit($user),
+            'edit'   => $this->edit($user),
             'remove' => $this->remove($user),
-            'show' => $this->show($user),
+            'show'   => $this->show($user),
         ]);
     }
 

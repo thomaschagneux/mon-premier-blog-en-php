@@ -31,6 +31,7 @@ clean:
 	rm -rf vendor
 	rm -rf composer.lock
 test:
+	./vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php
 	vendor/bin/phpstan analyse
 
 insert_data:

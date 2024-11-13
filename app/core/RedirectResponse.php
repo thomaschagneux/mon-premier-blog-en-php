@@ -31,16 +31,16 @@ class RedirectResponse
     /**
      * RedirectResponse constructor.
      *
-     * @param string $url The URL to which the client will be redirected.
-     * @param HttpHeadersInterface $headers The HTTP headers handler.
-     * @param HttpResponse $response The HTTP response handler.
-     * @throws Exception if the URL is not valid
-     * 
+     * @param  string               $url      The URL to which the client will be redirected.
+     * @param  HttpHeadersInterface $headers  The HTTP headers handler.
+     * @param  HttpResponse         $response The HTTP response handler.
+     * @throws Exception            if the URL is not valid
+     *
      */
     public function __construct(string $url, HttpHeadersInterface $headers, HttpResponse $response)
     {
-        $this->url = $this->sanitizeUrl($url);
-        $this->headers = $headers;
+        $this->url      = $this->sanitizeUrl($url);
+        $this->headers  = $headers;
         $this->response = $response;
     }
 
@@ -58,7 +58,7 @@ class RedirectResponse
         $this->headers->sendHeader('Location: ' . $this->url);
         $this->response->terminate();
     }
-    
+
     /**
      * Gets the URL to which the client will be redirected.
      *
@@ -72,16 +72,16 @@ class RedirectResponse
     /**
      * Sanitizes the URL.
      *
-     * @param string $url The URL to sanitize.
-     * @return string The sanitized URL.
+     * @param  string    $url The URL to sanitize.
+     * @return string    The sanitized URL.
      * @throws Exception if the URL is not valid
      */
     private function sanitizeUrl(string $url): string
     {
         $sanitizeUrl = filter_var($url, FILTER_SANITIZE_URL);
 
-        if($sanitizeUrl === false || empty($sanitizeUrl)) {
-            throw new Exception("Invalid URL");
+        if ($sanitizeUrl === false || empty($sanitizeUrl)) {
+            throw new Exception('Invalid URL');
         }
 
         return $sanitizeUrl;

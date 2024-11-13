@@ -28,7 +28,7 @@ class TableComponent
     }
 
     /**
-     * @param array<string, string> $row
+     * @param  array<string, string> $row
      * @return void
      */
     public function addRow(array $row): void
@@ -53,7 +53,7 @@ class TableComponent
     }
 
     /**
-     * @param Environment $twig
+     * @param  Environment  $twig
      * @throws LoaderError
      * @throws RuntimeError
      * @throws SyntaxError
@@ -63,7 +63,7 @@ class TableComponent
     {
         return $twig->render('components/tables/table.html.twig', [
             'columns' => $this->getColumns(),
-            'rows' => $this->getRows()
+            'rows'    => $this->getRows(),
         ]);
     }
 }

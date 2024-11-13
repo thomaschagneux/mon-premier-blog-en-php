@@ -7,19 +7,20 @@ use PHPMailer\PHPMailer\Exception;
 
 /**
  * Mailer
- * 
+ *
  * This class provides functionalities to send emails using PHPMailer.
  */
-class Mailer {
-
+class Mailer
+{
     private PHPMailer $mailer;
 
     /**
      * Constructor to initialize PHPMailer settings.
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->mailer = new PHPMailer(true);
-        
+
         // Server settings
         $this->mailer->isSMTP();
         $this->mailer->Host       = 'smtp.gmail.com'; // Set the SMTP server to send through
@@ -30,18 +31,19 @@ class Mailer {
         $this->mailer->Port       = 587;                // TCP port to connect to
     }
 
-     /**
-     * Sends an email.
-     * 
-     * @param string $to Recipient email address.
-     * @param string $subject Subject of the email.
-     * @param string $body Body content of the email.
-     * @param string $from Sender email address.
+    /**
+    * Sends an email.
+    *
+     * @param string $to       Recipient email address.
+     * @param string $subject  Subject of the email.
+     * @param string $body     Body content of the email.
+     * @param string $from     Sender email address.
      * @param string $fromName Sender name.
-     * 
+    *
      * @return string Message indicating success or failure.
-     */
-    public function sendMail($to, $subject, $body, $from = 'thomas.chagneux@greta-cfa-aquitaine.academy', $fromName = 'Thomas Chagneux') {
+    */
+    public function sendMail($to, $subject, $body, $from = 'thomas.chagneux@greta-cfa-aquitaine.academy', $fromName = 'Thomas Chagneux')
+    {
         try {
             // Recipients
             $this->mailer->setFrom($from, $fromName);
@@ -53,7 +55,7 @@ class Mailer {
             $this->mailer->Body    = $body;
 
             $this->mailer->send();
-            return "Message has been sent";
+            return 'Message has been sent';
         } catch (Exception $e) {
             return "Message could not be sent. Mailer Error: {$this->mailer->ErrorInfo}";
         }

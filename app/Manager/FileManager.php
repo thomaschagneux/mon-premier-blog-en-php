@@ -13,9 +13,9 @@ class FileManager
     /**
      * Retrieve and validate a file from the $_FILES array.
      *
-     * @param string $key The key of the file in the $_FILES array.
-     * @param array<string> $allowedTypes List of allowed MIME types.
-     * @param int $maxSize Maximum allowed file size in bytes.
+     * @param  string                                                              $key          The key of the file in the $_FILES array.
+     * @param  array<string>                                                       $allowedTypes List of allowed MIME types.
+     * @param  int                                                                 $maxSize      Maximum allowed file size in bytes.
      * @throws Exception
      * @return array{name: string, tmp_name: string, size: int, type: string}|null Returns an array with file data if valid, otherwise null.
      */
@@ -51,10 +51,10 @@ class FileManager
 
         // If everything is valid, return the file data
         return [
-            'name' => $filteredName,
+            'name'     => $filteredName,
             'tmp_name' => $file['tmp_name'],
-            'size' => $file['size'],
-            'type' => $mimeType,
+            'size'     => $file['size'],
+            'type'     => $mimeType,
         ];
     }
 
@@ -62,8 +62,8 @@ class FileManager
     /**
      * Move an uploaded file to a target directory.
      *
-     * @param string $tmpPath The temporary path of the file.
-     * @return string The final path where the file is moved.
+     * @param  string    $tmpPath The temporary path of the file.
+     * @return string    The final path where the file is moved.
      * @throws Exception If the file could not be moved.
      */
     public function moveFile(string $tmpPath, string $finalName): string
@@ -88,7 +88,7 @@ class FileManager
     /**
      * Set the destination directory where files will be moved.
      *
-     * @param string $destination The path to the directory where files should be moved.
+     * @param  string    $destination The path to the directory where files should be moved.
      * @return self
      * @throws Exception If the directory does not exist or is not writable.
      */
@@ -106,7 +106,7 @@ class FileManager
     }
 
     /**
-     * @param string|null $key
+     * @param  string|null  $key
      * @return array<mixed>
      */
     public function sanitizedFiles(string $key = null): array

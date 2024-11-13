@@ -8,12 +8,10 @@ use Twig\Environment;
 
 class PostEditFormService extends AbstractFormService
 {
-
     public function __construct(
         Environment $twig,
         private readonly Post $post,
-    )
-    {
+    ) {
         parent::__construct($twig);
     }
 
@@ -24,13 +22,12 @@ class PostEditFormService extends AbstractFormService
     {
         $this
             ->addFormRow('title', new FormRowComponent(
-            'text',
-            'title',
-            $this->post->getTitle(),
-            ['class' => 'form-control', 'placeholder' => 'Enter title', 'required' => true],
-            [],
-
-        ));
+                'text',
+                'title',
+                $this->post->getTitle(),
+                ['class' => 'form-control', 'placeholder' => 'Enter title', 'required' => true],
+                [],
+            ));
 
         $this->addFormRow('lede', new FormRowComponent(
             'text',
@@ -48,25 +45,25 @@ class PostEditFormService extends AbstractFormService
         ));
 
 
-       /* $this->addFormRow('image', new FormRowComponent(
-            'file',
-            'image',
-            '',
-            ['class' => 'form-control-file'],
-            [],
-        ));
+        /* $this->addFormRow('image', new FormRowComponent(
+             'file',
+             'image',
+             '',
+             ['class' => 'form-control-file'],
+             [],
+         ));
 
-        $selectOptions = [
-            ['value' => '1', 'label' => 'Option 1'],
-            ['value' => '2', 'label' => 'Option 2'],
-            ['value' => '3', 'label' => 'Option 3', 'selected' => true],
-        ];
-        $this->addFormRow('category', new FormRowComponent(
-            'select',
-            'category',
-            null,
-            ['class' => 'form-select'],
-            $selectOptions,
-        ));*/
+         $selectOptions = [
+             ['value' => '1', 'label' => 'Option 1'],
+             ['value' => '2', 'label' => 'Option 2'],
+             ['value' => '3', 'label' => 'Option 3', 'selected' => true],
+         ];
+         $this->addFormRow('category', new FormRowComponent(
+             'select',
+             'category',
+             null,
+             ['class' => 'form-select'],
+             $selectOptions,
+         ));*/
     }
 }

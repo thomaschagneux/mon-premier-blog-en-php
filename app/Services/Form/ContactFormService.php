@@ -6,7 +6,6 @@ use App\Components\FormRowComponent;
 
 class ContactFormService extends AbstractFormService
 {
-
     /**
      * Build the form components and store them in an associative array.
      */
@@ -14,13 +13,13 @@ class ContactFormService extends AbstractFormService
     {
         $this
             ->addFormRow('firstName', new FormRowComponent(
-            'text',
-            'firstName',
-            '',
-            ['class' => 'form-control', 'placeholder' => 'Entrez votre nom', 'required' => true],
-            [],
+                'text',
+                'firstName',
+                '',
+                ['class' => 'form-control', 'placeholder' => 'Entrez votre nom', 'required' => true],
+                [],
                 'Votre prénom: '
-        ));
+            ));
 
         $this
             ->addFormRow('lastName', new FormRowComponent(

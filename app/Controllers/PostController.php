@@ -11,28 +11,26 @@ use App\Services\CustomTables\CommentaryTableService;
 use App\Services\CustomTables\PostTableService;
 use App\Services\Form\PostAddFormService;
 use App\Services\Form\PostEditFormService;
-use App\Services\HelperServices;
-use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 
 class PostController extends AbstractController
 {
-    private  Post $post;
+    private Post $post;
 
     private Comment $comment;
 
-    private  PostTableService $postTableService;
+    private PostTableService $postTableService;
 
     private CommentaryTableService $commentaryTableService;
 
     public function __construct(Router $router)
     {
         parent::__construct($router);
-        $this->post = new Post();
-        $this->comment = new Comment();
-        $this->postTableService = new PostTableService($this->post, $this->twig, $this->router);
+        $this->post                   = new Post();
+        $this->comment                = new Comment();
+        $this->postTableService       = new PostTableService($this->post, $this->twig, $this->router);
         $this->commentaryTableService = new CommentaryTableService($this->twig, $this->router);
     }
 
@@ -54,8 +52,8 @@ class PostController extends AbstractController
                 $this->cookieManager->deleteCookie('success_message');
             }
             return $this->render('post/list.html.twig', [
-                'posts' => $posts,
-                'table' => $table,
+                'posts'           => $posts,
+                'table'           => $table,
                 'success_message' => $message,
             ]);
         }
@@ -77,18 +75,18 @@ class PostController extends AbstractController
             $formRows = $postAddFormService->getFormRows();
 
             return $this->render('post/add.html.twig', [
-                'form_rows' => $formRows,
+                'form_rows'     => $formRows,
                 'error_message' => $message,
             ]);
-        } else {
-            return $this->redirectToReferer();
         }
+        return $this->redirectToReferer();
+
     }
 
     public function addPostAction(): string|RedirectResponse
     {
-        $title =  $this->postManager->getPostParam('title');
-        $lede =  $this->postManager->getPostParam('lede');
+        $title   =  $this->postManager->getPostParam('title');
+        $lede    =  $this->postManager->getPostParam('lede');
         $content = $this->postManager->getPostParam('content');
 
         if (null === $title || null === $content || null === $lede) {
@@ -97,7 +95,7 @@ class PostController extends AbstractController
         }
 
         $userModel = new User();
-        $userData = $this->getUserData();
+        $userData  = $this->getUserData();
 
         if (!is_array($userData) || !isset($userData['email']) || !is_string($userData['email'])) {
             $this->cookieManager->setCookie('error_message', 'Il y a eu une erreur, veuillez recommencer');
@@ -134,7 +132,7 @@ class PostController extends AbstractController
 
         if ($this->isConnected()) {
             $PostModel = new Post();
-            $post = $PostModel->findById($id);
+            $post      = $PostModel->findById($id);
 
             if (!$post instanceof Post) {
                 $this->cookieManager->setCookie('error_message', 'Il y a eu une erreur, veuillez recommencer', 60);
@@ -146,19 +144,19 @@ class PostController extends AbstractController
             $formRows = $postEditFormService->getFormRows();
 
             return  $this->render('post/edit.html.twig', [
-                'form_rows' => $formRows,
-                'post' => $post,
+                'form_rows'     => $formRows,
+                'post'          => $post,
                 'error_message' => $message,
                 ]);
-        } else {
-            return $this->redirectToReferer();
         }
+        return $this->redirectToReferer();
+
     }
 
     public function editPostAction(int $id): string|RedirectResponse
     {
-        $title =  $this->postManager->getPostParam('title');
-        $lede =  $this->postManager->getPostParam('lede');
+        $title   =  $this->postManager->getPostParam('title');
+        $lede    =  $this->postManager->getPostParam('lede');
         $content = $this->postManager->getPostParam('content');
         if (null === $title || null === $content || null === $lede) {
             $this->cookieManager->setCookie('error_message', 'Veuillez remplir les champs requis', 60);
@@ -166,7 +164,7 @@ class PostController extends AbstractController
         }
 
         $postModel = new Post();
-        $post = $postModel->findById($id);
+        $post      = $postModel->findById($id);
 
         if (!$post instanceof Post) {
             $this->cookieManager->setCookie('error_message', 'Il y a eu une erreur, veuillez recommencer', 60);
@@ -189,7 +187,7 @@ class PostController extends AbstractController
             $this->cookieManager->deleteCookie('success_message');
         }
 
-        $post = $this->post->findById($id);
+        $post     = $this->post->findById($id);
         $comments = $this->comment->getCommentsByPostId($id);
 
         $commentsTable = '';
@@ -198,9 +196,9 @@ class PostController extends AbstractController
         }
 
         return $this->render('post/show.html.twig', [
-            'post' => $post,
-            'comments' => $comments,
-            'comments_table' => $commentsTable,
+            'post'            => $post,
+            'comments'        => $comments,
+            'comments_table'  => $commentsTable,
             'success_message' => $message,
         ]);
     }
