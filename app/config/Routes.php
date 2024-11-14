@@ -1,6 +1,6 @@
 <?php
 
-use App\Controllers\Admincontroller;
+use App\Controllers\AdminController;
 use App\Controllers\CommentController;
 use App\Controllers\ErrorController;
 use App\Controllers\PostController;
@@ -25,6 +25,8 @@ function defineRoutes(Router $router): void
 
     $router->addRoute('GET', '/contact', [HomeController::class, 'contactSubmit'], 'contact');
 
+    $router->addRoute('GET', '/post/list', [HomeController::class, 'frontPostList'], 'front_post_list');
+
     $router->addRoute('GET', '/post/{id}', [HomeController::class, 'frontPostShow'], 'front_post_show');
 
     $router->addRoute('GET', '/error/500', [ErrorController::class, 'error500'], 'error_500');
@@ -39,7 +41,7 @@ function defineRoutes(Router $router): void
 
     $router->addRoute('GET', '/logout', [AuthController::class, 'logout'], 'logout');
 
-    $router->addRoute('GET', '/admin/home', [Admincontroller::class, 'adminHome'], 'admin_home');
+    $router->addRoute('GET', '/admin/home', [AdminController::class, 'adminHome'], 'admin_home');
 
     $router->addRoute('GET', '/admin/user/list', [Usercontroller::class, 'adminListUser'], 'admin_list_user');
 

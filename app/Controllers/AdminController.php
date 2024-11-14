@@ -8,7 +8,7 @@ use App\Models\Comment;
 use App\Models\Post;
 use App\Models\User;
 
-class Admincontroller extends AbstractController
+class AdminController extends AbstractController
 {
     public function __construct(
         Router $router,
