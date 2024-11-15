@@ -2,11 +2,10 @@
 {% extends "components/base/base.html.twig" %}
 
 {% block body %}
-	<div class="post-container container my-5">
+	<div class="posts-container container my-5">
 		<h1 class="mb-4">Liste des articles</h1>
 
-		<div class="row">
-			<div class="col-12 mb-4">
+		<div class="row mb-4">
 				<div class="card h-100 shadow-lg featured-post">
 					{% if last_post.featuredImage %}
 						<img src="{{ last_post.featuredImage.pathName ~ last_post.featuredImage.fileName }}" class="card-img-top" alt="{{ last_post.title }}">
@@ -26,14 +25,15 @@
 						<a href="{{ path('front_post_show', {'id': last_post.id}) }}" class="btn btn-primary">Lire la suite</a>
 					</div>
 				</div>
-			</div>
+		</div>
 
+		<div class="row">
 			{% if posts is not empty %}
 				{% for post in posts %}
-					<div class="col-md-6 mb-4">
+					<div class="col-md-4 mb-4">
 						<div class="card h-100 shadow-sm">
 							{% if post.featuredImage %}
-								<img src="{{ post.featuredImage.pathName ~ post.featuredImage.fileName }}" class="card-img-top" alt="{{ post.title }}">
+								<img src="{{ post.featuredImage.pathName ~ post.featuredImage.fileName }}" class="post-image" alt="{{ post.title }}">
 							{% endif %}
 							<div class="card-body">
 								<h3 class="card-title">{{ post.title }}</h3>

@@ -217,13 +217,28 @@ class Post extends AbstractModel
         }
 
         try {
-            $query = 'DELETE FROM post WHERE id = :id';
-            $stmt  = $this->conn->prepare($query);
-            return $stmt->execute([':id' => $this->id]);
-        } catch (Exception $e) {
-            throw new Exception('Erreur lors de la suppression de l\'utilisateur : ' . $e->getMessage());
-        }
+            // Démarrer la transaction pour garantir l'intégrité des suppressions
+            $this->conn->beginTransaction();
 
+            // Supprimer les commentaires associés au post
+            $queryCommentary = 'DELETE FROM commentary WHERE post_id = :id';
+            $stmtCommentary  = $this->conn->prepare($queryCommentary);
+            $stmtCommentary->execute([':id' => $this->id]);
+
+            // Supprimer le post
+            $queryPost = 'DELETE FROM post WHERE id = :id';
+            $stmtPost  = $this->conn->prepare($queryPost);
+            $stmtPost->execute([':id' => $this->id]);
+
+            // Valider la transaction si tout s'est bien passé
+            $this->conn->commit();
+            return true;
+
+        } catch (Exception $e) {
+            // Annuler la transaction en cas d'erreur
+            $this->conn->rollBack();
+            throw new Exception('Erreur lors de la suppression du post et de ses commentaires : ' . $e->getMessage());
+        }
     }
 
     /**

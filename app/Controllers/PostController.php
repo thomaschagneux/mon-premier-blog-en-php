@@ -209,7 +209,7 @@ class PostController extends AbstractController
         $post->setId($id);
 
         if ($post->remove()) {
-            $this->cookieManager->setCookie('success_message', 'Cet utilisateur a bien été supprimé', 60);
+            $this->cookieManager->setCookie('success_message', 'Ce post a bien été supprimé', 60);
             return $this->redirectToRoute('list_post');
         }
         $this->cookieManager->setCookie('error_message', 'Il y a eu un problème dans la suppression du post', 60);

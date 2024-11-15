@@ -54,11 +54,20 @@ For Administration part check app_admin.css
 }
 
 /**
+CSS pour la page de liste des posts
+ */
+.post-image {
+    width: 100%; /* ou la largeur désirée */
+    height: 200px; /* ou la hauteur désirée */
+    object-fit: cover; /* Redimensionne et recadre l'image */
+    object-position: center; /* Centre l'image dans le cadre */
+}
+/**
 CSS pour la page de détail d'un post
  */
 /* Container principal pour la page du post */
 .post-container {
-    max-width: 800px;
+    max-width: 1200px;
     margin: 0 auto;
 }
 
