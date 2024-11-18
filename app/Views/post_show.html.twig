@@ -40,7 +40,7 @@
 							<div class="comment mb-4 p-3 border-bottom">
 								<div class="comment-author fw-bold mb-2">{{ comment.user.firstName }} {{ comment.user.lastName }}</div>
 								<div class="comment-content text-muted">{{ comment.content | striptags }}</div>
-								<div class="comment-date small text-end text-muted">{{ comment.date | date("d M Y H:i") }}</div>
+								<div class="comment-date small text-end text-muted">{{ comment.updatedAt | date("d-m-Y H:i") }}</div>
 							</div>
 							{% endif %}
 						{% endfor %}

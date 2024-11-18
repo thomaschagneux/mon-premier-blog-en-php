@@ -7,6 +7,7 @@ use App\Models\Comment;
 use App\Models\Post;
 use App\core\RedirectResponse;
 use App\Services\Form\ContactFormService;
+use DateMalformedStringException;
 use Dotenv\Dotenv;
 use Exception;
 use Twig\Error\LoaderError;
@@ -94,7 +95,7 @@ class HomeController extends AbstractController
      * @throws LoaderError
      * @throws Exception
      */
-    public function frontPostShow(int $id): RedirectResponse|string
+    public function frontPostShow(int $id): string|RedirectResponse
     {
         $postModel = new Post();
         $post      = $postModel->findById($id);
@@ -112,14 +113,20 @@ class HomeController extends AbstractController
     }
 
     /**
-     * @throws LoaderError
-     * @throws RuntimeError
+     * @throws DateMalformedStringException
      * @throws SyntaxError
-     * @throws Exception
-     * @return string|RedirectResponse
+     * @throws RuntimeError
+     * @throws LoaderError
      */
-    public function contact(): string|RedirectResponse
+    public function frontPostList(): RedirectResponse|string
     {
-        return $this->twig->render('contact.html.twig');
+        $postArray = array_reverse((new Post())->getAllPosts());
+        $lastPost  = $postArray[0];
+        $posts     = array_slice($postArray, 1);
+
+        return $this->twig->render('post_list.html.twig', [
+            'posts'     => $posts,
+            'last_post' => $lastPost,
+        ]);
     }
 }

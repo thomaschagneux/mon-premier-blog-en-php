@@ -1,0 +1,61 @@
+{% set asset_path = '../assets/' %}
+{% extends "components/base/base.html.twig" %}
+
+{% block body %}
+	<div class="posts-container container my-5">
+		<h1 class="mb-4">Liste des articles</h1>
+
+		<div class="row mb-4">
+				<div class="card h-100 shadow-lg featured-post">
+					{% if last_post.featuredImage %}
+						<img src="{{ last_post.featuredImage.pathName ~ last_post.featuredImage.fileName }}" class="card-img-top" alt="{{ last_post.title }}">
+					{% endif %}
+					<div class="card-body">
+						<h2 class="card-title">{{ last_post.title }}</h2>
+						<p class="card-text text-muted small">
+							Par <strong>
+								{% if last_post.user is not null %}
+									{{ last_post.user.firstName }} {{ last_post.user.lastName }}
+								{% else %}
+									Auteur inconnu
+								{% endif %}
+							</strong> - Publié le {{ last_post.createdAt|date("d-m-Y") }}
+						</p>
+						<p class="card-text">{{ last_post.lede | raw }}</p>
+						<a href="{{ path('front_post_show', {'id': last_post.id}) }}" class="btn btn-primary">Lire la suite</a>
+					</div>
+				</div>
+		</div>
+
+		<div class="row">
+			{% if posts is not empty %}
+				{% for post in posts %}
+					<div class="col-md-4 mb-4">
+						<div class="card h-100 shadow-sm">
+							{% if post.featuredImage %}
+								<img src="{{ post.featuredImage.pathName ~ post.featuredImage.fileName }}" class="post-image" alt="{{ post.title }}">
+							{% endif %}
+							<div class="card-body">
+								<h3 class="card-title">{{ post.title }}</h3>
+								<p class="card-text text-muted small">
+									Par <strong>
+										{% if post.user is not null %}
+											{{ post.user.firstName }} {{ post.user.lastName }}
+										{% else %}
+											Auteur inconnu
+										{% endif %}
+									</strong> - Publié le {{ post.createdAt|date("d-m-Y") }}
+								</p>
+								<p class="card-text">{{ post.lede | raw }}</p>
+								<a href="{{ path('front_post_show', {'id': post.id}) }}" class="btn btn-outline-primary">Lire la suite</a>
+							</div>
+						</div>
+					</div>
+				{% endfor %}
+
+			</div>
+		{% else %}
+			<p class="text-center text-muted">Aucun article disponible pour le moment.</p>
+		{% endif %}
+	</div>
+{% endblock %}

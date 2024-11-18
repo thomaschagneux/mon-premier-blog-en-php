@@ -1,4 +1,4 @@
 id,title,lede,featured_image_id,content,user_id,views,created_at,updated_at
-1,Premier Post,Ceci est le premier post.,5,Contenu détaillé du premier post en français.,1,150,2023-06-28 10:00:00,
-2,Deuxième Post,Ceci est le deuxième post.,6,Contenu détaillé du deuxième post en français.,2,53,2023-06-28 10:00:00,
-3,Troisième Post,Ceci est le troisième post.,4,Contenu détaillé du troisième post en français.,3,42,2023-06-28 10:00:00,
+1,La Supraconductivité : Un Voyage au Cœur de la Physique Quantique,1,5,1,1,150,2023-06-28 10:00:00,
+2,ITER : Le Plus Grand Projet d'Énergie de Fusion au Monde,2,6,2,2,53,2023-06-28 10:00:00,
+3,Troisième Post,3,4,3,3,42,2023-06-28 10:00:00,
