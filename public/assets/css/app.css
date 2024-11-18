@@ -1,7 +1,18 @@
 /**
 CSS stylesheet for general app.
 For Administration part check app_admin.css
- */
+*/
+
+/* Conteneur principal pour les images */
+.post-image {
+    width: 100%;
+    height: 200px; /* Hauteur fixe pour uniformiser les cartes */
+    object-fit: contain; /* Garde l'image entière visible */
+    background-color: #f7f7f7; /* Fond gris clair (remplacez par #ffffff pour un fond blanc) */
+    border: 1px solid #ddd; /* Optionnel : bordure pour encadrer */
+    border-radius: 8px; /* Coins arrondis pour une apparence plus moderne */
+    padding: 5px; /* Espace autour de l'image pour éviter les débordements */
+}
 
 /* Ajout d'une légère animation au survol pour les cartes */
 .featured-article, .latest-posts .card {
@@ -56,15 +67,91 @@ For Administration part check app_admin.css
 /**
 CSS pour la page de liste des posts
  */
-.post-image {
-    width: 100%; /* ou la largeur désirée */
-    height: 200px; /* ou la hauteur désirée */
-    object-fit: cover; /* Redimensionne et recadre l'image */
-    object-position: center; /* Centre l'image dans le cadre */
+/* Container principal pour la page */
+.posts-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
 }
+
+/* Styles pour les cartes */
+.card {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-5px); /* Légère élévation au survol */
+}
+
+/* Styles pour les titres et textes */
+.card-title {
+    font-weight: bold;
+    font-size: 1.25rem;
+    color: #333;
+}
+
+.card-text {
+    color: #555;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+.card-text.text-muted {
+    font-size: 0.9rem;
+    color: #888;
+}
+
+/* Boutons */
+.btn {
+    font-size: 0.9rem;
+    padding: 10px 20px;
+    border-radius: 4px;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #004085;
+}
+
+.btn-outline-primary {
+    color: #007bff;
+    border-color: #007bff;
+}
+
+.btn-outline-primary:hover {
+    background-color: #007bff;
+    color: #fff;
+    border-color: #0056b3;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .card-title {
+        font-size: 1rem;
+    }
+
+    .card-text {
+        font-size: 0.85rem;
+    }
+
+    .btn {
+        font-size: 0.85rem;
+    }
+}
+
 /**
 CSS pour la page de détail d'un post
- */
+*/
 /* Container principal pour la page du post */
 .post-container {
     max-width: 1200px;
@@ -94,7 +181,6 @@ CSS pour la page de détail d'un post
     color: #666;
     margin-top: 10px;
 }
-
 
 /* Styles pour les commentaires */
 .comments-section {
