@@ -24,6 +24,11 @@ class AdminController extends AbstractController
     public function adminHome(): string|RedirectResponse
     {
         if ($this->isConnected()) {
+            $errorMessage = $this->cookieManager->getCookie('error_message');
+            if ($errorMessage) {
+                $this->cookieManager->deleteCookie('error_message');
+            }
+
             $userData = $this->getUserData();
 
             if (is_array($userData) && isset($userData['email'])) {
@@ -57,6 +62,7 @@ class AdminController extends AbstractController
                         'total_posts'    => $totalPosts,
                         'views'          => $views,
                         'total_comments' => $totalComments,
+                        'error_message'  => $errorMessage,
                     ]);
                 }
             }

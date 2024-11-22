@@ -3,11 +3,11 @@
 {% block scripts %}
     <script src="https://www.google.com/recaptcha/api.js?render={{ recaptcha_site_key }}"></script>
     <script>
-        grecaptcha.ready(function() {
-            grecaptcha.execute('{{ recaptcha_site_key }}', {action: 'submit'}).then(function(token) {
-                document.getElementById('g-recaptcha-response').value = token;
-            });
+      grecaptcha.ready(function() {
+        grecaptcha.execute('{{ recaptcha_site_key }}', {action: 'submit'}).then(function(token) {
+          document.getElementById('g-recaptcha-response').value = token;
         });
+      });
     </script>
 {% endblock %}
 
@@ -19,19 +19,19 @@
             <h2>A propos de moi</h2>
             <p>
                 Je m'appelle Thomas Chagneux et je suis un développeur PHP junior passionné,
-            avec un fort intérêt pour le développement web et
-            une curiosité constante pour les nouvelles technologies.
-            Après des études en développement informatique et plusieurs projets académiques,
-            je me spécialise aujourd’hui en PHP et explore ses frameworks populaires, notamment Symfony.
+                avec un fort intérêt pour le développement web et
+                une curiosité constante pour les nouvelles technologies.
+                Après des études en développement informatique et plusieurs projets académiques,
+                je me spécialise aujourd’hui en PHP et explore ses frameworks populaires, notamment Symfony.
 
-            Grâce à mes projets personnels et à mes exercices académiques, j'ai acquis de solides compétences en PHP,
-            ainsi qu'une bonne maîtrise des bases du HTML, CSS et JavaScript.
-            Mon objectif est de concevoir des applications web modernes, fonctionnelles et accessibles.
-            En tant que développeur junior, je suis motivé par l'apprentissage continu et le désir d'améliorer mes compétences à chaque nouveau projet.
-            Que ce soit par la lecture de documentation, des cours en ligne ou la collaboration avec d'autres développeurs,
-            j'aime me lancer des défis pour progresser.
-            Vous cherchez un développeur motivé et en pleine évolution ?
-            Je serais ravi d’échanger avec vous et de contribuer à vos projets avec enthousiasme et détermination !
+                Grâce à mes projets personnels et à mes exercices académiques, j'ai acquis de solides compétences en PHP,
+                ainsi qu'une bonne maîtrise des bases du HTML, CSS et JavaScript.
+                Mon objectif est de concevoir des applications web modernes, fonctionnelles et accessibles.
+                En tant que développeur junior, je suis motivé par l'apprentissage continu et le désir d'améliorer mes compétences à chaque nouveau projet.
+                Que ce soit par la lecture de documentation, des cours en ligne ou la collaboration avec d'autres développeurs,
+                j'aime me lancer des défis pour progresser.
+                Vous cherchez un développeur motivé et en pleine évolution ?
+                Je serais ravi d’échanger avec vous et de contribuer à vos projets avec enthousiasme et détermination !
             </p>
 
             <div class="skills mt-3">
@@ -68,15 +68,17 @@
 
         <div class="latest-posts mt-5">
             <h2>Derniers articles</h2>
+
+            <!-- Dernier article en vedette -->
             <div class="row mb-4">
                 {% if last_post %}
                     <div class="col-12 mb-4 slide-in">
-                        <div class="card h-100 shadow-lg featured-article">
+                        <div class="card h-100 shadow-lg featured-post">
+                            {% if last_post.getFeaturedImage %}
+                                <img src="{{ last_post.getFeaturedImage.pathName }}{{ last_post.getFeaturedImage.fileName }}" class="card-img-top" alt="{{ last_post.title }}">
+                            {% endif %}
                             <div class="card-body">
                                 <h3 class="card-title">{{ last_post.title }}</h3>
-                                {% if last_post.getFeaturedImage %}
-                                    <img src="{{ last_post.getFeaturedImage.pathName }}{{ last_post.getFeaturedImage.fileName }}" class="card-img-top" alt="{{ last_post.title }}">
-                                {% endif %}
                                 <p class="card-text">{{ last_post.lede | slice(0, 200) ~ '...' }}</p>
                                 <a href="{{ path('front_post_show', { id: last_post.id }) }}" class="btn btn-primary btn-lg">Lire la suite</a>
                             </div>
@@ -85,15 +87,16 @@
                 {% endif %}
             </div>
 
+            <!-- Autres articles -->
             <div class="row">
                 {% for post in posts | slice(1, 3) %}
                     <div class="col-md-4 mb-4 slide-in">
                         <div class="card h-100 shadow-sm">
+                            {% if post.getFeaturedImage %}
+                                <img src="{{ post.getFeaturedImage.pathName }}{{ post.getFeaturedImage.fileName }}" class="post-image" alt="{{ post.title }}">
+                            {% endif %}
                             <div class="card-body">
                                 <h5 class="card-title">{{ post.title }}</h5>
-                                {% if last_post.getFeaturedImage %}
-                                    <img src="{{ post.getFeaturedImage.pathName }}{{ post.getFeaturedImage.fileName }}" class="card-img-top" alt="{{ last_post.title }}">
-                                {% endif %}
                                 <p class="card-text">{{ post.lede | slice(0, 100) ~ '...' }}</p>
                                 <a href="{{ path('front_post_show', { id: post.id}) }}" class="btn btn-outline-primary btn-sm">Lire la suite</a>
                             </div>

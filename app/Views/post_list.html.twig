@@ -7,6 +7,7 @@
 
 		<div class="row mb-4">
 				<div class="card h-100 shadow-lg featured-post">
+					{{ dumper(last_post) }}
 					{% if last_post.featuredImage %}
 						<img src="{{ last_post.featuredImage.pathName ~ last_post.featuredImage.fileName }}" class="card-img-top" alt="{{ last_post.title }}">
 					{% endif %}
@@ -46,7 +47,7 @@
 										{% endif %}
 									</strong> - Publié le {{ post.createdAt|date("d-m-Y") }}
 								</p>
-								<p class="card-text">{{ post.lede | raw }}</p>
+								<p class="card-text">{{ post.lede | slice(0, 100) ~ '...' }}</p>
 								<a href="{{ path('front_post_show', {'id': post.id}) }}" class="btn btn-outline-primary">Lire la suite</a>
 							</div>
 						</div>

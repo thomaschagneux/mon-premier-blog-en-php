@@ -29,6 +29,7 @@ class Post extends AbstractModel
     public function __construct()
     {
         parent::__construct();
+        $this->featured_image_id = 0;
     }
 
     /**
@@ -162,14 +163,15 @@ class Post extends AbstractModel
         if ($isUpdate) {
             $query = 'UPDATE post SET 
                         title = :title,
+                        featured_image_id = :featured_image_id,
                         lede = :lede,
                         content = :content,
                         user_id = :user_id,
                         updated_at = :updated_at
                       WHERE id = :id';
         } else {
-            $query = 'INSERT INTO post (title, lede, content, user_id, created_at) 
-                      VALUES (:title, :lede, :content, :user_id, :created_at)';
+            $query = 'INSERT INTO post (title, featured_image_id, lede, content, user_id, created_at) 
+                      VALUES (:title, :featured_image_id, :lede, :content, :user_id, :created_at)';
         }
 
         try {
@@ -182,6 +184,7 @@ class Post extends AbstractModel
 
             $params = [
                 ':title'   => $this->getTitle(),
+                ':featured_image_id' => $this->getFeaturedImageId(),
                 ':lede'    => $this->getLede(),
                 ':content' => $this->getContent(),
                 ':user_id' => $this->getUserId(),
