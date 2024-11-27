@@ -16,6 +16,7 @@
                 </div>
             </div>
             {% if posts is defined and posts is not null %}
+                {{ dumper(posts) }}
                 {{ table | raw }}
             {% endif %}
         </div>

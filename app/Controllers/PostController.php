@@ -45,11 +45,8 @@ class PostController extends AbstractController
      */
     public function postList(): string|RedirectResponse
     {
-        if ($this->isConnected()) {
 
-            $posts = $this->post->getAllPosts();
-            $table = $this->postTableService->getTableContent();
-
+        if ($this->isAdmin()) {
             $messageSuccess = $this->cookieManager->getCookie('success_message');
             if (null !== $messageSuccess) {
                 $this->cookieManager->deleteCookie('success_message');
@@ -58,6 +55,30 @@ class PostController extends AbstractController
             if (null !== $messageError) {
                 $this->cookieManager->deleteCookie('error_message');
             }
+            $posts = $this->post->getAllPosts();
+            $table = $this->postTableService->getTableContent();
+
+            return $this->render('post/list.html.twig', [
+                'posts'           => $posts,
+                'table'           => $table,
+                'success_message' => $messageSuccess,
+                'error_message'   => $messageError
+            ]);
+        }
+
+        if ($this->isConnected()) {
+            $messageSuccess = $this->cookieManager->getCookie('success_message');
+            if (null !== $messageSuccess) {
+                $this->cookieManager->deleteCookie('success_message');
+            }
+            $messageError = $this->cookieManager->getCookie('error_message');
+            if (null !== $messageError) {
+                $this->cookieManager->deleteCookie('error_message');
+            }
+
+            $currentUser = (new User())->findByUsermail($this->getUserData()['email']);
+            $posts = $this->post->findPostsByUserId($currentUser->getId());
+            $table = $this->postTableService->getTableContent($currentUser);
             return $this->render('post/list.html.twig', [
                 'posts'           => $posts,
                 'table'           => $table,

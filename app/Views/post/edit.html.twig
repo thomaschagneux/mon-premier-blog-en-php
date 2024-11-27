@@ -11,7 +11,7 @@
             <div class="spinner"></div>
         </div>
 
-
+{{ dumper(form_rows) }}
         <div class="card-body">
             <form method="POST" action="{{path('edit_post_action', {'id': post.id})}}" enctype="multipart/form-data">
                 <div class="row">
@@ -20,6 +20,11 @@
                     </div>
                     <div class="col col-md-6">
                         {{ form_rows.lede | raw }}
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col col-md-6">
+                        {{ form_rows.image | raw }}
                     </div>
                 </div>
                 <div class="row">

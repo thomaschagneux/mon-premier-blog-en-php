@@ -7,9 +7,8 @@
 
 		<div class="row mb-4">
 				<div class="card h-100 shadow-lg featured-post">
-					{{ dumper(last_post) }}
 					{% if last_post.featuredImage %}
-						<img src="{{ last_post.featuredImage.pathName ~ last_post.featuredImage.fileName }}" class="card-img-top" alt="{{ last_post.title }}">
+						<img src="{{ '../' ~ last_post.featuredImage.pathName ~ last_post.featuredImage.fileName }}" class="card-img-top" alt="{{ last_post.title }}">
 					{% endif %}
 					<div class="card-body">
 						<h2 class="card-title">{{ last_post.title }}</h2>
