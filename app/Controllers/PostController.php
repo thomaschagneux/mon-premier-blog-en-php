@@ -224,6 +224,37 @@ class PostController extends AbstractController
         $post->setLede($lede);
         $post->setUpdatedAt(new \DateTime());
 
+        $picture = new Picture();
+
+        try {
+            $fileData   =  $this->fileManager->getFile('image');
+        }catch (\Exception $e){
+            $this->cookieManager->setCookie('error_message', 'Le post doit avoir une image de présentation', 60);
+            return $this->redirectToRoute('edit_post_form', ['id' => (string) $id]);
+        }
+
+
+        if (is_array($fileData) && isset($fileData['tmp_name'], $fileData['name'])) {
+            $extension = pathinfo($fileData['name'], PATHINFO_EXTENSION);
+            $uniqueFileName = 'featured_image_' . uniqid() . '.' . $extension;
+            $uniqueFileName = Sanitizer::sanitizeString($uniqueFileName);
+
+            $picture->setFileName($uniqueFileName);
+            $picture->setPathName('assets/img/featured_image/');
+            $picture->setMimeType($fileData['type']);
+            $this->fileManager->setDestination($picture->getPathName());
+            $this->fileManager->moveFile($fileData['tmp_name'], $picture->getFileName());
+            $picture->save();
+
+            $post->setFeaturedImageId($picture->getId());
+        } elseif (null !== $post->getFeaturedImageId()) {
+            // Une image existe déjà, on peut continuer sans erreur
+        } else {
+            // Aucune image n'a été envoyée et le post n'a pas d'image existante
+            $this->cookieManager->setCookie('error_message', 'Le post doit avoir une image de présentation', 60);
+            return $this->redirectToRoute('edit_post_form', ['id' => (string) $id]);
+        }
+
         $post->save();
         $this->cookieManager->setCookie('success_message', 'Le post a bien été enregistré', 60);
         return $this->redirectToRoute('list_post');

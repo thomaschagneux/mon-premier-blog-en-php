@@ -22,7 +22,6 @@ class FileManager
     public function getFile(string $key, array $allowedTypes = ['image/jpeg', 'image/png'], int $maxSize = 2000000): ?array
     {
         $file = $this->sanitizedFiles($key);
-
         // Sanitize the file name (removes harmful characters)
         if (!is_string($file['name'])) {
             return null;
@@ -41,6 +40,7 @@ class FileManager
 
         // Validate MIME type using mime_content_type on the temp file
         $mimeType = mime_content_type($file['tmp_name']);
+
         if ($mimeType === false) {
             throw new Exception('Unable to determine file MIME type.');
         }
