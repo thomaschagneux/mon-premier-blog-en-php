@@ -37,9 +37,14 @@ class PostTableService extends AbstractTableService
      * @throws LoaderError
      * @throws \Exception
      */
-    public function getTableContent(): string
+    public function getTableContent(?User $user = null): string
     {
-        $posts = $this->post->getAllPosts();
+        if ($user === null) {
+            $posts = $this->post->getAllPosts();
+        } else {
+            $posts = $this->post->findPostsByUserId($user->getId());
+        }
+
 
         $rows = [];
         foreach ($posts as $post) {

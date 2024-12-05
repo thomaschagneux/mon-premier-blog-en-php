@@ -2,6 +2,7 @@
 
 namespace App\Manager;
 
+use App\Dto\FileDto;
 use App\Services\Sanitizer;
 use Exception;
 
@@ -12,17 +13,12 @@ class FileManager
 
     /**
      * Retrieve and validate a file from the $_FILES array.
-     *
-     * @param  string                                                              $key          The key of the file in the $_FILES array.
-     * @param  array<string>                                                       $allowedTypes List of allowed MIME types.
-     * @param  int                                                                 $maxSize      Maximum allowed file size in bytes.
+     * @param  array<string> $allowedTypes List of allowed MIME types.     $maxSize      Maximum allowed file size in bytes.
      * @throws Exception
-     * @return array{name: string, tmp_name: string, size: int, type: string}|null Returns an array with file data if valid, otherwise null.
      */
-    public function getFile(string $key, array $allowedTypes = ['image/jpeg', 'image/png'], int $maxSize = 2000000): ?array
+    public function getFile(string $key, array $allowedTypes = ['image/jpeg', 'image/png'], int $maxSize = 2000000): ?FileDto
     {
         $file = $this->sanitizedFiles($key);
-
         // Sanitize the file name (removes harmful characters)
         if (!is_string($file['name'])) {
             return null;
@@ -35,12 +31,13 @@ class FileManager
         }
 
         // Validate that tmp_name is a valid string
-        if (!is_string($file['tmp_name'])) {
-            throw new Exception('Temporary file path is invalid.');
+        if (!is_string($file['tmp_name']) || !file_exists($file['tmp_name'])) {
+            throw new Exception('Le chemin temporaire du fichier est invalide.');
         }
 
         // Validate MIME type using mime_content_type on the temp file
         $mimeType = mime_content_type($file['tmp_name']);
+
         if ($mimeType === false) {
             throw new Exception('Unable to determine file MIME type.');
         }
@@ -50,12 +47,12 @@ class FileManager
         }
 
         // If everything is valid, return the file data
-        return [
-            'name'     => $filteredName,
-            'tmp_name' => $file['tmp_name'],
-            'size'     => $file['size'],
-            'type'     => $mimeType,
-        ];
+        return new FileDto(
+            name     : $filteredName,
+            tmp_name : $file['tmp_name'],
+            size     : $file['size'],
+            type     : $mimeType,
+        );
     }
 
 
@@ -103,6 +100,24 @@ class FileManager
         $this->destination = rtrim($destination, '/') . '/';
 
         return $this;
+    }
+
+    /**
+     * Vérifie si un fichier a été envoyé et est valide.
+     *
+     * @param  string $key La clé spécifique dans $_FILES.
+     * @return bool   Retourne true si le fichier a été envoyé correctement, false sinon.
+     */
+    public function isPostFiles(string $key): bool
+    {
+        $file = $this->sanitizedFiles($key);
+
+        // Vérifie si le fichier est vide ou si une erreur d'upload indique qu'aucun fichier n'a été envoyé
+        if (empty($file['name']) || empty($file['tmp_name']) || $file['error'] === UPLOAD_ERR_NO_FILE) {
+            return false;
+        }
+
+        return true;
     }
 
     /**

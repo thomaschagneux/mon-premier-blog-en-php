@@ -23,6 +23,7 @@ class CommentAddFormService extends AbstractFormService
             '',
             ['class' => 'tiny-light', 'rows' => 5],
             [],
+            'Votre commentaire'
         ));
     }
 }

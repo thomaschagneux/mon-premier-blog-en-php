@@ -5,12 +5,14 @@ namespace App\Controllers;
 use App\core\RedirectResponse;
 use App\core\Router;
 use App\Models\Comment;
+use App\Models\Picture;
 use App\Models\Post;
 use App\Models\User;
 use App\Services\CustomTables\CommentaryTableService;
 use App\Services\CustomTables\PostTableService;
 use App\Services\Form\PostAddFormService;
 use App\Services\Form\PostEditFormService;
+use App\Services\Sanitizer;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
@@ -42,19 +44,53 @@ class PostController extends AbstractController
      */
     public function postList(): string|RedirectResponse
     {
-        if ($this->isConnected()) {
 
+        if ($this->isAdmin()) {
+            $messageSuccess = $this->cookieManager->getCookie('success_message');
+            if (null !== $messageSuccess) {
+                $this->cookieManager->deleteCookie('success_message');
+            }
+            $messageError = $this->cookieManager->getCookie('error_message');
+            if (null !== $messageError) {
+                $this->cookieManager->deleteCookie('error_message');
+            }
             $posts = $this->post->getAllPosts();
             $table = $this->postTableService->getTableContent();
 
-            $message = $this->cookieManager->getCookie('success_message');
-            if (null !== $message) {
-                $this->cookieManager->deleteCookie('success_message');
-            }
             return $this->render('post/list.html.twig', [
                 'posts'           => $posts,
                 'table'           => $table,
-                'success_message' => $message,
+                'success_message' => $messageSuccess,
+                'error_message'   => $messageError,
+            ]);
+        }
+
+        if ($this->isConnected()) {
+            $messageSuccess = $this->cookieManager->getCookie('success_message');
+            if (null !== $messageSuccess) {
+                $this->cookieManager->deleteCookie('success_message');
+            }
+            $messageError = $this->cookieManager->getCookie('error_message');
+            if (null !== $messageError) {
+                $this->cookieManager->deleteCookie('error_message');
+            }
+
+            $userData = $this->getUserData();
+            if (!is_array($userData) || !isset($userData['email'])) {
+                return $this->redirectToRoute('logout');
+            }
+            $mail        = (string) $userData['email'];
+            $currentUser = (new User())->findByUsermail($mail);
+            if (!$currentUser instanceof User) {
+                return $this->redirectToRoute('logout');
+            }
+            $posts       = $this->post->findPostsByUserId($currentUser->getId());
+            $table       = $this->postTableService->getTableContent($currentUser);
+            return $this->render('post/list.html.twig', [
+                'posts'           => $posts,
+                'table'           => $table,
+                'success_message' => $messageSuccess,
+                'error_message'   => $messageError,
             ]);
         }
         return $this->redirectToReferer();
@@ -116,6 +152,33 @@ class PostController extends AbstractController
         $postModel->setUserId($user->getId());
         $postModel->setCreatedAt(new \DateTime());
 
+        $picture    = new Picture();
+
+        try {
+            $fileData   =  $this->fileManager->getFile('image');
+        } catch (\Exception $e) {
+            $this->cookieManager->setCookie('error_message', 'Le post doit avoir une image de présentation', 60);
+            return $this->redirectToRoute('add_post_form');
+        }
+
+        if (null !== $fileData) {
+            $extension      = pathinfo($fileData->name, PATHINFO_EXTENSION);
+            $uniqueFileName = 'featured_image_' . uniqid() . '.' . $extension;
+            $uniqueFileName = Sanitizer::sanitizeString($uniqueFileName);
+
+            $picture->setFileName($uniqueFileName);
+            $picture->setPathName('assets/img/featured_image/');
+            $picture->setMimeType($fileData->type);
+
+            $this->fileManager->setDestination($picture->getPathName());
+            $this->fileManager->moveFile($fileData->tmp_name, $picture->getFileName());
+            $picture->save();
+
+            $postModel->setFeaturedImage($picture);
+            $postModel->setFeaturedImageId($picture->getId());
+        } else {
+            $postModel->setFeaturedImage(null);
+        }
 
         $postModel->save();
         $this->cookieManager->setCookie('success_message', 'Le post a bien été enregistré', 60);
@@ -153,6 +216,9 @@ class PostController extends AbstractController
 
     }
 
+    /**
+     * @throws \Exception
+     */
     public function editPostAction(int $id): string|RedirectResponse
     {
         $title   =  $this->postManager->getPostParam('title');
@@ -174,6 +240,33 @@ class PostController extends AbstractController
         $post->setTitle($title);
         $post->setLede($lede);
         $post->setUpdatedAt(new \DateTime());
+
+        if ($this->fileManager->isPostFiles('image')) {
+            $picture    = new Picture();
+            $fileData   =  $this->fileManager->getFile('image');
+
+            if (null !== $fileData) {
+                $extension      = pathinfo($fileData->name, PATHINFO_EXTENSION);
+                $uniqueFileName = 'featured_image_' . uniqid() . '.' . $extension;
+                $uniqueFileName = Sanitizer::sanitizeString($uniqueFileName);
+
+                $picture->setFileName($uniqueFileName);
+                $picture->setPathName('assets/img/featured_image/');
+                $picture->setMimeType($fileData->type);
+                $this->fileManager->setDestination($picture->getPathName());
+                $this->fileManager->moveFile($fileData->tmp_name, $picture->getFileName());
+
+                $picture->save();
+
+                $post->setFeaturedImage($picture);
+            }
+
+        } elseif (null !== $post->getFeaturedImageId()) {
+            // Une image existe déjà, on peut continuer sans erreur
+        } else {
+            $this->cookieManager->setCookie('error_message', 'Le post doit avoir une image de présentation', 60);
+            return $this->redirectToRoute('edit_post_form', ['id' => (string) $id]);
+        }
 
         $post->save();
         $this->cookieManager->setCookie('success_message', 'Le post a bien été enregistré', 60);

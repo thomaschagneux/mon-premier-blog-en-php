@@ -54,6 +54,7 @@ class UserController extends AbstractController
                 'error_message'   => $errorMessage,
             ]);
         }
+        $this->cookieManager->setCookie('error_message', 'Vous ne pouvez pas accéder à cette page', 60);
         return $this->redirectToReferer();
     }
 
@@ -123,29 +124,33 @@ class UserController extends AbstractController
             $user->setLastName($lastName);
             $user->setEmail($email);
             $user->setPassword(password_hash($password, PASSWORD_DEFAULT));
+            $user->setPictureId(null);
 
-            $picture  = new Picture();
-            $fileData = $this->fileManager->getFile('avatar');
+            if ($this->fileManager->isPostFiles('avatar')) {
+                $picture  = new Picture();
 
-            if (null !== $fileData) {
-                $extension      = pathinfo($fileData['name'], PATHINFO_EXTENSION);
-                $uniqueFileName = 'avatar_' . $user->getFirstName() . '_' . $user->getLastName() . '_' . uniqid() . '.' . $extension;
-                $uniqueFileName = Sanitizer::sanitizeString($uniqueFileName);
+                $fileData = $this->fileManager->getFile('avatar');
 
-                $picture->setFileName($uniqueFileName);
-                $picture->setPathName('assets/img/avatars/');
-                $picture->setMimeType($fileData['type']);
 
-                $this->fileManager->setDestination($picture->getPathName());
-                $this->fileManager->moveFile($fileData['tmp_name'], $picture->getFileName());
-                $picture->save();
+                if (null !== $fileData) {
+                    $extension      = pathinfo($fileData->name, PATHINFO_EXTENSION);
+                    $uniqueFileName = 'avatar_' . $user->getFirstName() . '_' . $user->getLastName() . '_' . uniqid() . '.' . $extension;
+                    $uniqueFileName = Sanitizer::sanitizeString($uniqueFileName);
 
-                $user->setPictureId($picture->getId());
-            } else {
-                $user->setPictureId(null);
+                    $picture->setFileName($uniqueFileName);
+                    $picture->setPathName('assets/img/avatars/');
+                    $picture->setMimeType($fileData->type);
+
+                    $this->fileManager->setDestination($picture->getPathName());
+                    $this->fileManager->moveFile($fileData->tmp_name, $picture->getFileName());
+                    $picture->save();
+
+                    $user->setPictureId($picture->getId());
+                }
             }
 
             $user->save();
+            $this->cookieManager->setCookie('success_message', 'Vous vous êtes bien inscrits', 60);
             return $this->redirectToRoute('index');
         }
 
@@ -182,24 +187,27 @@ class UserController extends AbstractController
             $user->setPassword(password_hash($password, PASSWORD_DEFAULT));
             $user->setRole($role);
 
-            $picture  = new Picture();
-            $fileData = $this->fileManager->getFile('avatar');
+            try {
+                $picture  = new Picture();
+                $fileData = $this->fileManager->getFile('avatar');
 
-            if (null !== $fileData) {
-                $extension      = pathinfo($fileData['name'], PATHINFO_EXTENSION);
-                $uniqueFileName = 'avatar_' . $user->getFirstName() . '_' . $user->getLastName() . '_' . uniqid() . '.' . $extension;
-                $uniqueFileName = Sanitizer::sanitizeString($uniqueFileName);
+                if (null !== $fileData) {
+                    $extension      = pathinfo($fileData->name, PATHINFO_EXTENSION);
+                    $uniqueFileName = 'avatar_' . $user->getFirstName() . '_' . $user->getLastName() . '_' . uniqid() . '.' . $extension;
+                    $uniqueFileName = Sanitizer::sanitizeString($uniqueFileName);
 
-                $picture->setFileName($uniqueFileName);
-                $picture->setPathName('assets/img/avatars/');
-                $picture->setMimeType($fileData['type']);
+                    $picture->setFileName($uniqueFileName);
+                    $picture->setPathName('assets/img/avatars/');
+                    $picture->setMimeType($fileData->type);
 
-                $this->fileManager->setDestination($picture->getPathName());
-                $this->fileManager->moveFile($fileData['tmp_name'], $picture->getFileName());
-                $picture->save();
+                    $this->fileManager->setDestination($picture->getPathName());
+                    $this->fileManager->moveFile($fileData->tmp_name, $picture->getFileName());
+                    $picture->save();
 
-                $user->setPictureId($picture->getId());
-            } else {
+                    $user->setPictureId($picture->getId());
+            }
+
+            } catch(Exception $e) {
                 $user->setPictureId(null);
             }
 
@@ -273,147 +281,140 @@ class UserController extends AbstractController
      */
     public function editUser(int $id): RedirectResponse
     {
-        if ($this->isAdmin()) {
-            $user = $this->user->findById($id);
-            if (null === $user) {
-                return $this->redirectToRoute('admin_list_user');
-            }
-
-            if ($this->isPostRequest()) {
-                $firstName = $this->postManager->getPostParam('first_name');
-                $lastName  = $this->postManager->getPostParam('last_name');
-                $email     = $this->postManager->getPostParam('email');
-                $password  = $this->postManager->getPostParam('password');
-                $role      = $this->postManager->getPostParam('role') ?? 'ROLE_USER';
-
-                if (empty($password)) {
-                    $password = $user->getPassword();
-                }
-
-                if (empty($firstName) || empty($lastName) || empty($email)) {
-                    $this->cookieManager->setCookie('error_message', 'Veuillez remplir les champs requis', 60);
-                    return $this->redirectToRoute('user_edit_form', ['id' => (string) $id]);
-                }
-
-                $user->setFirstName($firstName);
-                $user->setLastName($lastName);
-                $user->setEmail($email);
-                $user->setPassword(password_hash($password, PASSWORD_DEFAULT));
-                $user->setRole($role);
-
-                // Traitement du fichier avatar
-                $file = $this->fileManager->sanitizedFiles('avatar');
-
-                if ($file !== null && $file['error'] === UPLOAD_ERR_OK) {
-                    $fileData = $this->fileManager->getFile('avatar');
-
-                    if (null !== $fileData) {
-                        $extension      = pathinfo($fileData['name'], PATHINFO_EXTENSION);
-                        $uniqueFileName = 'avatar_' . $user->getFirstName() . '_' . $user->getLastName() . '_' . uniqid() . '.' . $extension;
-                        $uniqueFileName = Sanitizer::sanitizeString($uniqueFileName);
-
-                        $picture = new Picture();
-                        $picture->setFileName($uniqueFileName);
-                        $picture->setPathName('assets/img/avatars/');
-                        $picture->setMimeType($fileData['type']);
-
-                        $this->fileManager->setDestination($picture->getPathName());
-                        $this->fileManager->moveFile($fileData['tmp_name'], $picture->getFileName());
-                        $picture->save();
-
-                        $user->setPictureId($picture->getId());
-                    }
-                } elseif ($file['error'] === UPLOAD_ERR_NO_FILE) {
-                    // Aucun fichier n'a été téléchargé, on conserve l'image actuelle si elle existe
-                    if ($user->getPictureId() !== null) {
-                        $user->setPictureId($user->getPictureId());
-                    }
-                } else {
-                    // Gestion des autres erreurs de fichier
-                    if ($file['error'] === UPLOAD_ERR_INI_SIZE || $file['error'] === UPLOAD_ERR_FORM_SIZE) {
-                        $this->cookieManager->setCookie('error_message', 'Le fichier dépasse la taille maximale autorisée', 60);
-                        return $this->redirectToRoute('user_edit_form', ['id' => (string) $id]);
-                    }
-                    $this->cookieManager->setCookie('error_message', 'Erreur inconnue dans le chargement du fichier', 60);
-                    return $this->redirectToRoute('user_edit_form', ['id' => (string) $id]);
-
-                }
-
-                $user->save();
-                $this->cookieManager->setCookie('success_message', 'Cet utilisateur a bien été modifié', 60);
-                return $this->redirectToRoute('admin_list_user');
-            }
+        if (!$this->isAdmin()) {
+            return $this->redirectToRoute('admin_list_user');
         }
+
         $user = $this->user->findById($id);
         if (null === $user) {
             return $this->redirectToRoute('admin_list_user');
         }
 
-        if ($this->isPostRequest()) {
-            $firstName = $this->postManager->getPostParam('first_name');
-            $lastName  = $this->postManager->getPostParam('last_name');
-            $email     = $this->postManager->getPostParam('email');
-            $password  = $this->postManager->getPostParam('password');
-
-            if (empty($password)) {
-                $password = $user->getPassword();
-            }
-
-            if (empty($firstName) || empty($lastName) || empty($email)) {
-                $this->cookieManager->setCookie('error_message', 'Veuillez remplir les champs requis', 60);
-                return $this->redirectToRoute('user_edit_form', ['id' => (string) $id]);
-            }
-
-            $user->setFirstName($firstName);
-            $user->setLastName($lastName);
-            $user->setEmail($email);
-            $user->setPassword(password_hash($password, PASSWORD_DEFAULT));
-
-            // Traitement du fichier avatar
-            $file = $this->fileManager->sanitizedFiles('avatar');
-
-            if ($file !== null && $file['error'] === UPLOAD_ERR_OK) {
-                $fileData = $this->fileManager->getFile('avatar');
-
-                if (null !== $fileData) {
-                    $extension      = pathinfo($fileData['name'], PATHINFO_EXTENSION);
-                    $uniqueFileName = 'avatar_' . $user->getFirstName() . '_' . $user->getLastName() . '_' . uniqid() . '.' . $extension;
-                    $uniqueFileName = Sanitizer::sanitizeString($uniqueFileName);
-
-                    $picture = new Picture();
-                    $picture->setFileName($uniqueFileName);
-                    $picture->setPathName('assets/img/avatars/');
-                    $picture->setMimeType($fileData['type']);
-
-                    $this->fileManager->setDestination($picture->getPathName());
-                    $this->fileManager->moveFile($fileData['tmp_name'], $picture->getFileName());
-                    $picture->save();
-
-                    $user->setPictureId($picture->getId());
-                }
-            } elseif ($file['error'] === UPLOAD_ERR_NO_FILE) {
-                // Aucun fichier n'a été téléchargé, on conserve l'image actuelle si elle existe
-                if ($user->getPictureId() !== null) {
-                    $user->setPictureId($user->getPictureId());
-                }
-            } else {
-                // Gestion des autres erreurs de fichier
-                if ($file['error'] === UPLOAD_ERR_INI_SIZE || $file['error'] === UPLOAD_ERR_FORM_SIZE) {
-                    $this->cookieManager->setCookie('error_message', 'Le fichier dépasse la taille maximale autorisée', 60);
-                    return $this->redirectToRoute('user_edit_form', ['id' => (string) $id]);
-                }
-                $this->cookieManager->setCookie('error_message', 'Erreur inconnue dans le chargement du fichier', 60);
-                return $this->redirectToRoute('user_edit_form', ['id' => (string) $id]);
-
-            }
-
-            $user->save();
-            $this->cookieManager->setCookie('success_message', 'Cet utilisateur a bien été modifié', 60);
-            return $this->redirectToRoute('admin_list_user');
+        if (!$this->isPostRequest()) {
+            return $this->redirectToRoute('user_edit_form', ['id' => (string) $id]);
         }
 
-        return $this->redirectToRoute('user_edit_form', ['id' => (string) $id]);
+        $params = $this->getUserInput();
+        if ($this->hasMissingFields($params)) {
+            $this->cookieManager->setCookie('error_message', 'Veuillez remplir les champs requis', 60);
+            return $this->redirectToRoute('user_edit_form', ['id' => (string) $id]);
+        }
+
+        $params['password'] = $this->getPasswordOrDefault($params['password'], $user);
+
+        $this->updateUserFields($user, $params);
+        if (!$this->handleAvatarUpload($user)) {
+            return $this->redirectToRoute('user_edit_form', ['id' => (string) $id]);
+        }
+
+        $user->save();
+        $this->cookieManager->setCookie('success_message', 'Cet utilisateur a bien été modifié', 60);
+        return $this->redirectToRoute('admin_list_user');
     }
+
+    /**
+     * @return array<string, string>
+     */
+    private function getUserInput(): array
+    {
+        return [
+            'first_name' => $this->postManager->getPostParam('first_name') ?? '',
+            'last_name'  => $this->postManager->getPostParam('last_name')  ?? '',
+            'email'      => $this->postManager->getPostParam('email')      ?? '',
+            'password'   => $this->postManager->getPostParam('password')   ?? '',
+            'role'       => $this->postManager->getPostParam('role')       ?? 'ROLE_USER',
+        ];
+    }
+
+    /**
+     * @param  array<string, string|null> $params
+     * @return bool
+     */
+    private function hasMissingFields(array $params): bool
+    {
+        return empty($params['first_name']) || empty($params['last_name']) || empty($params['email']);
+    }
+
+    private function getPasswordOrDefault(?string $password, User $user): string
+    {
+        return empty($password) ? $user->getPassword() : password_hash($password, PASSWORD_DEFAULT);
+    }
+
+    /**
+     * @param  User                  $user
+     * @param  array<string, string> $params
+     * @return void
+     */
+    private function updateUserFields(User $user, array $params): void
+    {
+        $user->setFirstName($params['first_name']);
+        $user->setLastName($params['last_name']);
+        $user->setEmail($params['email']);
+        $user->setPassword($params['password']);
+        $user->setRole($params['role']);
+    }
+
+    private function handleAvatarUpload(User $user): bool
+    {
+        $file = $this->fileManager->sanitizedFiles('avatar');
+
+        if ($file['error'] === UPLOAD_ERR_OK) {
+            return $this->processAvatar($file, $user);
+        }
+
+        if ($file['error'] === UPLOAD_ERR_NO_FILE) {
+            return true;
+        }
+
+        if (false === is_int($file['error'])) {
+            throw new Exception('File error must be int');
+        }
+        return $this->handleFileUploadError($file['error']);
+    }
+
+    /**
+     * @param  array<string, string|int> $file
+     * @param  User                      $user
+     * @return bool
+     * @throws Exception
+     */
+    private function processAvatar(array $file, User $user): bool
+    {
+        $fileData = $this->fileManager->getFile('avatar');
+        if ($fileData === null) {
+            return false;
+        }
+
+        $extension      = pathinfo($fileData->name, PATHINFO_EXTENSION);
+        $uniqueFileName = Sanitizer::sanitizeString(
+            'avatar_' . $user->getFirstName() . '_' . $user->getLastName() . '_' . uniqid() . '.' . $extension
+        );
+
+        $picture = new Picture();
+        $picture->setFileName($uniqueFileName);
+        $picture->setPathName('assets/img/avatars/');
+        $picture->setMimeType($fileData->type);
+
+        $this->fileManager->setDestination($picture->getPathName());
+        $this->fileManager->moveFile($fileData->tmp_name, $picture->getFileName());
+        $picture->save();
+
+        $user->setPictureId($picture->getId());
+        return true;
+    }
+
+    private function handleFileUploadError(int $errorCode): bool
+    {
+        $errorMessages = [
+            UPLOAD_ERR_INI_SIZE  => 'Le fichier dépasse la taille maximale autorisée',
+            UPLOAD_ERR_FORM_SIZE => 'Le fichier dépasse la taille maximale autorisée',
+        ];
+
+        $message = $errorMessages[$errorCode] ?? 'Erreur inconnue dans le chargement du fichier';
+        $this->cookieManager->setCookie('error_message', $message, 60);
+        return false;
+    }
+
 
 
     /**

@@ -58,7 +58,7 @@ class AuthController extends AbstractController
                 return $this->redirectToRoute('login_form');
             } elseif ($this->authenticateUser($email, $password)) {
                 $this->cookieManager->setCookie('success_message', 'Vous vous êtes bien connecté', 60);
-                return $this->redirectToRoute('index');
+                return $this->redirectToRoute('admin_home');
             }
             $this->cookieManager->setCookie('error_message', 'Identifiants invalides', 60);
             return $this->redirectToRoute('login_form'); // Redirection pour recharger les cookies

@@ -24,6 +24,15 @@ class AdminController extends AbstractController
     public function adminHome(): string|RedirectResponse
     {
         if ($this->isConnected()) {
+            $errorMessage = $this->cookieManager->getCookie('error_message');
+            if ($errorMessage) {
+                $this->cookieManager->deleteCookie('error_message');
+            }
+            $successMessage = $this->cookieManager->getCookie('success_message');
+            if ($successMessage) {
+                $this->cookieManager->deleteCookie('success_message');
+            }
+
             $userData = $this->getUserData();
 
             if (is_array($userData) && isset($userData['email'])) {
@@ -52,11 +61,13 @@ class AdminController extends AbstractController
                     }
 
                     return $this->render('admin/index.html.twig', [
-                        'user'           => $user,
-                        'posts'          => $posts,
-                        'total_posts'    => $totalPosts,
-                        'views'          => $views,
-                        'total_comments' => $totalComments,
+                        'user'            => $user,
+                        'posts'           => $posts,
+                        'total_posts'     => $totalPosts,
+                        'views'           => $views,
+                        'total_comments'  => $totalComments,
+                        'error_message'   => $errorMessage,
+                        'success_message' => $successMessage,
                     ]);
                 }
             }

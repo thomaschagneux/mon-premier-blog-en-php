@@ -18,6 +18,7 @@ class PostAddFormService extends AbstractFormService
                 '',
                 ['class' => 'form-control', 'placeholder' => 'Enter title', 'required' => true],
                 [],
+                'Titre'
             ));
 
         $this->addFormRow('lede', new FormRowComponent(
@@ -25,6 +26,8 @@ class PostAddFormService extends AbstractFormService
             'lede',
             '',
             ['class' => 'form-control', 'placeholder' => 'Enter lede', 'required' => true],
+            [],
+            'Chapô'
         ));
 
         $this->addFormRow('content', new FormRowComponent(
@@ -33,28 +36,16 @@ class PostAddFormService extends AbstractFormService
             '',
             ['class' => 'tiny-mce', 'rows' => 5],
             [],
+            'Contenu de l\'article'
         ));
 
-
-        /* $this->addFormRow('image', new FormRowComponent(
-             'file',
-             'image',
-             '',
-             ['class' => 'form-control-file'],
-             [],
-         ));
-
-         $selectOptions = [
-             ['value' => '1', 'label' => 'Option 1'],
-             ['value' => '2', 'label' => 'Option 2'],
-             ['value' => '3', 'label' => 'Option 3', 'selected' => true],
-         ];
-         $this->addFormRow('category', new FormRowComponent(
-             'select',
-             'category',
-             null,
-             ['class' => 'form-select'],
-             $selectOptions,
-         ));*/
+        $this->addFormRow('image', new FormRowComponent(
+            'file',
+            'image',
+            '',
+            ['class' => 'form-control-file'],
+            [],
+            'Image de couverture'
+        ));
     }
 }
