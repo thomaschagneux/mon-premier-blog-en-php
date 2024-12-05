@@ -124,29 +124,33 @@ class UserController extends AbstractController
             $user->setLastName($lastName);
             $user->setEmail($email);
             $user->setPassword(password_hash($password, PASSWORD_DEFAULT));
+            $user->setPictureId(null);
 
-            $picture  = new Picture();
-            $fileData = $this->fileManager->getFile('avatar');
+            if ($this->fileManager->isPostFiles('avatar')) {
+                $picture  = new Picture();
 
-            if (null !== $fileData) {
-                $extension      = pathinfo($fileData['name'], PATHINFO_EXTENSION);
-                $uniqueFileName = 'avatar_' . $user->getFirstName() . '_' . $user->getLastName() . '_' . uniqid() . '.' . $extension;
-                $uniqueFileName = Sanitizer::sanitizeString($uniqueFileName);
+                $fileData = $this->fileManager->getFile('avatar');
 
-                $picture->setFileName($uniqueFileName);
-                $picture->setPathName('assets/img/avatars/');
-                $picture->setMimeType($fileData['type']);
 
-                $this->fileManager->setDestination($picture->getPathName());
-                $this->fileManager->moveFile($fileData['tmp_name'], $picture->getFileName());
-                $picture->save();
+                if (null !== $fileData) {
+                    $extension      = pathinfo($fileData->name, PATHINFO_EXTENSION);
+                    $uniqueFileName = 'avatar_' . $user->getFirstName() . '_' . $user->getLastName() . '_' . uniqid() . '.' . $extension;
+                    $uniqueFileName = Sanitizer::sanitizeString($uniqueFileName);
 
-                $user->setPictureId($picture->getId());
-            } else {
-                $user->setPictureId(null);
+                    $picture->setFileName($uniqueFileName);
+                    $picture->setPathName('assets/img/avatars/');
+                    $picture->setMimeType($fileData->type);
+
+                    $this->fileManager->setDestination($picture->getPathName());
+                    $this->fileManager->moveFile($fileData->tmp_name, $picture->getFileName());
+                    $picture->save();
+
+                    $user->setPictureId($picture->getId());
+                }
             }
 
             $user->save();
+            $this->cookieManager->setCookie('success_message', 'Vous vous êtes bien inscrits', 60);
             return $this->redirectToRoute('index');
         }
 
@@ -183,24 +187,27 @@ class UserController extends AbstractController
             $user->setPassword(password_hash($password, PASSWORD_DEFAULT));
             $user->setRole($role);
 
-            $picture  = new Picture();
-            $fileData = $this->fileManager->getFile('avatar');
+            try {
+                $picture  = new Picture();
+                $fileData = $this->fileManager->getFile('avatar');
 
-            if (null !== $fileData) {
-                $extension      = pathinfo($fileData['name'], PATHINFO_EXTENSION);
-                $uniqueFileName = 'avatar_' . $user->getFirstName() . '_' . $user->getLastName() . '_' . uniqid() . '.' . $extension;
-                $uniqueFileName = Sanitizer::sanitizeString($uniqueFileName);
+                if (null !== $fileData) {
+                    $extension      = pathinfo($fileData->name, PATHINFO_EXTENSION);
+                    $uniqueFileName = 'avatar_' . $user->getFirstName() . '_' . $user->getLastName() . '_' . uniqid() . '.' . $extension;
+                    $uniqueFileName = Sanitizer::sanitizeString($uniqueFileName);
 
-                $picture->setFileName($uniqueFileName);
-                $picture->setPathName('assets/img/avatars/');
-                $picture->setMimeType($fileData['type']);
+                    $picture->setFileName($uniqueFileName);
+                    $picture->setPathName('assets/img/avatars/');
+                    $picture->setMimeType($fileData->type);
 
-                $this->fileManager->setDestination($picture->getPathName());
-                $this->fileManager->moveFile($fileData['tmp_name'], $picture->getFileName());
-                $picture->save();
+                    $this->fileManager->setDestination($picture->getPathName());
+                    $this->fileManager->moveFile($fileData->tmp_name, $picture->getFileName());
+                    $picture->save();
 
-                $user->setPictureId($picture->getId());
-            } else {
+                    $user->setPictureId($picture->getId());
+            }
+
+            } catch(Exception $e) {
                 $user->setPictureId(null);
             }
 
@@ -305,28 +312,40 @@ class UserController extends AbstractController
         return $this->redirectToRoute('admin_list_user');
     }
 
+    /**
+     * @return array<string, string>
+     */
     private function getUserInput(): array
     {
         return [
-            'first_name' => $this->postManager->getPostParam('first_name'),
-            'last_name'  => $this->postManager->getPostParam('last_name'),
-            'email'      => $this->postManager->getPostParam('email'),
-            'password'   => $this->postManager->getPostParam('password'),
-            'role'       => $this->postManager->getPostParam('role') ?? 'ROLE_USER',
+            'first_name' => $this->postManager->getPostParam('first_name') ?? '',
+            'last_name'  => $this->postManager->getPostParam('last_name')  ?? '',
+            'email'      => $this->postManager->getPostParam('email')      ?? '',
+            'password'   => $this->postManager->getPostParam('password')   ?? '',
+            'role'       => $this->postManager->getPostParam('role')       ?? 'ROLE_USER',
         ];
     }
 
+    /**
+     * @param  array<string, string|null> $params
+     * @return bool
+     */
     private function hasMissingFields(array $params): bool
     {
         return empty($params['first_name']) || empty($params['last_name']) || empty($params['email']);
     }
 
-    private function getPasswordOrDefault(?string $password, $user): string
+    private function getPasswordOrDefault(?string $password, User $user): string
     {
         return empty($password) ? $user->getPassword() : password_hash($password, PASSWORD_DEFAULT);
     }
 
-    private function updateUserFields($user, array $params): void
+    /**
+     * @param  User                  $user
+     * @param  array<string, string> $params
+     * @return void
+     */
+    private function updateUserFields(User $user, array $params): void
     {
         $user->setFirstName($params['first_name']);
         $user->setLastName($params['last_name']);
@@ -335,12 +354,9 @@ class UserController extends AbstractController
         $user->setRole($params['role']);
     }
 
-    private function handleAvatarUpload($user): bool
+    private function handleAvatarUpload(User $user): bool
     {
         $file = $this->fileManager->sanitizedFiles('avatar');
-        if ($file === null) {
-            return true;
-        }
 
         if ($file['error'] === UPLOAD_ERR_OK) {
             return $this->processAvatar($file, $user);
@@ -350,17 +366,26 @@ class UserController extends AbstractController
             return true;
         }
 
+        if (false === is_int($file['error'])) {
+            throw new Exception('File error must be int');
+        }
         return $this->handleFileUploadError($file['error']);
     }
 
-    private function processAvatar(array $file, $user): bool
+    /**
+     * @param  array<string, string|int> $file
+     * @param  User                      $user
+     * @return bool
+     * @throws Exception
+     */
+    private function processAvatar(array $file, User $user): bool
     {
         $fileData = $this->fileManager->getFile('avatar');
         if ($fileData === null) {
             return false;
         }
 
-        $extension = pathinfo($fileData['name'], PATHINFO_EXTENSION);
+        $extension      = pathinfo($fileData->name, PATHINFO_EXTENSION);
         $uniqueFileName = Sanitizer::sanitizeString(
             'avatar_' . $user->getFirstName() . '_' . $user->getLastName() . '_' . uniqid() . '.' . $extension
         );
@@ -368,10 +393,10 @@ class UserController extends AbstractController
         $picture = new Picture();
         $picture->setFileName($uniqueFileName);
         $picture->setPathName('assets/img/avatars/');
-        $picture->setMimeType($fileData['type']);
+        $picture->setMimeType($fileData->type);
 
         $this->fileManager->setDestination($picture->getPathName());
-        $this->fileManager->moveFile($fileData['tmp_name'], $picture->getFileName());
+        $this->fileManager->moveFile($fileData->tmp_name, $picture->getFileName());
         $picture->save();
 
         $user->setPictureId($picture->getId());
@@ -381,7 +406,7 @@ class UserController extends AbstractController
     private function handleFileUploadError(int $errorCode): bool
     {
         $errorMessages = [
-            UPLOAD_ERR_INI_SIZE => 'Le fichier dépasse la taille maximale autorisée',
+            UPLOAD_ERR_INI_SIZE  => 'Le fichier dépasse la taille maximale autorisée',
             UPLOAD_ERR_FORM_SIZE => 'Le fichier dépasse la taille maximale autorisée',
         ];
 

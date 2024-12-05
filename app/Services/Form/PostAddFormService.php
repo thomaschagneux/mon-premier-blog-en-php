@@ -40,12 +40,12 @@ class PostAddFormService extends AbstractFormService
         ));
 
         $this->addFormRow('image', new FormRowComponent(
-             'file',
-             'image',
-             '',
-             ['class' => 'form-control-file'],
-             [],
+            'file',
+            'image',
+            '',
+            ['class' => 'form-control-file'],
+            [],
             'Image de couverture'
-         ));
+        ));
     }
 }

@@ -14,9 +14,9 @@ class Post extends AbstractModel
 
     private string $lede;
 
-    private int $featured_image_id;
+    private ?int $featured_image_id = null;
 
-    private ?Picture $featuredImage = null;
+    private ?Picture $featured_image = null;
 
     private string $content;
 
@@ -29,7 +29,6 @@ class Post extends AbstractModel
     public function __construct()
     {
         parent::__construct();
-        $this->featured_image_id = 0;
     }
 
     /**
@@ -49,6 +48,7 @@ class Post extends AbstractModel
             $picture = (new Picture())->findById($data['featured_image_id']);
             if ($picture) {
                 $post->setFeaturedImage($picture);
+                $post->setFeaturedImageId($picture->getId());
             }
         }
         $post->setContent(isset($data['content']) && is_string($data['content']) ? $data['content'] : '');
@@ -183,11 +183,11 @@ class Post extends AbstractModel
             }
 
             $params = [
-                ':title'   => $this->getTitle(),
+                ':title'             => $this->getTitle(),
                 ':featured_image_id' => $this->getFeaturedImageId(),
-                ':lede'    => $this->getLede(),
-                ':content' => $this->getContent(),
-                ':user_id' => $this->getUserId(),
+                ':lede'              => $this->getLede(),
+                ':content'           => $this->getContent(),
+                ':user_id'           => $this->getUserId(),
             ];
             if ($isUpdate) {
                 $params[':updated_at'] = $this->getUpdatedAt()?->format('Y-m-d H:i:s');
@@ -195,13 +195,14 @@ class Post extends AbstractModel
             } else {
                 $params[':created_at'] = $this->getCreatedAt()->format('Y-m-d H:i:s');
             }
+
             $stmt->execute($params);
             if (!$isUpdate) {
                 $this->id = (int) $this->conn->lastInsertId();
             }
             return $this->id;
         } catch (Exception) {
-            throw new Exception('Erreur lors de la sauvegarde de l\'utilisateur');
+            throw new Exception('Erreur lors de la sauvegarde du post');
         }
     }
 
@@ -278,7 +279,7 @@ class Post extends AbstractModel
         $this->lede = $lede;
     }
 
-    public function getFeaturedImageId(): int
+    public function getFeaturedImageId(): ?int
     {
         return $this->featured_image_id;
     }
@@ -290,12 +291,12 @@ class Post extends AbstractModel
 
     public function getFeaturedImage(): ?Picture
     {
-        return $this->featuredImage;
+        return $this->featured_image;
     }
 
-    public function setFeaturedImage(?Picture $featuredImage): void
+    public function setFeaturedImage(?Picture $featured_image): void
     {
-        $this->featuredImage = $featuredImage;
+        $this->featured_image = $featured_image;
     }
 
     public function getContent(): string

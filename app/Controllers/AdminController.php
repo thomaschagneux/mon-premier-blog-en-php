@@ -28,6 +28,10 @@ class AdminController extends AbstractController
             if ($errorMessage) {
                 $this->cookieManager->deleteCookie('error_message');
             }
+            $successMessage = $this->cookieManager->getCookie('success_message');
+            if ($successMessage) {
+                $this->cookieManager->deleteCookie('success_message');
+            }
 
             $userData = $this->getUserData();
 
@@ -57,12 +61,13 @@ class AdminController extends AbstractController
                     }
 
                     return $this->render('admin/index.html.twig', [
-                        'user'           => $user,
-                        'posts'          => $posts,
-                        'total_posts'    => $totalPosts,
-                        'views'          => $views,
-                        'total_comments' => $totalComments,
-                        'error_message'  => $errorMessage,
+                        'user'            => $user,
+                        'posts'           => $posts,
+                        'total_posts'     => $totalPosts,
+                        'views'           => $views,
+                        'total_comments'  => $totalComments,
+                        'error_message'   => $errorMessage,
+                        'success_message' => $successMessage,
                     ]);
                 }
             }

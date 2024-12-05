@@ -4,6 +4,23 @@ namespace App\Manager;
 
 class PostManager
 {
+    // Constantes pour les balises et attributs autorisés
+    private const ALLOWED_TAGS = [
+        'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'strong', 'em', 'ul', 'ol',
+        'li', 'br', 'span', 'details', 's', 'img', 'blockquote', 'sub', 'sup',
+        'table', 'thead', 'tbody', 'colgroup', 'col', 'tr', 'th', 'td', 'a', 'iframe',
+    ];
+
+    private const ALLOWED_ATTRIBUTES = [
+        'class', 'style', 'id', 'src', 'href', 'open', 'title', 'target', 'rel', 'alt', 'width', 'height',
+    ];
+
+    private const ALLOWED_IFRAME_ATTRIBUTES = ['src', 'width', 'height'];
+
+    private const TRUSTED_DOMAINS = [
+        'youtube.com', 'www.youtube.com', 'vimeo.com', 'player.vimeo.com',
+    ];
+
     /**
      * Validate and sanitize a POST parameter.
      *
@@ -29,69 +46,15 @@ class PostManager
      */
     private function sanitizeInput(string $input): string
     {
-        $allowedAttributes = [
-            'class',
-            'style',
-            'id',
-            'src',
-            'href',
-            'open',
-            'title',
-            'target',
-            'rel',
-            'alt',
-            'width',
-            'height',
-        ];
-
-        $allowedTags = array_fill_keys(
-            [
-                'p',
-                'h1',
-                'h2',
-                'h3',
-                'h4',
-                'h5',
-                'h6',
-                'strong',
-                'em',
-                'ul',
-                'ol',
-                'li',
-                'br',
-                'span',
-                'details',
-                's',
-                'img',
-                'blockquote',
-                'sub',
-                'sup',
-                'table',
-                'thead',
-                'tbody',
-                'colgroup',
-                'col',
-                'tr',
-                'th',
-                'td',
-                'a',
-                'iframe',
-            ],
-            $allowedAttributes
-        );
-
-        // Restriction des attributs autorisés pour l'iframe (par exemple, seulement src, width, height)
-        $allowedIframeAttributes = ['src', 'width', 'height'];
-
         $pattern = '#<(/?)([a-zA-Z0-9]+)([^>]*)>#';
 
-        $sanitizedInput = preg_replace_callback($pattern, function ($matches) use ($allowedTags, $allowedIframeAttributes) {
+        $sanitizedInput = preg_replace_callback($pattern, function ($matches) {
             $closingSlash = $matches[1];
             $tag          = strtolower($matches[2]);
             $attributes   = $matches[3];
 
-            if (!array_key_exists($tag, $allowedTags)) {
-                return ''; // Si la balise n'est pas autorisée, la supprimer
+            if (!in_array($tag, self::ALLOWED_TAGS, true)) {
+                return ''; // Supprimer les balises non autorisées
             }
 
             $filteredAttributes = '';
@@ -102,7 +65,7 @@ class PostManager
                 $attrValue = $attr[2];
 
                 // Vérifier les iframes spécifiquement
-                if ($tag === 'iframe' && !in_array($attrName, $allowedIframeAttributes)) {
+                if ($tag === 'iframe' && !in_array($attrName, self::ALLOWED_IFRAME_ATTRIBUTES, true)) {
                     continue; // Ignorer les attributs non autorisés pour les iframes
                 }
 
@@ -114,7 +77,7 @@ class PostManager
                     }
                 }
 
-                if (in_array($attrName, $allowedTags[$tag])) {
+                if (in_array($attrName, self::ALLOWED_ATTRIBUTES, true)) {
                     // Si l'attribut est autorisé, on le conserve
                     $filteredAttributes .= " $attrName=$attrValue";
                 } else {
@@ -137,22 +100,13 @@ class PostManager
      */
     private function isTrustedIframeSource(string $url): bool
     {
-        // Liste des domaines autorisés pour les iframes
-        $trustedDomains = [
-            'youtube.com',
-            'www.youtube.com',
-            'vimeo.com',
-            'player.vimeo.com',
-        ];
-
         $parsedUrl = parse_url($url);
 
         // Vérifier si le domaine de l'URL est dans la liste des domaines de confiance
-        if (isset($parsedUrl['host']) && in_array($parsedUrl['host'], $trustedDomains, true)) {
+        if (isset($parsedUrl['host']) && in_array($parsedUrl['host'], self::TRUSTED_DOMAINS, true)) {
             return true;
         }
 
         return false;
     }
-
 }
