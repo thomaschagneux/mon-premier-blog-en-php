@@ -5,6 +5,7 @@ namespace App\Services\CustomTables;
 use App\core\Router;
 use App\Models\Post;
 use App\Models\User;
+use Exception;
 use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
@@ -35,7 +36,7 @@ class PostTableService extends AbstractTableService
      * @throws RuntimeError
      * @throws SyntaxError
      * @throws LoaderError
-     * @throws \Exception
+     * @throws Exception
      */
     public function getTableContent(?User $user = null): string
     {
@@ -44,7 +45,6 @@ class PostTableService extends AbstractTableService
         } else {
             $posts = $this->post->findPostsByUserId($user->getId());
         }
-
 
         $rows = [];
         foreach ($posts as $post) {
@@ -86,7 +86,7 @@ class PostTableService extends AbstractTableService
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     private function getAuthor(Post $post): string
     {

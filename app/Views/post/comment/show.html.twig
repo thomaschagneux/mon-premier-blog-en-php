@@ -16,7 +16,8 @@
             <div class="card-body">
                 <p>{{ comment.content | raw }}</p>
             </div>
-            <div class="card-footer text-end">
+            {% if app_user.admin %}
+                <div class="card-footer text-end">
                 {% if not comment.isValidated %}
                     <form action="{{ path('comment_validate', {'id': comment.id}) }}" method="post" style="display:inline;">
                         <button type="submit" class="btn btn-primary">Valider le commentaire</button>
@@ -25,6 +26,7 @@
                     <p class="text-muted">Ce commentaire est déjà validé.</p>
                 {% endif %}
             </div>
+            {% endif %}
         {% else %}
             <p class="text-center text-muted">Commentaire introuvable.</p>
         {% endif %}

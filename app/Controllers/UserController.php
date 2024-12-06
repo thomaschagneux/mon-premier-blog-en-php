@@ -92,6 +92,7 @@ class UserController extends AbstractController
         }
 
         if ($this->isConnected()) {
+            $this->cookieManager->setCookie('error_message', 'Vous ne pouvez pas enregistrer, vous êtes déjà connecté', 60);
             return $this->redirectToRoute('admin_home');
         }
         return $this->render('user/registration.html.twig', ['message' => $message]);
@@ -163,6 +164,10 @@ class UserController extends AbstractController
      */
     public function addUser(): RedirectResponse
     {
+        if (!$this->isAdmin()) {
+            $this->cookieManager->setCookie('error_message', 'Vous ne pouvez pas accéder à cette page', 60);
+            return $this->redirectToRoute('adminAddUserForm');
+        }
         if ($this->isPostRequest()) {
             $firstName = $this->postManager->getPostParam('first_name');
             $lastName  = $this->postManager->getPostParam('last_name');
@@ -205,9 +210,9 @@ class UserController extends AbstractController
                     $picture->save();
 
                     $user->setPictureId($picture->getId());
-            }
+                }
 
-            } catch(Exception $e) {
+            } catch (Exception $e) {
                 $user->setPictureId(null);
             }
 
@@ -225,6 +230,10 @@ class UserController extends AbstractController
      */
     public function removeUser(int $id): RedirectResponse
     {
+        if (!$this->isAdmin()) {
+            $this->cookieManager->setCookie('error_message', 'Vous ne pouvez pas accéder à cette page', 60);
+            return $this->redirectToReferer();
+        }
         $user = new User();
         $user->setId($id);
         $name = $user->getFirstName() . ' ' . $user->getLastName();
@@ -281,14 +290,27 @@ class UserController extends AbstractController
      */
     public function editUser(int $id): RedirectResponse
     {
-        if (!$this->isAdmin()) {
-            return $this->redirectToRoute('admin_list_user');
+        if (!$this->isConnected()) {
+            $this->cookieManager->setCookie('error_message', 'Vous ne pouvez pas accéder à cette page', 60);
+            return $this->redirectToReferer();
         }
-
         $user = $this->user->findById($id);
         if (null === $user) {
-            return $this->redirectToRoute('admin_list_user');
+            return $this->redirectToRoute('user_edit_form', ['id' => (string) $id]);
         }
+
+        if (!$this->isAdmin()) {
+            $currentUser = $this->user->findByUsermail($this->getUserData()['email']);
+            if (!$currentUser instanceof User) {
+                $this->cookieManager->setCookie('error_message', 'Utilisateur non trouvé', 60);
+                return $this->redirectToReferer();
+            }
+            if ($currentUser->getId() !== $user->getId()) {
+                $this->cookieManager->setCookie('error_message', 'Vous ne pouvez pas accéder à cette page', 60);
+                return $this->redirectToReferer();
+            }
+        }
+
 
         if (!$this->isPostRequest()) {
             return $this->redirectToRoute('user_edit_form', ['id' => (string) $id]);
@@ -308,9 +330,16 @@ class UserController extends AbstractController
         }
 
         $user->save();
-        $this->cookieManager->setCookie('success_message', 'Cet utilisateur a bien été modifié', 60);
-        return $this->redirectToRoute('admin_list_user');
+
+        if ($this->isAdmin()) {
+            $this->cookieManager->setCookie('success_message', 'Cet utilisateur a bien été modifié', 60);
+            return $this->redirectToRoute('admin_list_user');
+        }
+        $this->cookieManager->setCookie('success_message', 'Vous avez bien modifié votre profil', 60);
+        return $this->redirectToRoute('admin_home');
     }
+
+
 
     /**
      * @return array<string, string>
@@ -437,6 +466,8 @@ class UserController extends AbstractController
             }
             return $this->render('user/show.html.twig', ['user' => $user, 'picture' => $picture]);
         }
+
+        $this->cookieManager->setCookie('error_message', 'Vous ne pouvez pas accéder à cette page', 60);
         return $this->redirectToReferer();
     }
 
