@@ -71,7 +71,7 @@ class UserController extends AbstractController
 
         if ($this->isAdmin()) {
             return $this->render('user/admin_add.html.twig', ['message' => $message]);
-        } elseif ($this->isConnected()) {
+        } elseif ($this->getConnectedUser()) {
             return $this->redirectToReferer();
         }
         return $this->redirectToRoute('register_form');
@@ -91,7 +91,7 @@ class UserController extends AbstractController
             $this->cookieManager->deleteCookie('error_message');
         }
 
-        if ($this->isConnected()) {
+        if ($this->getConnectedUser()) {
             $this->cookieManager->setCookie('error_message', 'Vous ne pouvez pas enregistrer, vous êtes déjà connecté', 60);
             return $this->redirectToRoute('admin_home');
         }
@@ -270,7 +270,7 @@ class UserController extends AbstractController
                 'user'          => $user,
                 'error_message' => $errorMessage,
                 ]);
-        } elseif ($this->isConnected()) {
+        } elseif ($this->getConnectedUser()) {
             $userData = $this->getUserData();
             if (is_array($userData) && isset($userData['email'])) {
                 $user = $this->user->findByUsermail($userData['email']);
@@ -290,7 +290,7 @@ class UserController extends AbstractController
      */
     public function editUser(int $id): RedirectResponse
     {
-        if (!$this->isConnected()) {
+        if (!$this->getConnectedUser()) {
             $this->cookieManager->setCookie('error_message', 'Vous ne pouvez pas accéder à cette page', 60);
             return $this->redirectToReferer();
         }
@@ -338,8 +338,6 @@ class UserController extends AbstractController
         $this->cookieManager->setCookie('success_message', 'Vous avez bien modifié votre profil', 60);
         return $this->redirectToRoute('admin_home');
     }
-
-
 
     /**
      * @return array<string, string>
@@ -443,8 +441,6 @@ class UserController extends AbstractController
         $this->cookieManager->setCookie('error_message', $message, 60);
         return false;
     }
-
-
 
     /**
      * @throws RuntimeError

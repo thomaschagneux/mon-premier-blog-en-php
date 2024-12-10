@@ -65,7 +65,7 @@ class PostController extends AbstractController
             ]);
         }
 
-        if ($this->isConnected()) {
+        if ($this->getConnectedUser()) {
             $messageSuccess = $this->cookieManager->getCookie('success_message');
             if (null !== $messageSuccess) {
                 $this->cookieManager->deleteCookie('success_message');
@@ -106,7 +106,7 @@ class PostController extends AbstractController
             $this->cookieManager->deleteCookie('error_message');
         }
 
-        if ($this->isConnected()) {
+        if ($this->getConnectedUser()) {
             $postAddFormService = new PostAddFormService($this->twig);
 
             $postAddFormService->buildForm();
@@ -123,7 +123,7 @@ class PostController extends AbstractController
 
     public function addPostAction(): string|RedirectResponse
     {
-        if (!$this->isConnected()) {
+        if (!$this->getConnectedUser()) {
             $this->cookieManager->setCookie('error_message', 'Vous ne pouvez pas accéder à cette page', 60);
             return $this->redirectToReferer();
         }
@@ -199,7 +199,7 @@ class PostController extends AbstractController
             $this->cookieManager->deleteCookie('error_message');
         }
 
-        if ($this->isConnected()) {
+        if ($this->getConnectedUser()) {
             $PostModel = new Post();
             $post      = $PostModel->findById($id);
 
@@ -229,7 +229,7 @@ class PostController extends AbstractController
      */
     public function editPostAction(int $id): string|RedirectResponse
     {
-        if (!$this->isConnected()) {
+        if (!$this->getConnectedUser()) {
             $this->cookieManager->setCookie('error_message', 'Vous ne pouvez pas accéder à cette page', 60);
             return $this->redirectToReferer();
         }
@@ -298,7 +298,7 @@ class PostController extends AbstractController
             $this->cookieManager->deleteCookie('success_message');
         }
 
-        if (!$this->isConnected()) {
+        if (!$this->getConnectedUser()) {
             $this->cookieManager->setCookie('error_message', 'Vous ne pouvez pas accéder à cette page', 60);
             return $this->redirectToReferer();
         }
@@ -310,7 +310,7 @@ class PostController extends AbstractController
             if ($post instanceof Post) {
                 $commentsTable = $this->commentaryTableService->getTableContent($post);
             }
-        } elseif ($this->isConnected()) {
+        } elseif ($this->getConnectedUser()) {
             $post     = $this->post->findById($id);
             $user     = (new User())->findByUsermail($this->getUserData()['email']);
             if (!$user instanceof User || !$post instanceof Post) {
@@ -339,7 +339,7 @@ class PostController extends AbstractController
             return $this->redirectToReferer();
         }
 
-        if (!$this->isConnected()) {
+        if (!$this->getConnectedUser()) {
             $this->cookieManager->setCookie('error_message', 'Vous ne pouvez pas accéder à cette page', 60);
             return $this->redirectToReferer();
         }

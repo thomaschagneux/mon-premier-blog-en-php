@@ -23,22 +23,22 @@ class AuthController extends AbstractController
      */
     public function loginForm(): string|RedirectResponse
     {
-        if ($this->isConnected()) {
+        try {
+            $this->getConnectedUser();
             return $this->redirectToRoute('index');
+        } catch (Exception) {
+            $csrfToken = bin2hex(random_bytes(32));
+
+            $errorMessage = $this->cookieManager->getCookie('error_message');
+            if ($errorMessage) {
+                $this->cookieManager->deleteCookie('error_message');
+            }
+
+            return $this->render('login/login.html.twig', [
+                'csrf_token'    => $csrfToken,
+                'error_message' => $errorMessage,
+            ]);
         }
-
-        $csrfToken = bin2hex(random_bytes(32));
-
-
-        $errorMessage = $this->cookieManager->getCookie('error_message');
-        if ($errorMessage) {
-            $this->cookieManager->deleteCookie('error_message');
-        }
-
-        return $this->render('login/login.html.twig', [
-            'csrf_token'    => $csrfToken,
-            'error_message' => $errorMessage,
-        ]);
     }
 
     /**
@@ -103,7 +103,6 @@ class AuthController extends AbstractController
             'last_name'  => $user->getLastName(),
             'email'      => $user->getEmail(),
             'role'       => $user->getRole(),
-            'password'   => $user->getPassword(),
             'picture_id' => $user->getpictureId(),
             'created_at' => $user->getCreatedAt()->format('d/m/y'),
             'updated_at' => $user->getUpdatedAt()?->format('d/m/y'),

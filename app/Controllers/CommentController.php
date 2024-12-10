@@ -9,6 +9,9 @@ use App\Models\Post;
 use App\Models\User;
 use App\Services\Form\CommentAddFormService;
 use App\Services\Form\CommentEditFormService;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 
 class CommentController extends AbstractController
 {
@@ -21,33 +24,44 @@ class CommentController extends AbstractController
         $this->commentModel = new Comment();
     }
 
+    /**
+     * @throws SyntaxError
+     * @throws RuntimeError
+     * @throws LoaderError
+     */
     public function commentShow(int $commentId): string|RedirectResponse
     {
         $comment = null;
-        if (!$this->isConnected()) {
+        try {
+            $userData = $this->getConnectedUser();
+
+            if (!$this->isAdmin()) {
+                $user = (new User())->findByUsermail($userData->getEmail());
+                if (!$user instanceof User) {
+                    $this->cookieManager->setCookie('error_message', 'Utilisateur non trouvé', 60);
+                    return $this->redirectToReferer();
+                }
+                $comment = $this->commentModel->findById($commentId);
+                if (!$comment instanceof Comment) {
+                    $this->cookieManager->setCookie('error_message', 'Commentaire non trouvé', 60);
+                    return $this->redirectToReferer();
+                }
+                if ($user->getId() !== $comment->getUserId()) {
+                    $this->cookieManager->setCookie('error_message', 'Vous ne pouvez pas accéder à cette page', 60);
+                    return $this->redirectToReferer();
+                }
+
+            }
+            return $this->render('post/comment/show.html.twig', [
+                'comment' => $comment,
+            ]);
+
+        } catch (\Exception) {
             $this->cookieManager->setCookie('error_message', 'Vous ne pouvez pas accéder à cette page', 60);
             return $this->redirectToReferer();
         }
-        if (!$this->isAdmin()) {
-            $user = (new User())->findByUsermail($this->getUserData()['email']);
-            if (!$user instanceof User) {
-                $this->cookieManager->setCookie('error_message', 'Utilisateur non trouvé', 60);
-                return $this->redirectToReferer();
-            }
-            $comment = $this->commentModel->findById($commentId);
-            if (!$comment instanceof Comment) {
-                $this->cookieManager->setCookie('error_message', 'Commentaire non trouvé', 60);
-                return $this->redirectToReferer();
-            }
-            if ($user->getId() !== $comment->getUserId()) {
-                $this->cookieManager->setCookie('error_message', 'Commentaire non trouvé', 60);
-                return $this->redirectToReferer();
-            }
 
-        }
-        return $this->render('post/comment/show.html.twig', [
-            'comment' => $comment,
-        ]);
+
     }
 
     public function commentAddForm(int $postId): string|RedirectResponse
@@ -58,7 +72,10 @@ class CommentController extends AbstractController
             $this->cookieManager->deleteCookie('error_message');
         }
 
-        if ($this->isConnected()) {
+        try {
+
+            $this->getConnectedUser();
+
             $postModel      = new Post();
             $post           = $postModel->findById($postId);
             $commentAddForm = new CommentAddFormService($this->twig);
@@ -69,85 +86,75 @@ class CommentController extends AbstractController
                 'comment_add_form' => $commentAddForm->getFormRows(),
                 'error_message'    => $message,
             ]);
+        } catch (\Exception) {
+            $this->cookieManager->setCookie('error_message', 'Vous devez vous connecter pour ajouter un commentaire', 60);
+            return $this->redirectToReferer();
         }
-
-        return $this->redirectToReferer();
     }
 
     public function CommentAddAction(int $postId): RedirectResponse
     {
-        if (!$this->isConnected()) {
+        try {
+            $userData = $this->getConnectedUser();
+
+            $content = $this->postManager->getPostParam('content');
+
+            if (null === $content) {
+                return $this->redirectToRoute('comment_add_form', ['id' => (string) $postId]);
+            }
+
+            $commentModel = new Comment();
+            $commentModel->setPostId($postId);
+            $commentModel->setUserId($userData->getId());
+            $commentModel->setContent($content);
+            $commentModel->setCreatedAt(new \DateTime());
+
+            $commentModel->save();
+
+            $this->cookieManager->setCookie('success_message', 'Le commentaire a bien été enregistré', 60);
+            return $this->redirectToRoute('post_show', ['id' => (string) $postId]);
+
+        } catch (\Exception) {
+
             $this->cookieManager->setCookie('error_message', 'Vous ne pouvez pas accéder à cette page', 60);
             return $this->redirectToReferer();
         }
-
-        $content = $this->postManager->getPostParam('content');
-
-        if (null === $content) {
-            return $this->redirectToRoute('comment_add_form', ['id' => (string) $postId]);
-        }
-
-        $userModel = new User();
-        $userData  = $this->getUserData();
-
-        if (!is_array($userData) || !isset($userData['email']) || !is_string($userData['email'])) {
-            $this->cookieManager->setCookie('error_message', 'Il y a eu une erreur, veuillez recommencer');
-            return $this->redirectToRoute('comment_add_form', ['id' => (string) $postId]);
-        }
-
-        $user = $userModel->findByUsermail($userData['email']);
-
-        if (!$user instanceof User) {
-            $this->cookieManager->setCookie('error_message', 'Il y a eu une erreur, veuillez recommencer');
-            return $this->redirectToRoute('comment_add_form', ['id' => (string) $postId]);
-        }
-
-        $commentModel = new Comment();
-        $commentModel->setPostId($postId);
-        $commentModel->setUserId($user->getId());
-        $commentModel->setContent($content);
-        $commentModel->setCreatedAt(new \DateTime());
-
-        $commentModel->save();
-
-        $this->cookieManager->setCookie('success_message', 'Le commentaire a bien été enregistré', 60);
-        return $this->redirectToRoute('post_show', ['id' => (string) $postId]);
     }
 
     public function commentRemove(int $commentId): RedirectResponse
     {
-        if (!$this->isConnected()) {
+        try {
+            $user = $this->getConnectedUser();
+
+            $comment      = (new Comment())->findById($commentId);
+            if (!$comment instanceof Comment) {
+                $this->cookieManager->setCookie('error_message', 'Commentaire non trouvé', 60);
+                return $this->redirectToReferer();
+            }
+
+            if (!$this->isAdmin()) {
+                if ($user->getId() !== $comment->getUserId()) {
+                }
+                $this->cookieManager->setCookie('error_message', 'Vous ne pouvez pas accéder à ce commentaire', 60);
+                return $this->redirectToReferer();
+            }
+
+
+            if ($comment instanceof Comment) {
+                $postId = $comment->getPostId();
+
+                if ($comment->remove()) {
+                    $this->cookieManager->setCookie('success_message', 'Cet commentaire a bien été supprimé', 60);
+                    return $this->redirectToRoute('post_show', ['id' => (string) $postId]);
+                }
+            }
+            $this->cookieManager->setCookie('error_message', 'Il y a eu un problème dans la suppression de ce message', 60);
+
+            return $this->redirectToReferer();
+        } catch (\Exception) {
             $this->cookieManager->setCookie('error_message', 'Vous ne pouvez pas accéder à cette page', 60);
             return $this->redirectToReferer();
         }
-
-        $commentModel = new Comment();
-        $comment      = $commentModel->findById($commentId);
-
-        if (!$this->isAdmin()) {
-            $user = (new User())->findByUsermail($this->getUserData()['email']);
-            if (!$user instanceof User) {
-                $this->cookieManager->setCookie('error_message', 'Utilisateur non trouvé', 60);
-                return $this->redirectToReferer();
-            }
-            if ($user->getId() !== $comment->getUserId()) {
-            }
-            $this->cookieManager->setCookie('error_message', 'Vous ne pouvez pas accéder à ce commentaire', 60);
-            return $this->redirectToReferer();
-        }
-
-
-        if ($comment instanceof Comment) {
-            $postId = $comment->getPostId();
-
-            if ($comment->remove()) {
-                $this->cookieManager->setCookie('success_message', 'Cet commentaire a bien été supprimé', 60);
-                return $this->redirectToRoute('post_show', ['id' => (string) $postId]);
-            }
-        }
-        $this->cookieManager->setCookie('error_message', 'Il y a eu un problème dans la suppression de ce message', 60);
-
-        return $this->redirectToReferer();
     }
 
     public function commentEditForm(int $commentId): string|RedirectResponse
@@ -160,7 +167,7 @@ class CommentController extends AbstractController
 
 
 
-        if (!$this->isConnected()) {
+        if (!$this->getConnectedUser()) {
             $this->cookieManager->setCookie('error_message', 'Vous ne pouvez pas accéder à cette page', 60);
             return $this->redirectToReferer();
         }
@@ -206,7 +213,7 @@ class CommentController extends AbstractController
 
     public function commentEditAction(int $commentId): RedirectResponse
     {
-        if (!$this->isConnected()) {
+        if (!$this->getConnectedUser()) {
             $this->cookieManager->setCookie('error_message', 'Vous ne pouvez pas accéder à cette page', 60);
             return $this->redirectToReferer();
         }
