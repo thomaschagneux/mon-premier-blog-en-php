@@ -33,8 +33,7 @@ class AdminController extends AbstractController
             $this->cookieManager->deleteCookie('success_message');
         }
 
-        $userModel = new User();
-        $user      = $userModel->findByUsermail($userData->getEmail());
+        $user      = $userData ? (new User())->findByUsermail($userData->getEmail()) : null;
 
         if ($user instanceof User) {
 

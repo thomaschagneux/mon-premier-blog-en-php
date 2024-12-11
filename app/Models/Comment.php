@@ -121,6 +121,12 @@ class Comment extends AbstractModel
         return [];
     }
 
+    /**
+     * @param  int                           $postId
+     * @param  int                           $userId
+     * @return array<int, Comment>
+     * @throws \DateMalformedStringException
+     */
     public function findCommentsByPostIdAndUserId(int $postId, int $userId): array
     {
         if ($this->conn instanceof PDO) {

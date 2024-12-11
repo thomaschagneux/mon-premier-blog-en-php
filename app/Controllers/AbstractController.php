@@ -214,7 +214,7 @@ abstract class AbstractController
         }
 
         $currentUser = new User();
-        $currentUser->setId(isset($user['id']) && is_int($user['id']) ? $user['id'] : null);
+        $currentUser->setId(isset($user['id']) && is_int($user['id']) ? $user['id'] : 0);
         $currentUser->setEmail(isset($user['email']) && is_string($user['email']) ? $user['email'] : '');
         $currentUser->setFirstName(isset($user['first_name']) && is_string($user['first_name']) ? $user['first_name'] : '');
         $currentUser->setLastName(isset($user['last_name']) && is_string($user['last_name']) ? $user['last_name'] : '');
@@ -228,12 +228,11 @@ abstract class AbstractController
     /**
      * @throws Exception
      */
-    public function getConnectedUser(): User
+    public function getConnectedUser(): ?User
     {
         $user = $this->getUserData();
 
-
-        return ($user instanceof User) ? $user : throw new Exception('User is not logged in');
+        return ($user instanceof User) ? $user : null;
     }
 
     /**
@@ -243,7 +242,7 @@ abstract class AbstractController
     {
         $user = $this->getConnectedUser();
 
-        return $user->getRole() === 'ROLE_ADMIN';
+        return $user?->getRole() === 'ROLE_ADMIN';
     }
 
     protected function isPostRequest(): bool
