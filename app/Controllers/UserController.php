@@ -260,29 +260,26 @@ class UserController extends AbstractController
             $this->cookieManager->deleteCookie('error_message');
         }
 
+        $currentUser = $this->getConnectedUser();
+
+        if (!$currentUser instanceof User) {
+            $this->cookieManager->setCookie('error_message', 'Vous ne pouvez pas accéder à cette page', 60);
+            return $this->redirectToReferer();
+        }
+
         if ($this->isAdmin()) {
             $user = $this->user->findById($id);
             if (null === $user) {
                 return $this->redirectToRoute('admin_list_user');
             }
 
-            return $this->render('user/edit.html.twig', [
-                'user'          => $user,
-                'error_message' => $errorMessage,
-                ]);
-        } elseif ($this->getConnectedUser()) {
-            $userData = $this->getUserData();
-            if (is_array($userData) && isset($userData['email'])) {
-                $user = $this->user->findByUsermail($userData['email']);
-                if ($user instanceof User) {
-                    return $this->render('user/edit.html.twig', [
-                        'user'          => $user,
-                        'error_message' => $errorMessage,
-                    ]);
-                }
-            }
+        } else {
+            $user = $currentUser;
         }
-        return $this->redirectToReferer();
+        return $this->render('user/edit.html.twig', [
+            'user'          => $user,
+            'error_message' => $errorMessage,
+        ]);
     }
 
     /**
@@ -290,7 +287,9 @@ class UserController extends AbstractController
      */
     public function editUser(int $id): RedirectResponse
     {
-        if (!$this->getConnectedUser()) {
+        $currentUser = $this->getConnectedUser();
+
+        if (!$currentUser instanceof User) {
             $this->cookieManager->setCookie('error_message', 'Vous ne pouvez pas accéder à cette page', 60);
             return $this->redirectToReferer();
         }
@@ -300,17 +299,12 @@ class UserController extends AbstractController
         }
 
         if (!$this->isAdmin()) {
-            $currentUser = $this->user->findByUsermail($this->getUserData()['email']);
-            if (!$currentUser instanceof User) {
-                $this->cookieManager->setCookie('error_message', 'Utilisateur non trouvé', 60);
-                return $this->redirectToReferer();
-            }
+
             if ($currentUser->getId() !== $user->getId()) {
                 $this->cookieManager->setCookie('error_message', 'Vous ne pouvez pas accéder à cette page', 60);
                 return $this->redirectToReferer();
             }
         }
-
 
         if (!$this->isPostRequest()) {
             return $this->redirectToRoute('user_edit_form', ['id' => (string) $id]);
