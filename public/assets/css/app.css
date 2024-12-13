@@ -112,27 +112,6 @@ CSS pour la page de liste des posts
     border-radius: 4px;
 }
 
-.btn-primary {
-    background-color: #007bff;
-    border-color: #007bff;
-    color: #fff;
-}
-
-.btn-primary:hover {
-    background-color: #0056b3;
-    border-color: #004085;
-}
-
-.btn-outline-primary {
-    color: #007bff;
-    border-color: #007bff;
-}
-
-.btn-outline-primary:hover {
-    background-color: #007bff;
-    color: #fff;
-    border-color: #0056b3;
-}
 
 /* Responsive */
 @media (max-width: 768px) {

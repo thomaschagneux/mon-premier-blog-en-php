@@ -23,22 +23,21 @@ class AuthController extends AbstractController
      */
     public function loginForm(): string|RedirectResponse
     {
-        try {
-            $this->getConnectedUser();
-            return $this->redirectToRoute('index');
-        } catch (Exception) {
-            $csrfToken = bin2hex(random_bytes(32));
-
-            $errorMessage = $this->cookieManager->getCookie('error_message');
-            if ($errorMessage) {
-                $this->cookieManager->deleteCookie('error_message');
-            }
-
-            return $this->render('login/login.html.twig', [
-                'csrf_token'    => $csrfToken,
-                'error_message' => $errorMessage,
-            ]);
+        if ($this->getConnectedUser() instanceof User) {
+            $this->cookieManager->setCookie('error_message', 'Vous êtes déjà déconnecté', 60);
+            return $this->redirectToRoute('admin_home');
         }
+        $csrfToken = bin2hex(random_bytes(32));
+
+        $errorMessage = $this->cookieManager->getCookie('error_message');
+        if ($errorMessage) {
+            $this->cookieManager->deleteCookie('error_message');
+        }
+
+        return $this->render('login/login.html.twig', [
+            'csrf_token'    => $csrfToken,
+            'error_message' => $errorMessage,
+        ]);
     }
 
     /**
@@ -99,6 +98,7 @@ class AuthController extends AbstractController
     private function initializeUserSession(User $user): void
     {
         $userData = json_encode([
+            'id'         => $user->getId(),
             'first_name' => $user->getFirstName(),
             'last_name'  => $user->getLastName(),
             'email'      => $user->getEmail(),
@@ -111,7 +111,7 @@ class AuthController extends AbstractController
             throw new Exception("Erreur lors de l'enregistrement de l'utilisateur");
         }
 
-        $this->cookieManager->setCookie('user_data', $userData, time() + (60 * 60 * 24)); // temps en secondes
+        $this->cookieManager->setCookie('user_data', $userData, (60 * 60 * 24)); // temps en secondes
     }
 
     /**
