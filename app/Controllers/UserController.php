@@ -71,7 +71,7 @@ class UserController extends AbstractController
 
         if ($this->isAdmin()) {
             return $this->render('user/admin_add.html.twig', ['message' => $message]);
-        } elseif ($this->isConnected()) {
+        } elseif ($this->getConnectedUser()) {
             return $this->redirectToReferer();
         }
         return $this->redirectToRoute('register_form');
@@ -91,7 +91,8 @@ class UserController extends AbstractController
             $this->cookieManager->deleteCookie('error_message');
         }
 
-        if ($this->isConnected()) {
+        if ($this->getConnectedUser()) {
+            $this->cookieManager->setCookie('error_message', 'Vous ne pouvez pas enregistrer, vous êtes déjà connecté', 60);
             return $this->redirectToRoute('admin_home');
         }
         return $this->render('user/registration.html.twig', ['message' => $message]);
@@ -163,6 +164,10 @@ class UserController extends AbstractController
      */
     public function addUser(): RedirectResponse
     {
+        if (!$this->isAdmin()) {
+            $this->cookieManager->setCookie('error_message', 'Vous ne pouvez pas accéder à cette page', 60);
+            return $this->redirectToRoute('adminAddUserForm');
+        }
         if ($this->isPostRequest()) {
             $firstName = $this->postManager->getPostParam('first_name');
             $lastName  = $this->postManager->getPostParam('last_name');
@@ -205,9 +210,9 @@ class UserController extends AbstractController
                     $picture->save();
 
                     $user->setPictureId($picture->getId());
-            }
+                }
 
-            } catch(Exception $e) {
+            } catch (Exception $e) {
                 $user->setPictureId(null);
             }
 
@@ -225,6 +230,10 @@ class UserController extends AbstractController
      */
     public function removeUser(int $id): RedirectResponse
     {
+        if (!$this->isAdmin()) {
+            $this->cookieManager->setCookie('error_message', 'Vous ne pouvez pas accéder à cette page', 60);
+            return $this->redirectToReferer();
+        }
         $user = new User();
         $user->setId($id);
         $name = $user->getFirstName() . ' ' . $user->getLastName();
@@ -251,29 +260,26 @@ class UserController extends AbstractController
             $this->cookieManager->deleteCookie('error_message');
         }
 
+        $currentUser = $this->getConnectedUser();
+
+        if (!$currentUser instanceof User) {
+            $this->cookieManager->setCookie('error_message', 'Vous ne pouvez pas accéder à cette page', 60);
+            return $this->redirectToReferer();
+        }
+
         if ($this->isAdmin()) {
             $user = $this->user->findById($id);
             if (null === $user) {
                 return $this->redirectToRoute('admin_list_user');
             }
 
-            return $this->render('user/edit.html.twig', [
-                'user'          => $user,
-                'error_message' => $errorMessage,
-                ]);
-        } elseif ($this->isConnected()) {
-            $userData = $this->getUserData();
-            if (is_array($userData) && isset($userData['email'])) {
-                $user = $this->user->findByUsermail($userData['email']);
-                if ($user instanceof User) {
-                    return $this->render('user/edit.html.twig', [
-                        'user'          => $user,
-                        'error_message' => $errorMessage,
-                    ]);
-                }
-            }
+        } else {
+            $user = $currentUser;
         }
-        return $this->redirectToReferer();
+        return $this->render('user/edit.html.twig', [
+            'user'          => $user,
+            'error_message' => $errorMessage,
+        ]);
     }
 
     /**
@@ -281,13 +287,23 @@ class UserController extends AbstractController
      */
     public function editUser(int $id): RedirectResponse
     {
-        if (!$this->isAdmin()) {
-            return $this->redirectToRoute('admin_list_user');
-        }
+        $currentUser = $this->getConnectedUser();
 
+        if (!$currentUser instanceof User) {
+            $this->cookieManager->setCookie('error_message', 'Vous ne pouvez pas accéder à cette page', 60);
+            return $this->redirectToReferer();
+        }
         $user = $this->user->findById($id);
         if (null === $user) {
-            return $this->redirectToRoute('admin_list_user');
+            return $this->redirectToRoute('user_edit_form', ['id' => (string) $id]);
+        }
+
+        if (!$this->isAdmin()) {
+
+            if ($currentUser->getId() !== $user->getId()) {
+                $this->cookieManager->setCookie('error_message', 'Vous ne pouvez pas accéder à cette page', 60);
+                return $this->redirectToReferer();
+            }
         }
 
         if (!$this->isPostRequest()) {
@@ -308,8 +324,13 @@ class UserController extends AbstractController
         }
 
         $user->save();
-        $this->cookieManager->setCookie('success_message', 'Cet utilisateur a bien été modifié', 60);
-        return $this->redirectToRoute('admin_list_user');
+
+        if ($this->isAdmin()) {
+            $this->cookieManager->setCookie('success_message', 'Cet utilisateur a bien été modifié', 60);
+            return $this->redirectToRoute('admin_list_user');
+        }
+        $this->cookieManager->setCookie('success_message', 'Vous avez bien modifié votre profil', 60);
+        return $this->redirectToRoute('admin_home');
     }
 
     /**
@@ -415,8 +436,6 @@ class UserController extends AbstractController
         return false;
     }
 
-
-
     /**
      * @throws RuntimeError
      * @throws SyntaxError
@@ -437,6 +456,8 @@ class UserController extends AbstractController
             }
             return $this->render('user/show.html.twig', ['user' => $user, 'picture' => $picture]);
         }
+
+        $this->cookieManager->setCookie('error_message', 'Vous ne pouvez pas accéder à cette page', 60);
         return $this->redirectToReferer();
     }
 

@@ -23,12 +23,11 @@ class AuthController extends AbstractController
      */
     public function loginForm(): string|RedirectResponse
     {
-        if ($this->isConnected()) {
-            return $this->redirectToRoute('index');
+        if ($this->getConnectedUser() instanceof User) {
+            $this->cookieManager->setCookie('error_message', 'Vous êtes déjà déconnecté', 60);
+            return $this->redirectToRoute('admin_home');
         }
-
         $csrfToken = bin2hex(random_bytes(32));
-
 
         $errorMessage = $this->cookieManager->getCookie('error_message');
         if ($errorMessage) {
@@ -99,11 +98,11 @@ class AuthController extends AbstractController
     private function initializeUserSession(User $user): void
     {
         $userData = json_encode([
+            'id'         => $user->getId(),
             'first_name' => $user->getFirstName(),
             'last_name'  => $user->getLastName(),
             'email'      => $user->getEmail(),
             'role'       => $user->getRole(),
-            'password'   => $user->getPassword(),
             'picture_id' => $user->getpictureId(),
             'created_at' => $user->getCreatedAt()->format('d/m/y'),
             'updated_at' => $user->getUpdatedAt()?->format('d/m/y'),
@@ -112,7 +111,7 @@ class AuthController extends AbstractController
             throw new Exception("Erreur lors de l'enregistrement de l'utilisateur");
         }
 
-        $this->cookieManager->setCookie('user_data', $userData, time() + (60 * 60 * 24)); // temps en secondes
+        $this->cookieManager->setCookie('user_data', $userData, (60 * 60 * 24)); // temps en secondes
     }
 
     /**

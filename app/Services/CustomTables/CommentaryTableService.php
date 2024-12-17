@@ -39,9 +39,14 @@ class CommentaryTableService extends AbstractTableService
      * @throws LoaderError
      * @throws \Exception
      */
-    public function getTableContent(Post $post): string
+    public function getTableContent(Post $post, ?User $user = null): string
     {
-        $comments = $this->comment->getCommentsByPostId($post->getId());
+        if (null !== $user) {
+            $comments = $this->comment->findCommentsByPostIdAndUserId($post->getId(), $user->getId());
+        } else {
+            $comments = $this->comment->getCommentsByPostId($post->getId());
+        }
+
 
         $rows = [];
         foreach ($comments as $comment) {

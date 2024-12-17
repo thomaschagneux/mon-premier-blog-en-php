@@ -11,9 +11,11 @@ use App\Manager\CookieManager;
 use App\Manager\FileManager;
 use App\Manager\PostManager;
 use App\Manager\ServerManager;
+use App\Models\User;
 use App\Services\Sanitizer;
 use App\Twig\AppExtension;
 use App\Twig\UrlExtension;
+use Exception;
 use Respect\Validation\Validatable;
 use Respect\Validation\Validator as v;
 use Twig\Environment;
@@ -86,7 +88,7 @@ abstract class AbstractController
 
         $this->addGlobalVariables();
 
-        $this->isConnected();
+        $this->getConnectedUser();
     }
 
     /**
@@ -147,7 +149,7 @@ abstract class AbstractController
      * Get a redirection to the named route with optional parameters
      *
      * @param  array<int|string, array<mixed>|string> $params
-     * @throws \Exception
+     * @throws Exception
      */
     protected function redirectToRoute(string $routeName, array $params = []): RedirectResponse
     {
@@ -156,7 +158,7 @@ abstract class AbstractController
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     protected function redirectToUrl(string $url): RedirectResponse
     {
@@ -180,7 +182,7 @@ abstract class AbstractController
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     protected function redirectToReferer(): RedirectResponse
     {
@@ -188,10 +190,9 @@ abstract class AbstractController
     }
 
     /**
-     * @throws \Exception
-     * @return mixed
+     * @throws Exception
      */
-    public function getUserData(): mixed
+    public function getUserData(): ?User
     {
         $cookieData = $this->cookieManager->getCookie('user_data');
 
@@ -208,21 +209,40 @@ abstract class AbstractController
             return null;
         }
 
-        return $user;
+        if (!is_array($user)) {
+            return null;
+        }
+
+        $currentUser = new User();
+        $currentUser->setId(isset($user['id']) && is_int($user['id']) ? $user['id'] : 0);
+        $currentUser->setEmail(isset($user['email']) && is_string($user['email']) ? $user['email'] : '');
+        $currentUser->setFirstName(isset($user['first_name']) && is_string($user['first_name']) ? $user['first_name'] : '');
+        $currentUser->setLastName(isset($user['last_name']) && is_string($user['last_name']) ? $user['last_name'] : '');
+        $currentUser->setRole(isset($user['role']) && is_string($user['role']) ? $user['role'] : '');
+
+
+        return $currentUser;
     }
 
-    public function isConnected(): bool
+
+    /**
+     * @throws Exception
+     */
+    public function getConnectedUser(): ?User
     {
         $user = $this->getUserData();
 
-        return is_array($user) && !empty($user['email']);
+        return ($user instanceof User) ? $user : null;
     }
 
+    /**
+     * @throws Exception
+     */
     public function isAdmin(): bool
     {
-        $user = $this->getUserData();
+        $user = $this->getConnectedUser();
 
-        return is_array($user) && isset($user['role']) && $user['role'] === 'ROLE_ADMIN';
+        return $user?->getRole() === 'ROLE_ADMIN';
     }
 
     protected function isPostRequest(): bool
@@ -230,10 +250,13 @@ abstract class AbstractController
         return $this->serverManager->getServerParams('REQUEST_METHOD') === 'POST';
     }
 
+    /**
+     * @throws Exception
+     */
     protected function addGlobalVariables(): void
     {
         $userArray = [
-            'connected' => $this->isConnected(),
+            'connected' => $this->getConnectedUser() instanceof User,
             'admin'     => $this->isAdmin(),
         ];
         $this->twig->addGlobal('app_user', $userArray); // Add user to Twig globals

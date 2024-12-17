@@ -110,14 +110,39 @@ class Comment extends AbstractModel
             $stmt  = $this->conn->prepare($query);
             $stmt->execute([':user_id' => $userId]);
 
-            $posts = [];
+            $comments = [];
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                 if (is_array($row)) {
-                    $posts[] = self::fromArray($row);
+                    $comments[] = self::fromArray($row);
                 }
             }
-            return $posts;
+            return $comments;
         }
+        return [];
+    }
+
+    /**
+     * @param  int                           $postId
+     * @param  int                           $userId
+     * @return array<int, Comment>
+     * @throws \DateMalformedStringException
+     */
+    public function findCommentsByPostIdAndUserId(int $postId, int $userId): array
+    {
+        if ($this->conn instanceof PDO) {
+            $query = 'SELECT * FROM commentary WHERE post_id = :post_id AND user_id = :user_id';
+            $stmt  = $this->conn->prepare($query);
+            $stmt->execute([':post_id' => $postId, ':user_id' => $userId]);
+            $comments = [];
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                if (is_array($row)) {
+                    $comments[] = self::fromArray($row);
+                }
+            }
+
+            return $comments;
+        }
+
         return [];
     }
 
