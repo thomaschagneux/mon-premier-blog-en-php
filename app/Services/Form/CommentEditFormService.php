@@ -24,6 +24,7 @@ class CommentEditFormService extends AbstractFormService
             $this->comment->getContent(),
             ['class' => 'tiny-light', 'rows' => 5],
             [],
+            ''
         ));
     }
 }

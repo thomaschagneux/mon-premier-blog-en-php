@@ -182,10 +182,6 @@ class CommentController extends AbstractController
             $this->cookieManager->deleteCookie('error_message');
         }
 
-
-
-
-
         $comment = (new Comment())->findById($commentId);
 
         if (!$comment instanceof Comment) {
@@ -207,21 +203,16 @@ class CommentController extends AbstractController
                 return $this->redirectToReferer();
             }
         }
-        $commentEditForm = null;
-        $post            = null;
 
-        if ($comment instanceof Comment) {
-            $commentEditForm = new CommentEditFormService($this->twig, $comment);
-            $commentEditForm->buildForm();
+        $commentEditForm = new CommentEditFormService($this->twig, $comment);
+        $commentEditForm->buildForm();
 
-            $postModel = new Post();
-            $post      = $comment->getPostId() ? $postModel->findById($comment->getPostId()) : null;
-
-        }
-
+        $postModel = new Post();
+        $post      = $comment->getPostId() ? $postModel->findById($comment->getPostId()) : null;
 
         return $this->render('post/comment/edit.html.twig', [
             'post'              => $post instanceof Post ? $post : null,
+            'comment'           => $comment,
             'comment_edit_form' => $commentEditForm->getFormRows(),
             'error_message'     => $message,
         ]);
@@ -246,6 +237,7 @@ class CommentController extends AbstractController
         }
 
         if (!$this->isAdmin()) {
+
             if ($user->getId() !== $comment->getUserId()) {
                 $this->cookieManager->setCookie('error_message', 'Vous ne pouvez pas accéder à ce commentaire', 60);
                 return $this->redirectToReferer();

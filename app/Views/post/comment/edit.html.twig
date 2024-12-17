@@ -7,7 +7,7 @@
         </div>
 
         <div class="card-body">
-            <form method="POST" action="{{path('comment_edit_action', { 'id': post.id })}}" enctype="multipart/form-data">
+            <form method="POST" action="{{path('comment_edit_action', { 'id': comment.id })}}" enctype="multipart/form-data">
                 <div class="row">
                     {{ comment_edit_form.content | raw }}
                 </div>
