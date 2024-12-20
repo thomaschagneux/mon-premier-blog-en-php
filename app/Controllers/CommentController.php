@@ -35,18 +35,21 @@ class CommentController extends AbstractController
         $comment = null;
         try {
             $userData = $this->getConnectedUser();
+            $comment  = $this->commentModel->findById($commentId);
 
             if (!$this->isAdmin()) {
                 $user = $userData ? (new User())->findByUsermail($userData->getEmail()) : null;
+
                 if (!$user instanceof User) {
                     $this->cookieManager->setCookie('error_message', 'Utilisateur non trouvé', 60);
                     return $this->redirectToReferer();
                 }
-                $comment = $this->commentModel->findById($commentId);
+
                 if (!$comment instanceof Comment) {
                     $this->cookieManager->setCookie('error_message', 'Commentaire non trouvé', 60);
                     return $this->redirectToReferer();
                 }
+
                 if ($user->getId() !== $comment->getUserId()) {
                     $this->cookieManager->setCookie('error_message', 'Vous ne pouvez pas accéder à cette page', 60);
                     return $this->redirectToReferer();
