@@ -8,6 +8,7 @@ use App\Models\Picture;
 use App\Models\User;
 use App\Services\CustomTables\UserTableService;
 use App\Services\Sanitizer;
+use Respect\Validation\Validator as v;
 use Exception;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
@@ -63,14 +64,14 @@ class UserController extends AbstractController
      */
     public function adminAddUserForm(): string|RedirectResponse
     {
-        $message = $this->cookieManager->getCookie('error_message') ?? null;
+        $errorMessage = $this->cookieManager->getCookie('error_message') ?? null;
 
-        if ($message !== null) {
+        if ($errorMessage !== null) {
             $this->cookieManager->deleteCookie('error_message');
         }
 
         if ($this->isAdmin()) {
-            return $this->render('user/admin_add.html.twig', ['message' => $message]);
+            return $this->render('user/admin_add.html.twig', ['error_message' => $errorMessage]);
         } elseif ($this->getConnectedUser()) {
             return $this->redirectToReferer();
         }
@@ -85,9 +86,9 @@ class UserController extends AbstractController
      */
     public function registerForm(): string|RedirectResponse
     {
-        $message = $this->cookieManager->getCookie('error_message') ?? null;
+        $errorMessage = $this->cookieManager->getCookie('error_message') ?? null;
 
-        if ($message !== null) {
+        if ($errorMessage !== null) {
             $this->cookieManager->deleteCookie('error_message');
         }
 
@@ -95,7 +96,7 @@ class UserController extends AbstractController
             $this->cookieManager->setCookie('error_message', 'Vous ne pouvez pas enregistrer, vous êtes déjà connecté', 60);
             return $this->redirectToRoute('admin_home');
         }
-        return $this->render('user/registration.html.twig', ['message' => $message]);
+        return $this->render('user/registration.html.twig', ['error_message' => $errorMessage]);
 
     }
 
@@ -110,8 +111,18 @@ class UserController extends AbstractController
             $lastName  = $this->postManager->getPostParam('last_name');
             $password  = $this->postManager->getPostParam('password');
 
-            if (empty($firstName) || empty($lastName) || empty($email) || empty($password)) {
-                $this->cookieManager->setCookie('error_message', 'Tous les champs sont requis.', 60);
+            $data = [
+                'email'     => $email,
+                'firstName' => $firstName,
+                'lastName'  => $lastName,
+                'password'  => $password,
+
+            ];
+
+            $errors = $this->validateUserForm($data);
+
+            if (!empty($errors)) {
+                $this->cookieManager->setCookie('error_message', implode(' ', $errors), 60);
                 return $this->redirectToRoute('register_form');
             }
 
@@ -169,14 +180,25 @@ class UserController extends AbstractController
             return $this->redirectToRoute('adminAddUserForm');
         }
         if ($this->isPostRequest()) {
+
             $firstName = $this->postManager->getPostParam('first_name');
             $lastName  = $this->postManager->getPostParam('last_name');
             $email     = $this->postManager->getPostParam('email');
             $password  = $this->postManager->getPostParam('password');
             $role      = $this->postManager->getPostParam('role') ?? 'ROLE_USER';
 
-            if (empty($firstName) || empty($lastName) || empty($email) || empty($password)) {
-                $this->cookieManager->setCookie('error_message', 'Veuillez remplir les champs requis', 60);
+            $data = [
+                'firstName'  => $firstName,
+                'lastName'   => $lastName,
+                'email'      => $email,
+                'password'   => $password,
+                'role'       => $role,
+            ];
+
+            $errors = $this->validateUserForm($data);
+
+            if (!empty($errors)) {
+                $this->cookieManager->setCookie('error_message', implode(' ', $errors), 60);
                 return $this->redirectToRoute('admin_add_user_form');
             }
 
@@ -311,8 +333,11 @@ class UserController extends AbstractController
         }
 
         $params = $this->getUserInput();
-        if ($this->hasMissingFields($params)) {
-            $this->cookieManager->setCookie('error_message', 'Veuillez remplir les champs requis', 60);
+
+        $errors = $this->validateUserForm($params);
+
+        if (!empty($errors)) {
+            $this->cookieManager->setCookie('error_message', implode(' ', $errors), 60);
             return $this->redirectToRoute('user_edit_form', ['id' => (string) $id]);
         }
 
@@ -339,21 +364,12 @@ class UserController extends AbstractController
     private function getUserInput(): array
     {
         return [
-            'first_name' => $this->postManager->getPostParam('first_name') ?? '',
-            'last_name'  => $this->postManager->getPostParam('last_name')  ?? '',
+            'firstName'  => $this->postManager->getPostParam('first_name')  ?? '',
+            'lastName'   => $this->postManager->getPostParam('last_name')   ?? '',
             'email'      => $this->postManager->getPostParam('email')      ?? '',
             'password'   => $this->postManager->getPostParam('password')   ?? '',
             'role'       => $this->postManager->getPostParam('role')       ?? 'ROLE_USER',
         ];
-    }
-
-    /**
-     * @param  array<string, string|null> $params
-     * @return bool
-     */
-    private function hasMissingFields(array $params): bool
-    {
-        return empty($params['first_name']) || empty($params['last_name']) || empty($params['email']);
     }
 
     private function getPasswordOrDefault(?string $password, User $user): string
@@ -368,8 +384,8 @@ class UserController extends AbstractController
      */
     private function updateUserFields(User $user, array $params): void
     {
-        $user->setFirstName($params['first_name']);
-        $user->setLastName($params['last_name']);
+        $user->setFirstName($params['firstName']);
+        $user->setLastName($params['lastName']);
         $user->setEmail($params['email']);
         $user->setPassword($params['password']);
         $user->setRole($params['role']);
@@ -459,6 +475,45 @@ class UserController extends AbstractController
 
         $this->cookieManager->setCookie('error_message', 'Vous ne pouvez pas accéder à cette page', 60);
         return $this->redirectToReferer();
+    }
+
+    private function validateUserForm(array $data): array
+    {
+        $errors = [];
+
+        $rules = [
+            'password'   => [v::notEmpty()->length(8, 100)],
+            'email'      => [v::notEmpty()->email()],
+            'firstName'  => [v::notEmpty()->length(1, 100)],
+            'lastName'   => [v::notEmpty()->length(1, 100)],
+        ];
+
+        // Traduction des noms de champs
+        $fieldTranslations = [
+            'password'   => 'mot de passe',
+            'email'      => 'email',
+            'firstName'  => 'prénom',
+            'lastName'   => 'nom',
+        ];
+
+        foreach ($rules as $field => $validators) {
+            $value = $data[$field] ?? null;
+            foreach ($validators as $validator) {
+                if (!$validator->validate($value)) {
+                    $fieldName = $fieldTranslations[$field] ;
+                    if ($field === 'password') {
+                        $errors[$field] = "Le {$fieldName} doit contenir au moins 8 caractères.";
+                    } elseif ($field === 'email') {
+                        $errors[$field] = "L'{$fieldName} doit être valide.";
+                    } else {
+                        $errors[$field] = "Le {$fieldName} ne doit pas être vide.";
+                    }
+                    break;
+                }
+            }
+        }
+
+        return $errors;
     }
 
 }
