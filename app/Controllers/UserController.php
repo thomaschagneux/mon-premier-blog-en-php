@@ -106,10 +106,10 @@ class UserController extends AbstractController
     public function register(): RedirectResponse
     {
         if ($this->isPostRequest()) {
-            $email     = $this->postManager->getPostParam('email');
-            $firstName = $this->postManager->getPostParam('first_name');
-            $lastName  = $this->postManager->getPostParam('last_name');
-            $password  = $this->postManager->getPostParam('password');
+            $email     = $this->postManager->getPostParam('email')      ?? '';
+            $firstName = $this->postManager->getPostParam('first_name') ?? '';
+            $lastName  = $this->postManager->getPostParam('last_name')  ?? '';
+            $password  = $this->postManager->getPostParam('password')   ?? '';
 
             $data = [
                 'email'     => $email,
@@ -181,11 +181,11 @@ class UserController extends AbstractController
         }
         if ($this->isPostRequest()) {
 
-            $firstName = $this->postManager->getPostParam('first_name');
-            $lastName  = $this->postManager->getPostParam('last_name');
-            $email     = $this->postManager->getPostParam('email');
-            $password  = $this->postManager->getPostParam('password');
-            $role      = $this->postManager->getPostParam('role') ?? 'ROLE_USER';
+            $firstName = $this->postManager->getPostParam('first_name') ?? '';
+            $lastName  = $this->postManager->getPostParam('last_name')  ?? '';
+            $email     = $this->postManager->getPostParam('email')      ?? '';
+            $password  = $this->postManager->getPostParam('password')   ?? '';
+            $role      = $this->postManager->getPostParam('role')       ?? 'ROLE_USER';
 
             $data = [
                 'firstName'  => $firstName,
@@ -366,9 +366,9 @@ class UserController extends AbstractController
         return [
             'firstName'  => $this->postManager->getPostParam('first_name')  ?? '',
             'lastName'   => $this->postManager->getPostParam('last_name')   ?? '',
-            'email'      => $this->postManager->getPostParam('email')      ?? '',
-            'password'   => $this->postManager->getPostParam('password')   ?? '',
-            'role'       => $this->postManager->getPostParam('role')       ?? 'ROLE_USER',
+            'email'      => $this->postManager->getPostParam('email')       ?? '',
+            'password'   => $this->postManager->getPostParam('password')    ?? '',
+            'role'       => $this->postManager->getPostParam('role')        ?? 'ROLE_USER',
         ];
     }
 
@@ -477,6 +477,10 @@ class UserController extends AbstractController
         return $this->redirectToReferer();
     }
 
+    /**
+     * @param  array<string, string> $data
+     * @return array<string, string>
+     */
     private function validateUserForm(array $data): array
     {
         $errors = [];
