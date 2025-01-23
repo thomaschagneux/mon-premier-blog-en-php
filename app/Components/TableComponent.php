@@ -7,20 +7,26 @@ use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 
+/**
+ * Class TableComponent
+ * Represents a table component with configurable columns and rows for rendering in Twig.
+ */
 class TableComponent
 {
     /**
-     * @var array<array<string, mixed>>
+     * @var array<array<string, mixed>> The configuration of table columns.
      */
     private array $columns = [];
 
     /**
-     * @var array<array<string, string>>
+     * @var array<array<string, string>> The data rows of the table.
      */
     private array $rows = [];
 
     /**
-     * @param array<array<string, mixed>> $columns
+     * TableComponent constructor.
+     *
+     * @param array<array<string, mixed>> $columns The configuration for the table columns.
      */
     public function __construct(array $columns = [])
     {
@@ -28,7 +34,10 @@ class TableComponent
     }
 
     /**
-     * @param  array<string, string> $row
+     * Adds a row of data to the table.
+     *
+     * @param array<string, string> $row A single row of data with key-value pairs.
+     *
      * @return void
      */
     public function addRow(array $row): void
@@ -37,7 +46,9 @@ class TableComponent
     }
 
     /**
-     * @return array<array<string, mixed>>
+     * Gets the configured columns of the table.
+     *
+     * @return array<array<string, mixed>> An array of column configurations.
      */
     public function getColumns(): array
     {
@@ -45,7 +56,9 @@ class TableComponent
     }
 
     /**
-     * @return array<array<string, string>>
+     * Gets the rows of data in the table.
+     *
+     * @return array<array<string, string>> An array of rows, each represented as key-value pairs.
      */
     public function getRows(): array
     {
@@ -53,11 +66,15 @@ class TableComponent
     }
 
     /**
-     * @param  Environment  $twig
-     * @throws LoaderError
-     * @throws RuntimeError
-     * @throws SyntaxError
-     * @return string
+     * Renders the table using the provided Twig environment.
+     *
+     * @param Environment $twig The Twig environment instance.
+     *
+     * @throws LoaderError   If the template cannot be found.
+     * @throws RuntimeError  If an error occurs during rendering.
+     * @throws SyntaxError   If there is a syntax error in the template.
+     *
+     * @return string The rendered HTML of the table.
      */
     public function render(Environment $twig): string
     {

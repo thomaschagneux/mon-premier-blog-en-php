@@ -6,20 +6,33 @@ use App\Dto\FileDto;
 use App\Services\Sanitizer;
 use Exception;
 
+/**
+ * Class FileManager
+ * Handles file uploads, validation, sanitization, and file movements.
+ */
 class FileManager
 {
+    /**
+     * @var string The destination directory where files will be moved.
+     */
     private string $destination;
-
 
     /**
      * Retrieve and validate a file from the $_FILES array.
-     * @param  array<string> $allowedTypes List of allowed MIME types.     $maxSize      Maximum allowed file size in bytes.
-     * @throws Exception
+     *
+     * @param string $key         The key in the $_FILES array.
+     * @param array<string> $allowedTypes List of allowed MIME types. Defaults to ['image/jpeg', 'image/png'].
+     * @param int    $maxSize     Maximum allowed file size in bytes. Defaults to 2MB (2000000).
+     *
+     * @throws Exception If the file is invalid or does not meet the validation criteria.
+     *
+     * @return FileDto|null A FileDto instance if the file is valid, or null if the file is not provided.
      */
     public function getFile(string $key, array $allowedTypes = ['image/jpeg', 'image/png'], int $maxSize = 2000000): ?FileDto
     {
         $file = $this->sanitizedFiles($key);
-        // Sanitize the file name (removes harmful characters)
+
+        // Sanitize the file name
         if (!is_string($file['name'])) {
             return null;
         }
@@ -30,83 +43,80 @@ class FileManager
             throw new Exception('File size exceeds the maximum allowed size.');
         }
 
-        // Validate that tmp_name is a valid string
+        // Validate that tmp_name is a valid file path
         if (!is_string($file['tmp_name']) || !file_exists($file['tmp_name'])) {
-            throw new Exception('Le chemin temporaire du fichier est invalide.');
+            throw new Exception('Temporary file path is invalid.');
         }
 
-        // Validate MIME type using mime_content_type on the temp file
+        // Validate MIME type
         $mimeType = mime_content_type($file['tmp_name']);
-
         if ($mimeType === false) {
             throw new Exception('Unable to determine file MIME type.');
         }
-
         if (!in_array($mimeType, $allowedTypes)) {
             throw new Exception('Invalid file type.');
         }
 
-        // If everything is valid, return the file data
+        // Return valid FileDto
         return new FileDto(
-            name     : $filteredName,
-            tmp_name : $file['tmp_name'],
-            size     : $file['size'],
-            type     : $mimeType,
+            name: $filteredName,
+            tmp_name: $file['tmp_name'],
+            size: $file['size'],
+            type: $mimeType,
         );
     }
-
 
     /**
      * Move an uploaded file to a target directory.
      *
-     * @param  string    $tmpPath The temporary path of the file.
-     * @return string    The final path where the file is moved.
-     * @throws Exception If the file could not be moved.
+     * @param string $tmpPath   The temporary path of the file.
+     * @param string $finalName The final name of the file in the destination directory.
+     *
+     * @throws Exception If the destination directory is not set or the file cannot be moved.
+     *
+     * @return string The full path of the moved file.
      */
     public function moveFile(string $tmpPath, string $finalName): string
     {
-        // Assurez-vous que $this->destination a bien été défini avec setDestination()
         if (empty($this->destination)) {
-            throw new \Exception('Le répertoire de destination n\'est pas défini.');
+            throw new Exception('Le répertoire de destination n\'est pas défini.');
         }
 
-        // Chemin complet du fichier de destination
         $filePath = $this->destination . $finalName;
 
-        // Déplacement du fichier temporaire vers le chemin final
         if (!move_uploaded_file($tmpPath, $filePath)) {
-            throw new \Exception('Échec du déplacement du fichier.');
+            throw new Exception('Échec du déplacement du fichier.');
         }
 
         return $filePath;
     }
 
-
     /**
      * Set the destination directory where files will be moved.
      *
-     * @param  string    $destination The path to the directory where files should be moved.
-     * @return self
+     * @param string $destination The directory path.
+     *
      * @throws Exception If the directory does not exist or is not writable.
+     *
+     * @return self
      */
     public function setDestination(string $destination): self
     {
-        // Vérification que le répertoire existe et est accessible en écriture
         if (!is_dir($destination) || !is_writable($destination)) {
             throw new Exception("Le répertoire $destination n'existe pas ou n'est pas accessible en écriture.");
         }
 
-        // Ajoute un slash à la fin du chemin si nécessaire
         $this->destination = rtrim($destination, '/') . '/';
 
         return $this;
     }
 
     /**
-     * Vérifie si un fichier a été envoyé et est valide.
+     * Check if a file has been uploaded correctly.
      *
-     * @param  string $key La clé spécifique dans $_FILES.
-     * @return bool   Retourne true si le fichier a été envoyé correctement, false sinon.
+     * @param string $key The key in the $_FILES array.
+     *
+     * @return bool True if a file is uploaded and valid, false otherwise.
      */
     public function isPostFiles(string $key): bool
     {
@@ -121,8 +131,11 @@ class FileManager
     }
 
     /**
-     * @param  string|null  $key
-     * @return array<mixed>
+     * Retrieve and sanitize the $_FILES array or a specific file within it.
+     *
+     * @param string|null $key The key in the $_FILES array, or null for the entire $_FILES array.
+     *
+     * @return array<mixed> The sanitized file data.
      */
     public function sanitizedFiles(string $key = null): array
     {

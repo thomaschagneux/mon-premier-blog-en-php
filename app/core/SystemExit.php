@@ -11,5 +11,5 @@ use Exception;
  */
 class SystemExit extends Exception
 {
-    // Custom exception for terminating the script
+
 }
