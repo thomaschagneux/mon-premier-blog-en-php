@@ -20,9 +20,9 @@ class FileManager
     /**
      * Retrieve and validate a file from the $_FILES array.
      *
-     * @param string $key         The key in the $_FILES array.
+     * @param string        $key          The key in the $_FILES array.
      * @param array<string> $allowedTypes List of allowed MIME types. Defaults to ['image/jpeg', 'image/png'].
-     * @param int    $maxSize     Maximum allowed file size in bytes. Defaults to 2MB (2000000).
+     * @param int           $maxSize      Maximum allowed file size in bytes. Defaults to 2MB (2000000).
      *
      * @throws Exception If the file is invalid or does not meet the validation criteria.
      *

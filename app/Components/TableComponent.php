@@ -70,9 +70,9 @@ class TableComponent
      *
      * @param Environment $twig The Twig environment instance.
      *
-     * @throws LoaderError   If the template cannot be found.
-     * @throws RuntimeError  If an error occurs during rendering.
-     * @throws SyntaxError   If there is a syntax error in the template.
+     * @throws LoaderError  If the template cannot be found.
+     * @throws RuntimeError If an error occurs during rendering.
+     * @throws SyntaxError  If there is a syntax error in the template.
      *
      * @return string The rendered HTML of the table.
      */

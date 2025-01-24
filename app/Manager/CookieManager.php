@@ -29,14 +29,14 @@ class CookieManager
     /**
      * Sets a cookie with optional encryption and sanitization.
      *
-     * @param string $name       The name of the cookie.
-     * @param string $value      The value of the cookie.
-     * @param int    $expire     The expiration time in seconds. Defaults to 0 (session cookie).
-     * @param string $path       The path on the server where the cookie is available. Defaults to '/'.
-     * @param string $domain     The domain that the cookie is available to. Defaults to an empty string.
-     * @param bool   $secure     Whether the cookie should only be transmitted over a secure HTTPS connection. Defaults to false.
-     * @param bool   $httpOnly   Whether the cookie is accessible only through the HTTP protocol. Defaults to true.
-     * @param bool   $encrypt    Whether the cookie value should be encrypted. Defaults to true.
+     * @param string $name     The name of the cookie.
+     * @param string $value    The value of the cookie.
+     * @param int    $expire   The expiration time in seconds. Defaults to 0 (session cookie).
+     * @param string $path     The path on the server where the cookie is available. Defaults to '/'.
+     * @param string $domain   The domain that the cookie is available to. Defaults to an empty string.
+     * @param bool   $secure   Whether the cookie should only be transmitted over a secure HTTPS connection. Defaults to false.
+     * @param bool   $httpOnly Whether the cookie is accessible only through the HTTP protocol. Defaults to true.
+     * @param bool   $encrypt  Whether the cookie value should be encrypted. Defaults to true.
      *
      * @throws Exception If the cookie fails to set or encryption fails.
      *
@@ -54,7 +54,7 @@ class CookieManager
     ): void {
         if ($encrypt) {
             $encryptedValue = $this->encrypt($value);
-            $value = Sanitizer::sanitizeString($encryptedValue);
+            $value          = Sanitizer::sanitizeString($encryptedValue);
         } else {
             $value = Sanitizer::sanitizeString($value);
         }

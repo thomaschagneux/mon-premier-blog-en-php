@@ -67,8 +67,8 @@ class PostManager
 
         $sanitizedInput = preg_replace_callback($pattern, function ($matches) {
             $closingSlash = $matches[1];
-            $tag = strtolower($matches[2]);
-            $attributes = $matches[3];
+            $tag          = strtolower($matches[2]);
+            $attributes   = $matches[3];
 
             // Remove disallowed tags
             if (!in_array($tag, self::ALLOWED_TAGS, true)) {
@@ -79,7 +79,7 @@ class PostManager
             preg_match_all('/([a-zA-Z]+)=("[^"]*"|\'[^\']*\')/', $attributes, $attrMatches, PREG_SET_ORDER);
 
             foreach ($attrMatches as $attr) {
-                $attrName = strtolower($attr[1]);
+                $attrName  = strtolower($attr[1]);
                 $attrValue = $attr[2];
 
                 // Specific checks for iframe attributes

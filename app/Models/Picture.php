@@ -7,49 +7,34 @@ use Exception;
 use PDO;
 
 /**
- * Picture Model Class
- *
- * Represents an image/picture entity in the application's database.
- * Handles database operations for picture records, including creation and retrieval.
- *
- * @package App\Models
- * @author [Your Name]
- * @version 1.0.0
+ * Class Picture
+ * Represents a picture object, including its metadata such as filename, path, and MIME type.
  */
 class Picture extends AbstractModel
 {
     /**
-     * Unique identifier for the picture
-     *
-     * @var int
+     * @var int The unique identifier of the picture.
      */
     private int $id;
 
     /**
-     * Original filename of the picture
-     *
-     * @var string
+     * @var string The name of the file.
      */
     private string $fileName;
 
     /**
-     * Full path to the picture file
-     *
-     * @var string
+     * @var string The path to the file on the server.
      */
     private string $pathName;
 
     /**
-     * MIME type of the picture
-     *
-     * @var string
+     * @var string The MIME type of the file (e.g., image/jpeg, image/png).
      */
     private string $mimeType;
 
     /**
-     * Constructor initializes the picture object
-     *
-     * Sets an empty path name by default
+     * Picture constructor.
+     * Initializes the parent AbstractModel constructor and sets default values.
      */
     public function __construct()
     {
@@ -58,52 +43,98 @@ class Picture extends AbstractModel
     }
 
     /**
-     * Creates a Picture instance from an associative array of data
+     * Populates a Picture object from an array of data.
      *
-     * Safely transforms input data into a Picture object,
-     * providing type checking and default values.
+     * @param array<string, mixed> $data The data to populate the Picture object.
      *
-     * @param array<string, mixed> $data Input data for picture creation
-     * @return self Constructed Picture object
-     * @throws Exception If data validation fails
+     * @throws Exception If any required data is invalid.
+     *
+     * @return self The populated Picture object.
      */
     public function fromArray(array $data): self
     {
-        // Method implementation remains the same
+        $picture = new self();
+
+        $picture->setId(isset($data['id']) && is_int($data['id']) ? $data['id'] : 0);
+        $picture->setFileName(isset($data['file_name']) && is_string($data['file_name']) ? $data['file_name'] : '');
+        $picture->setPathName(isset($data['path_name']) && is_string($data['path_name']) ? $data['path_name'] : '');
+        $picture->setMimeType(isset($data['mime_type']) && is_string($data['mime_type']) ? $data['mime_type'] : '');
+
+        return $picture;
     }
 
     /**
-     * Saves the picture record to the database
+     * Saves the picture to the database.
      *
-     * Inserts a new picture record with current object's data.
-     * Automatically sets the creation timestamp and retrieves the new record's ID.
+     * @throws Exception If the database connection is unavailable or the query fails.
      *
-     * @return int The ID of the newly inserted picture record
-     * @throws Exception If database connection fails or insertion encounters an error
+     * @return int The ID of the saved picture.
      */
     public function save(): int
     {
-        // Method implementation remains the same
+        if (!$this->conn instanceof PDO) {
+            throw new Exception('Failed to save picture: no database connection.');
+        }
+
+        try {
+            $query = 'INSERT INTO picture (file_name, path_name, mime_type, created_at)
+                      VALUES (:file_name, :path_name, :mime_type, :created_at)';
+            $stmt = $this->conn->prepare($query);
+
+            $this->createdAt = new DateTime();
+
+            $stmt->execute([
+                ':file_name'  => $this->getFileName(),
+                ':path_name'  => $this->getPathName(),
+                ':mime_type'  => $this->getMimeType(),
+                ':created_at' => $this->getCreatedAt()->format('Y-m-d H:i:s'),
+            ]);
+
+            $this->id = (int) $this->conn->lastInsertId();
+
+            return $this->id;
+        } catch (Exception $e) {
+            throw new Exception('Failed to save picture: ' . $e->getMessage());
+        }
     }
 
     /**
-     * Retrieves a Picture object by its database ID
+     * Finds a picture by its ID.
      *
-     * Fetches a single picture record from the database matching the given ID.
+     * @param int $id The ID of the picture to find.
      *
-     * @param int $id The unique identifier of the picture to retrieve
-     * @return ?Picture Returns the Picture object if found, null otherwise
-     * @throws Exception If database connection fails
+     * @throws Exception If the database connection is unavailable.
+     *
+     * @return Picture|null The Picture object if found, or null if no picture exists with the given ID.
      */
     public function findById(int $id): ?Picture
     {
-        // Method implementation remains the same
+        if (!$this->conn instanceof PDO) {
+            throw new Exception('Failed to fetch picture by ID: ' . $id);
+        }
+
+        try {
+            $query = 'SELECT * FROM picture WHERE id = :id';
+            $stmt  = $this->conn->prepare($query);
+            $stmt->execute([':id' => $id]);
+
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (is_array($result)) {
+                return $this->fromArray($result);
+            }
+
+            return null;
+        } catch (Exception $e) {
+            error_log('Failed to fetch picture by ID: ' . $e->getMessage());
+            return null;
+        }
     }
 
     /**
-     * Retrieves the picture's unique identifier
+     * Gets the ID of the picture.
      *
-     * @return int The picture's database ID
+     * @return int The picture ID.
      */
     public function getId(): int
     {
@@ -111,9 +142,11 @@ class Picture extends AbstractModel
     }
 
     /**
-     * Sets the picture's unique identifier
+     * Sets the ID of the picture.
      *
-     * @param int $id The ID to assign to the picture
+     * @param int $id The ID to set.
+     *
+     * @return void
      */
     public function setId(int $id): void
     {
@@ -121,9 +154,9 @@ class Picture extends AbstractModel
     }
 
     /**
-     * Retrieves the original filename of the picture
+     * Gets the file name of the picture.
      *
-     * @return string The filename of the picture
+     * @return string The file name.
      */
     public function getFileName(): string
     {
@@ -131,9 +164,11 @@ class Picture extends AbstractModel
     }
 
     /**
-     * Sets the original filename of the picture
+     * Sets the file name of the picture.
      *
-     * @param string $fileName The filename to assign
+     * @param string $fileName The file name to set.
+     *
+     * @return void
      */
     public function setFileName(string $fileName): void
     {
@@ -141,9 +176,9 @@ class Picture extends AbstractModel
     }
 
     /**
-     * Retrieves the full path of the picture
+     * Gets the path name of the picture.
      *
-     * @return string The full path to the picture file
+     * @return string The path name.
      */
     public function getPathName(): string
     {
@@ -151,9 +186,11 @@ class Picture extends AbstractModel
     }
 
     /**
-     * Sets the full path of the picture
+     * Sets the path name of the picture.
      *
-     * @param string $pathName The full path to assign
+     * @param string $pathName The path name to set.
+     *
+     * @return void
      */
     public function setPathName(string $pathName): void
     {
@@ -161,9 +198,9 @@ class Picture extends AbstractModel
     }
 
     /**
-     * Retrieves the MIME type of the picture
+     * Gets the MIME type of the picture.
      *
-     * @return string The MIME type of the picture file
+     * @return string The MIME type.
      */
     public function getMimeType(): string
     {
@@ -171,9 +208,11 @@ class Picture extends AbstractModel
     }
 
     /**
-     * Sets the MIME type of the picture
+     * Sets the MIME type of the picture.
      *
-     * @param string $mimeType The MIME type to assign
+     * @param string $mimeType The MIME type to set.
+     *
+     * @return void
      */
     public function setMimeType(string $mimeType): void
     {
