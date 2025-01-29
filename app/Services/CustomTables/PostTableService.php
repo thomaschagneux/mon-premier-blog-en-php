@@ -144,7 +144,7 @@ class PostTableService extends AbstractTableService
     private function getAuthor(Post $post): string
     {
         $userModel = new User();
-        $user = $post->getUserId() ? $userModel->findById($post->getUserId()) : null;
+        $user      = $post->getUserId() ? $userModel->findById($post->getUserId()) : null;
 
         if ($user instanceof User) {
             return $user->getFirstName() . ' ' . $user->getLastName();

@@ -4,10 +4,17 @@ namespace App\Services\Form;
 
 use App\Components\FormRowComponent;
 
+/**
+ * Class PostAddFormService
+ * Provides a form service for adding posts, extending the AbstractFormService.
+ */
 class PostAddFormService extends AbstractFormService
 {
     /**
-     * Build the form components and store them in an associative array.
+     * Builds the form components for the post creation form and stores them in the form rows array.
+     * The form includes fields for title, lede, content, and an optional cover image.
+     *
+     * @return void
      */
     public function buildForm(): void
     {

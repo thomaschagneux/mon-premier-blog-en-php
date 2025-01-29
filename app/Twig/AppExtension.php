@@ -7,19 +7,30 @@ use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
 
+/**
+ * Class AppExtension
+ * Provides custom Twig filters and functions for use in Twig templates.
+ */
 class AppExtension extends AbstractExtension
 {
-    private HelperServices $helperServices;
+    /**
+     * @var HelperServices The helper services instance for utility functions.
+     */
+    private readonly HelperServices $helperServices;
 
+    /**
+     * AppExtension constructor.
+     * Initializes the extension with a HelperServices instance.
+     */
     public function __construct()
     {
         $this->helperServices = new HelperServices();
     }
 
     /**
-     * Returns a list of custom filters.
+     * Returns a list of custom Twig filters.
      *
-     * @return array<TwigFilter>
+     * @return array<TwigFilter> An array of custom Twig filters.
      */
     public function getFilters(): array
     {
@@ -29,7 +40,9 @@ class AppExtension extends AbstractExtension
     }
 
     /**
-     * @return array<TwigFunction>
+     * Returns a list of custom Twig functions.
+     *
+     * @return array<TwigFunction> An array of custom Twig functions.
      */
     public function getFunctions()
     {
@@ -39,10 +52,13 @@ class AppExtension extends AbstractExtension
     }
 
     /**
-     * Convert an associative array to HTML attributes string.
+     * Converts an associative array to an HTML attributes string.
      *
-     * @param  array<string, string> $attributes
-     * @return string
+     * Example: ['class' => 'btn', 'id' => 'submit'] becomes 'class="btn" id="submit"'
+     *
+     * @param array<string, string> $attributes The associative array of attributes.
+     *
+     * @return string The HTML attributes as a string.
      */
     public function attributesFilter(array $attributes): string
     {
@@ -53,6 +69,13 @@ class AppExtension extends AbstractExtension
         return trim($html);
     }
 
+    /**
+     * Dumps a variable using the helper service in Twig templates.
+     *
+     * @param mixed $var The variable to dump.
+     *
+     * @return void
+     */
     public function dumper(mixed $var): void
     {
         $this->helperServices->dump($var);

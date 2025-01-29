@@ -145,7 +145,7 @@ class CommentaryTableService extends AbstractTableService
     private function getAuthor(Comment $comment): string
     {
         $userModel = new User();
-        $user = $comment->getUserId() ? $userModel->findById($comment->getUserId()) : null;
+        $user      = $comment->getUserId() ? $userModel->findById($comment->getUserId()) : null;
         if ($user instanceof User) {
             return $user->getFirstName() . ' ' . $user->getLastName();
         }

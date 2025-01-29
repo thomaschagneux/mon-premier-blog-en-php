@@ -39,7 +39,7 @@ abstract class AbstractTableService
      * AbstractTableService constructor.
      * Initializes the service with Twig and Router, and sets up the columns.
      *
-     * @param Environment $twig The Twig environment.
+     * @param Environment $twig   The Twig environment.
      * @param Router      $router The router instance.
      */
     public function __construct(Environment $twig, Router $router)
@@ -124,10 +124,10 @@ abstract class AbstractTableService
     /**
      * Generates an HTML link.
      *
-     * @param string                                          $route The route name.
-     * @param string                                          $label The link label.
+     * @param string                                          $route    The route name.
+     * @param string                                          $label    The link label.
      * @param string|null                                     $cssClass The CSS class for the link.
-     * @param array<int|string, string|array<string, string>> $params Parameters for the route.
+     * @param array<int|string, string|array<string, string>> $params   Parameters for the route.
      *
      * @return string The generated link HTML.
      */
@@ -140,7 +140,7 @@ abstract class AbstractTableService
     /**
      * Generates an HTML "Edit" link.
      *
-     * @param string                                          $route The route name.
+     * @param string                                          $route  The route name.
      * @param array<int|string, string|array<string, string>> $params Parameters for the route.
      *
      * @return string The generated "Edit" link HTML.
@@ -153,7 +153,7 @@ abstract class AbstractTableService
     /**
      * Generates an HTML "Delete" link.
      *
-     * @param string                                          $route The route name.
+     * @param string                                          $route  The route name.
      * @param array<int|string, string|array<string, string>> $params Parameters for the route.
      *
      * @return string The generated "Delete" link HTML.
@@ -166,7 +166,7 @@ abstract class AbstractTableService
     /**
      * Generates an HTML "Show" link.
      *
-     * @param string                                          $route The route name.
+     * @param string                                          $route  The route name.
      * @param array<int|string, string|array<string, string>> $params Parameters for the route.
      *
      * @return string The generated "Show" link HTML.
