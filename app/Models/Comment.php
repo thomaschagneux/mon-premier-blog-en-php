@@ -6,29 +6,59 @@ use DateTime;
 use Exception;
 use PDO;
 
+/**
+ * Class Comment
+ * Represents a comment associated with a post and a user, providing methods for CRUD operations.
+ */
 class Comment extends AbstractModel
 {
+    /**
+     * @var int The unique identifier of the comment.
+     */
     private int $id;
 
+    /**
+     * @var string The content of the comment.
+     */
     private string $content;
 
+    /**
+     * @var bool Whether the comment has been validated.
+     */
     private bool $validated = false;
 
+    /**
+     * @var int|null The ID of the associated post.
+     */
     private ?int $post_id = null;
 
+    /**
+     * @var int|null The ID of the user who created the comment.
+     */
     private ?int $user_id = null;
 
+    /**
+     * @var User|null The user associated with the comment.
+     */
     private ?User $user = null;
 
+    /**
+     * Comment constructor.
+     * Initializes the parent AbstractModel constructor.
+     */
     public function __construct()
     {
         parent::__construct();
     }
 
     /**
-     * @param  array<string, mixed>          $data
+     * Creates a Comment instance from an array of data.
+     *
+     * @param array<string, mixed> $data The data to initialize the comment.
+     *
+     * @throws Exception If any date string is malformed.
+     *
      * @return self
-     * @throws \DateMalformedStringException
      */
     public function fromArray(array $data): self
     {
@@ -52,8 +82,11 @@ class Comment extends AbstractModel
     }
 
     /**
-     * @return array<int, Comment>
-     * @throws \DateMalformedStringException
+     * Retrieves all comments from the database.
+     *
+     * @throws Exception If any date string is malformed.
+     *
+     * @return array<int, Comment> An array of Comment objects.
      */
     public function getAllComments(): array
     {
@@ -75,9 +108,13 @@ class Comment extends AbstractModel
     }
 
     /**
-     * @param  int                           $id
-     * @return array<int, Comment>
-     * @throws \DateMalformedStringException
+     * Retrieves comments by post ID.
+     *
+     * @param int $id The ID of the post.
+     *
+     * @throws Exception If any date string is malformed.
+     *
+     * @return array<int, Comment> An array of Comment objects.
      */
     public function getCommentsByPostId(int $id): array
     {
@@ -99,9 +136,13 @@ class Comment extends AbstractModel
     }
 
     /**
-     * @param  int                           $userId
-     * @return array<int, Comment>
-     * @throws \DateMalformedStringException
+     * Retrieves comments by user ID.
+     *
+     * @param int $userId The ID of the user.
+     *
+     * @throws Exception If any date string is malformed.
+     *
+     * @return array<int, Comment> An array of Comment objects.
      */
     public function findcommentsByUserId(int $userId): array
     {
@@ -122,10 +163,14 @@ class Comment extends AbstractModel
     }
 
     /**
-     * @param  int                           $postId
-     * @param  int                           $userId
-     * @return array<int, Comment>
-     * @throws \DateMalformedStringException
+     * Retrieves comments by post ID and user ID.
+     *
+     * @param int $postId The ID of the post.
+     * @param int $userId The ID of the user.
+     *
+     * @throws Exception If any date string is malformed or an error occurs while creating a `DateTime` object.
+     *
+     * @return array<int, Comment> An array of Comment objects that match the given post ID and user ID.
      */
     public function findCommentsByPostIdAndUserId(int $postId, int $userId): array
     {
@@ -146,6 +191,13 @@ class Comment extends AbstractModel
         return [];
     }
 
+    /**
+     * Finds a comment by its ID.
+     *
+     * @param int $id The ID of the comment to find.
+     *
+     * @return self|null The Comment object if found, or null if no comment exists with the given ID.
+     */
     public function findById(int $id): ?self
     {
         if ($this->conn instanceof PDO) {
@@ -161,6 +213,13 @@ class Comment extends AbstractModel
         return null;
     }
 
+    /**
+     * Saves the comment to the database (insert or update).
+     *
+     * @throws Exception If the database connection is unavailable or the query fails.
+     *
+     * @return int The ID of the saved comment.
+     */
     public function save(): int
     {
         // Vérification de la connexion à la base de données
@@ -215,8 +274,11 @@ class Comment extends AbstractModel
     }
 
     /**
-     * @throws Exception
-     * @return bool
+     * Deletes the comment from the database.
+     *
+     * @throws Exception If the database connection is unavailable or the comment ID is invalid.
+     *
+     * @return bool True if the comment was successfully deleted, false otherwise.
      */
     public function remove(): bool
     {
@@ -238,6 +300,13 @@ class Comment extends AbstractModel
 
     }
 
+    /**
+     * Marks the comment as validated.
+     *
+     * @throws Exception If the database connection is unavailable or the comment ID is invalid.
+     *
+     * @return bool True if the comment was successfully validated, false otherwise.
+     */
     public function validate(): bool
     {
         // Vérifiez que la connexion PDO est bien initialisée
@@ -264,64 +333,132 @@ class Comment extends AbstractModel
     }
 
     /**
-     *  GETTERS AND SETTERS
+     * Gets the ID of the comment.
+     *
+     * @return int The comment ID.
      */
-
     public function getId(): int
     {
         return $this->id;
     }
 
+    /**
+     * Sets the ID of the comment.
+     *
+     * @param int $id The comment ID.
+     *
+     * @return void
+     */
     public function setId(int $id): void
     {
         $this->id = $id;
     }
 
+    /**
+     * Gets the content of the comment.
+     *
+     * @return string The content of the comment.
+     */
     public function getContent(): string
     {
         return $this->content;
     }
 
+    /**
+     * Sets the content of the comment.
+     *
+     * @param string $content The content to set for the comment.
+     *
+     * @return void
+     */
     public function setContent(string $content): void
     {
         $this->content = $content;
     }
 
+    /**
+     * Checks if the comment is validated.
+     *
+     * @return bool True if the comment is validated, false otherwise.
+     */
     public function isValidated(): bool
     {
         return $this->validated;
     }
 
+    /**
+     * Sets the validation status of the comment.
+     *
+     * @param bool $validated True to mark the comment as validated, false otherwise.
+     *
+     * @return void
+     */
     public function setValidated(bool $validated): void
     {
         $this->validated = $validated;
     }
 
+    /**
+     * Gets the ID of the associated post.
+     *
+     * @return int|null The ID of the associated post, or null if not set.
+     */
     public function getPostId(): ?int
     {
         return $this->post_id;
     }
 
+    /**
+     * Sets the ID of the associated post.
+     *
+     * @param int|null $post_id The ID of the post to associate with the comment.
+     *
+     * @return void
+     */
     public function setPostId(?int $post_id): void
     {
         $this->post_id = $post_id;
     }
 
+    /**
+     * Gets the ID of the user who created the comment.
+     *
+     * @return int|null The ID of the user, or null if not set.
+     */
     public function getUserId(): ?int
     {
         return $this->user_id;
     }
 
+    /**
+     * Sets the ID of the user who created the comment.
+     *
+     * @param int|null $user_id The ID of the user to associate with the comment.
+     *
+     * @return void
+     */
     public function setUserId(?int $user_id): void
     {
         $this->user_id = $user_id;
     }
 
+    /**
+     * Gets the User object associated with the comment.
+     *
+     * @return User|null The User object, or null if not set.
+     */
     public function getUser(): ?User
     {
         return $this->user;
     }
 
+    /**
+     * Sets the User object associated with the comment.
+     *
+     * @param User|null $user The User object to associate with the comment.
+     *
+     * @return void
+     */
     public function setUser(?User $user): void
     {
         $this->user = $user;

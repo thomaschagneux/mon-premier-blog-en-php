@@ -6,36 +6,74 @@ use DateTime;
 use Exception;
 use PDO;
 
+/**
+ * Class Post
+ * Represents a blog post, including metadata, content, and associations with a user and featured image.
+ */
 class Post extends AbstractModel
 {
+    /**
+     * @var int The unique identifier of the post.
+     */
     private int $id;
 
+    /**
+     * @var string The title of the post.
+     */
     private string $title;
 
+    /**
+     * @var string The lede (short introduction) of the post.
+     */
     private string $lede;
 
+    /**
+     * @var int|null The ID of the featured image associated with the post.
+     */
     private ?int $featured_image_id = null;
 
+    /**
+     * @var Picture|null The featured image associated with the post.
+     */
     private ?Picture $featured_image = null;
 
+    /**
+     * @var string The main content of the post.
+     */
     private string $content;
 
+    /**
+     * @var int|null The ID of the user who created the post.
+     */
     private ?int $user_id = null;
 
+    /**
+     * @var User|null The user who created the post.
+     */
     private ?User $user = null;
 
+    /**
+     * @var int The number of views the post has received.
+     */
     private int $views = 0;
 
+    /**
+     * Post constructor.
+     * Initializes the parent AbstractModel constructor.
+     */
     public function __construct()
     {
         parent::__construct();
     }
 
     /**
-     * @param  array<string, int|string|null> $data
-     * @return self
-     * @throws \DateMalformedStringException
-     * @throws Exception
+     * Populates a Post object from an array of data.
+     *
+     * @param array<string, int|string|null> $data The data to populate the post object.
+     *
+     * @throws Exception If the data contains invalid values.
+     *
+     * @return self The populated Post object.
      */
     public function fromArray(array $data): self
     {
@@ -67,8 +105,11 @@ class Post extends AbstractModel
     }
 
     /**
-     * @return array<int, Post>
-     * @throws \DateMalformedStringException
+     * Retrieves all posts from the database.
+     *
+     * @throws Exception If a date string is malformed.
+     *
+     * @return array<int, Post> An array of Post objects.
      */
     public function getAllPosts(): array
     {
@@ -90,8 +131,11 @@ class Post extends AbstractModel
     }
 
     /**
-     * @param  int              $userId
-     * @return array<int, Post>
+     * Retrieves posts by the user ID.
+     *
+     * @param int $userId The ID of the user.
+     *
+     * @return array<int, Post> An array of Post objects associated with the user.
      */
     public function findPostsByUserId(int $userId): array
     {
@@ -111,6 +155,13 @@ class Post extends AbstractModel
         return [];
     }
 
+    /**
+     * Finds a post by its ID.
+     *
+     * @param int $id The ID of the post.
+     *
+     * @return Post|null The Post object if found, or null otherwise.
+     */
     public function findById(int $id): ?self
     {
         if ($this->conn instanceof PDO) {
@@ -137,6 +188,11 @@ class Post extends AbstractModel
         return null;
     }
 
+    /**
+     * Increments the view count for the post.
+     *
+     * @return void
+     */
     public function incrementViews(): void
     {
         // Incrémenter les vues dans la base de données
@@ -151,6 +207,13 @@ class Post extends AbstractModel
         }
     }
 
+    /**
+     * Saves the post to the database (insert or update).
+     *
+     * @throws Exception If the database connection is unavailable or the query fails.
+     *
+     * @return int The ID of the saved post.
+     */
     public function save(): int
     {
         // Vérification de la connexion à la base de données
@@ -207,8 +270,11 @@ class Post extends AbstractModel
     }
 
     /**
-     * @throws Exception
-     * @return bool
+     * Deletes the post and its associated comments from the database.
+     *
+     * @throws Exception If the database connection is unavailable or the deletion fails.
+     *
+     * @return bool True if the post and comments were successfully deleted, false otherwise.
      */
     public function remove(): bool
     {
@@ -249,94 +315,201 @@ class Post extends AbstractModel
      *  GETTERS AND SETTERS
      */
 
+    /**
+     * Gets the ID of the post.
+     *
+     * @return int The post ID.
+     */
     public function getId(): int
     {
         return $this->id;
     }
 
+    /**
+     * Sets the ID of the post.
+     *
+     * @param int $id The post ID.
+     *
+     * @return void
+     */
     public function setId(int $id): void
     {
         $this->id = $id;
     }
 
+    /**
+     * Gets the title of the post.
+     *
+     * @return string The title of the post.
+     */
     public function getTitle(): string
     {
         return $this->title;
     }
 
+    /**
+     * Sets the title of the post.
+     *
+     * @param string $title The title to set.
+     *
+     * @return void
+     */
     public function setTitle(string $title): void
     {
         $this->title = $title;
     }
 
+    /**
+     * Gets the lede (short introduction) of the post.
+     *
+     * @return string The lede of the post.
+     */
     public function getLede(): string
     {
         return $this->lede;
     }
 
+    /**
+     * Sets the lede of the post.
+     *
+     * @param string $lede The lede to set.
+     *
+     * @return void
+     */
     public function setLede(string $lede): void
     {
         $this->lede = $lede;
     }
 
+    /**
+     * Gets the ID of the featured image.
+     *
+     * @return int|null The ID of the featured image, or null if not set.
+     */
     public function getFeaturedImageId(): ?int
     {
         return $this->featured_image_id;
     }
 
+    /**
+     * Sets the ID of the featured image.
+     *
+     * @param int $featured_image_id The ID of the featured image to set.
+     *
+     * @return void
+     */
     public function setFeaturedImageId(int $featured_image_id): void
     {
         $this->featured_image_id = $featured_image_id;
     }
 
+    /**
+     * Gets the featured image object.
+     *
+     * @return Picture|null The featured image object, or null if not set.
+     */
     public function getFeaturedImage(): ?Picture
     {
         return $this->featured_image;
     }
 
+    /**
+     * Sets the featured image object.
+     *
+     * @param Picture|null $featured_image The featured image object to set.
+     *
+     * @return void
+     */
     public function setFeaturedImage(?Picture $featured_image): void
     {
         $this->featured_image = $featured_image;
     }
 
+    /**
+     * Gets the content of the post.
+     *
+     * @return string The content of the post.
+     */
     public function getContent(): string
     {
         return $this->content;
     }
 
+    /**
+     * Sets the content of the post.
+     *
+     * @param string $content The content to set.
+     *
+     * @return void
+     */
     public function setContent(string $content): void
     {
         $this->content = $content;
     }
 
+    /**
+     * Gets the ID of the user who created the post.
+     *
+     * @return int|null The ID of the user, or null if not set.
+     */
     public function getUserId(): ?int
     {
         return $this->user_id;
     }
 
+    /**
+     * Sets the ID of the user who created the post.
+     *
+     * @param int|null $user_id The ID of the user to set.
+     *
+     * @return void
+     */
     public function setUserId(?int $user_id): void
     {
         $this->user_id = $user_id;
     }
 
+    /**
+     * Gets the user object associated with the post.
+     *
+     * @return User|null The user object, or null if not set.
+     */
     public function getUser(): ?User
     {
         return $this->user;
     }
 
+    /**
+     * Sets the user object associated with the post.
+     *
+     * @param User|null $user The user object to set.
+     *
+     * @return void
+     */
     public function setUser(?User $user): void
     {
         $this->user = $user;
     }
 
+    /**
+     * Gets the number of views for the post.
+     *
+     * @return int The number of views.
+     */
     public function getViews(): int
     {
         return $this->views;
     }
 
+    /**
+     * Sets the number of views for the post.
+     *
+     * @param int $views The number of views to set.
+     *
+     * @return void
+     */
     public function setViews(int $views): void
     {
         $this->views = $views;
     }
-
 }

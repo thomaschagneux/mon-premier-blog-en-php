@@ -6,8 +6,19 @@ use App\Components\FormRowComponent;
 use App\Models\Post;
 use Twig\Environment;
 
+/**
+ * Class PostEditFormService
+ * Provides a form service for editing posts, extending the AbstractFormService.
+ */
 class PostEditFormService extends AbstractFormService
 {
+    /**
+     * PostEditFormService constructor.
+     * Initializes the form service with the Twig environment and a Post model instance.
+     *
+     * @param Environment $twig The Twig environment for rendering templates.
+     * @param Post        $post The Post model instance to edit.
+     */
     public function __construct(
         Environment $twig,
         private readonly Post $post,
@@ -16,7 +27,10 @@ class PostEditFormService extends AbstractFormService
     }
 
     /**
-     * Build the form components and store them in an associative array.
+     * Builds the form components for editing a post and stores them in the form rows array.
+     * The form includes fields for title, lede, content, and an optional cover image.
+     *
+     * @return void
      */
     public function buildForm(): void
     {

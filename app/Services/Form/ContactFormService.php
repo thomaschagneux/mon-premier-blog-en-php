@@ -4,10 +4,17 @@ namespace App\Services\Form;
 
 use App\Components\FormRowComponent;
 
+/**
+ * Class ContactFormService
+ * Provides a form service for building and managing a contact form, extending the AbstractFormService.
+ */
 class ContactFormService extends AbstractFormService
 {
     /**
-     * Build the form components and store them in an associative array.
+     * Builds the form components for the contact form and stores them in the form rows array.
+     * The form includes fields for first name, last name, email, and a message.
+     *
+     * @return void
      */
     public function buildForm(): void
     {
