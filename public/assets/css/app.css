@@ -172,7 +172,7 @@ CSS pour la page de détail d'un post
 }
 
 .card-header {
-    background-color: #007bff;
+    background-color: var(--bs-primary);
     color: #fff;
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
