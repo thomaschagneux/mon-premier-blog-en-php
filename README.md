@@ -10,7 +10,6 @@ Ce projet est un blog simple développé en PHP. Il utilise Composer pour la ges
 - [Configuration](#configuration)
 - [Commandes Makefile](#commandes-makefile)
 - [Contribution](#contribution)
-- [Licence](#licence)
 - [Contact](#contact)
 
 ## Installation
@@ -58,31 +57,22 @@ Authentification utilisateur
 
 Le fichier .env contient les variables d'environnement nécessaires pour configurer le projet. Voici un exemple de configuration :
 
-APP_ENV=local
-APP_DEBUG=true
 APP_URL=http://localhost:8000
 
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=mon_premier_blog
-DB_USERNAME=root
-DB_PASSWORD=
+DB_HOST=127.0.0.1 
+
+DB_NAME=first_blog
+
+DB_USER=first_blog
+
+DB_PASS=first_blog
 
 ## Commandes Makefile
 
 Le projet inclut un Makefile pour simplifier les tâches courantes. Voici les commandes disponibles :
 
-make install : Installer les dépendances du projet.
-make start : Démarrer le serveur de développement PHP.
-make clean : Nettoyer les fichiers générés.
-make help : Afficher ce message d'aide.
-make test : Analyser le code avec phpStan.
-make insert_data : Insérer des données dans la base de données.
-make create_db : Créer la base de données.
-make create_tables : Créer les tables de la base de données.
-make drop_db : Supprimer la base de données.
-make reset : Réinitialiser la base de données (supprimer, créer, insérer des données).
+
+make help : Afficher la liste des commandes make.
 
 ## Contribution
 
@@ -93,10 +83,6 @@ Créer une nouvelle branche pour vos modifications
 Committer vos modifications
 Pousser vos modifications vers votre fork
 Ouvrir une Pull Request
-
-## Licence
-
-Ce projet est sous licence MIT. Voir le fichier LICENSE pour plus de détails.
 
 ## Contact
 
