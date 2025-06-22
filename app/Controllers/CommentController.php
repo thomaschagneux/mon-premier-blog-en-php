@@ -78,7 +78,10 @@ class CommentController extends AbstractController
 
         try {
 
-            $this->getConnectedUser();
+            if (!$this->getConnectedUser()) {
+                $this->cookieManager->setCookie('error_message', 'Vous devez vous connecter pour ajouter un commentaire', 60);
+                return $this->redirectToRoute('login_form');
+            }
 
             $postModel      = new Post();
             $post           = $postModel->findById($postId);
